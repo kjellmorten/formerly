@@ -37,6 +37,21 @@ var formpoly = (function () {
 		el.validity[trueProp] = true;
 	}
 	
+	function _addClass(el, className) {
+		if (el.className === '') {
+			el.className = className;
+		} else if (!(new RegExp("(^|\\s)" + className + "(\\s||$)")).test(el.className)) {
+			el.className += ' ' + className;
+		}
+	}
+	
+	function _removeClass(el, className) {
+		el.className = el.className.replace(new RegExp("(?:^|\\s)" + className + "(?!\\S)"), '');
+		if (el.className.charAt(0) === ' ') {
+			el.className = el.className.substr(1);
+		}
+	}
+	
 	function _checkValueMissing (el) {
 		return ((el.attributes['required'] !== undefined) && !(el.value));
 	}
@@ -81,6 +96,9 @@ var formpoly = (function () {
 		this.validity.typeMismatch = typeMismatch;
 		this.validity.tooLong = tooLong;
 		this.validity.valid = !(valueMissing || typeMismatch || tooLong);
+		
+		_addClass(this, (this.validity.valid) ? 'valid' : 'invalid');
+		_removeClass(this, (this.validity.valid) ? 'invalid' : 'valid');
 
 		return this.validity.valid;
 	}

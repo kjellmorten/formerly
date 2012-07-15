@@ -7,6 +7,96 @@ TestCase("formpolyValidation", {
 		
 		assertTrue(ret);
 		assertTrue(el.validity.valid);
+	},
+	
+	"test should set valid class": function () {
+		var el = createElement("text", "");
+
+		var ret = el.checkValidity();
+		
+		assertEquals('valid', el.className);
+	},
+
+	"test should preserve other class names": function () {
+		var el = createElement("text", "", null, "other class names");
+
+		var ret = el.checkValidity();
+		
+		var classNames = el.className.split(' ');
+		
+		assertEquals(4, classNames.length);
+		assertNotEquals(-1, classNames.indexOf('other'));
+		assertNotEquals(-1, classNames.indexOf('valid'));
+	},
+
+	"test should not add valid class if exists": function () {
+		var el = createElement("text", "", null, "already valid");
+
+		var ret = el.checkValidity();
+		
+		var classNames = el.className.split(' ');
+		
+		assertEquals(2, classNames.length);
+		assertNotEquals(-1, classNames.indexOf('already'));
+		assertNotEquals(-1, classNames.indexOf('valid'));
+	},
+
+	"test should not be fooled by 'valid' in other class names": function () {
+		var el = createElement("text", "", null, "not reallyvalid");
+
+		var ret = el.checkValidity();
+		
+		var classNames = el.className.split(' ');
+		
+		assertEquals(3, classNames.length);
+		assertNotEquals(-1, classNames.indexOf('reallyvalid'));
+		assertNotEquals(-1, classNames.indexOf('valid'));
+	},
+	
+	"test should remove invalid class": function () {
+		var el = createElement("text", "", null, "invalid");
+
+		var ret = el.checkValidity();
+		
+		assertEquals("valid", el.className);
+	},
+
+	"test should remove invalid class among other classes": function () {
+		var el = createElement("text", "", null, "is invalid");
+
+		var ret = el.checkValidity();
+		
+		var classNames = el.className.split(' ');
+		
+		assertEquals(2, classNames.length);
+		assertTrue("Has class 'is'", classNames.indexOf('is') > -1);
+		assertTrue("Has class 'valid'", classNames.indexOf('valid') > -1);
+	},
+
+	"test should not be fooled by 'invalid' in other class names": function () {
+		var el = createElement("text", "", null, "is notinvalid");
+
+		var ret = el.checkValidity();
+		
+		var classNames = el.className.split(' ');
+		
+		assertEquals(3, classNames.length);
+		assertTrue("Has class 'is'", classNames.indexOf('is') > -1);
+		assertTrue("Has class 'valid'", classNames.indexOf('valid') > -1);
+		assertTrue("Has class 'notinvalid'", classNames.indexOf('notinvalid') > -1);
+	},
+
+	"test should not be fooled by 'invalid' at the beginning of other class names": function () {
+		var el = createElement("text", "", null, "is invalidlike");
+
+		var ret = el.checkValidity();
+		
+		var classNames = el.className.split(' ');
+		
+		assertEquals(3, classNames.length);
+		assertTrue("Has class 'is'", classNames.indexOf('is') > -1);
+		assertTrue("Has class 'valid'", classNames.indexOf('valid') > -1);
+		assertTrue("Has class 'notinvalid'", classNames.indexOf('invalidlike') > -1);
 	}
 
 });
@@ -21,6 +111,14 @@ TestCase("formpolyValidationValueMissing", {
 		assertFalse(ret);
 		assertTrue(el.validity.valueMissing);
 		assertFalse(el.validity.valid);
+	},
+	
+	"test should set invalid and remove valid class": function () {
+		var el = createElement("text", "", { required: "required" }, "valid");
+		
+		var ret = el.checkValidity();
+		
+		assertEquals("invalid", el.className);
 	}
 	
 });
