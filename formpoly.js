@@ -12,7 +12,8 @@ var formpoly = (function () {
 	var _elsToValidate = 'text search tel url email password datetime date month week ' +
 						'time datetime-local number range color checkbox radio file ' +
 						'submit select-one select-multiple textarea'.split(' '),
-		_emailRegExp = /^[a-zA-Z][a-zA-Z0-9!#$%&'*+\-\/=?^_`{|}~\.]*@[a-zA-Z0-9\-]+(\.[a-zA-Z0-9\-]+)*$/,
+		_emailRegExp = /^[a-z][a-z0-9!#$%&'*+\-\/=?^_`{|}~\.]*@[a-z0-9\-]+(\.[a-z0-9\-]+)*$/i,
+		_urlRegExp = /^\s*[a-z][a-z0-9+\-\.]+:\/\//i,
 		_validity = {
 						valueMissing: false,
 						typeMismatch: false,
@@ -43,11 +44,14 @@ var formpoly = (function () {
 	function _checkTypeMismatch(el) {
 		var type = el.type;
 		
-		if (type === 'email') {
-			return ((el.value === '') || !_emailRegExp.test(el.value));
+		switch (type) {
+			case 'email':
+				return !((el.value === '') || _emailRegExp.test(el.value));
+			case 'url':
+				return !(_urlRegExp.test(el.value));
+			default:
+				return false;
 		}
-		
-		return false;
 	}
 	
 	function _checkTooLong (el) {

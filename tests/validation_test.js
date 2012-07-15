@@ -25,16 +25,14 @@ TestCase("formpolyValidationValueMissing", {
 	
 });
 
-TestCase("formpolyValidationTypeMismatch", {
+TestCase("formpolyValidationTypeMismatchEmail", {
 	
 	"test should set typeMismatch for invalid email": function () {
 		var el = createElement("email", "noemail");
 		
 		var ret = el.checkValidity();
 		
-		assertFalse(ret);
-		assertTrue(el.validity.typeMismatch);
-		assertFalse(el.validity.valid);
+		assertTypeMismatch(ret, el);
 	},
 	
 	"test should not set typeMismatch for valid email": function () {
@@ -42,11 +40,56 @@ TestCase("formpolyValidationTypeMismatch", {
 		
 		var ret = el.checkValidity();
 		
-		assertTrue(ret);
-		assertFalse(el.validity.typeMismatch);
-		assertTrue(el.validity.valid);
-	}
+		assertNoTypeMismatch(ret, el);
+	},
 	
+	"test should not set typeMismatch for empty string": function () {
+		var el = createElement("email", "");
+		
+		var ret = el.checkValidity();
+		
+		assertNoTypeMismatch(ret, el);
+	}
+
+	
+	// TODO: More tests with different e-mail addresses
+	// TODO: multiple e-mail addresses
+		
+});
+
+TestCase("formpolyValidationTypeMismatchUrl", {
+	
+	"test should set typeMismatch for invalid url": function () {
+		var el = createElement("url", "nourl");
+		
+		var ret = el.checkValidity();
+
+		assertTypeMismatch(ret, el);
+	},
+	
+	"test should set typeMismatch for a relative url": function () {
+		var el = createElement("url", "//www.relative.com/");
+		
+		var ret = el.checkValidity();
+
+		assertTypeMismatch(ret, el);
+	},
+	
+	"test should not set typeMismatch for valid url": function () {
+		var el = createElement("url", "http://www.valid.com/");
+		
+		var ret = el.checkValidity();
+
+		assertNoTypeMismatch(ret, el);
+	},
+
+	"test should not set typeMismatch for valid url surrounded by spaces": function () {
+		var el = createElement("url", " http://www.valid.com/ ");
+		
+		var ret = el.checkValidity();
+
+		assertNoTypeMismatch(ret, el);
+	}
 });
 
 TestCase("formpolyValidationTooLong", {
@@ -81,3 +124,15 @@ TestCase("formpolyValidationTooLong", {
 	}
 	
 });
+
+function assertTypeMismatch (ret, el) {
+	assertFalse(ret);
+	assertTrue(el.validity.typeMismatch);
+	assertFalse(el.validity.valid);
+}
+
+function assertNoTypeMismatch (ret, el) {
+	assertTrue(ret);
+	assertFalse(el.validity.typeMismatch);
+	assertTrue(el.validity.valid);
+}
