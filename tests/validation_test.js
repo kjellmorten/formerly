@@ -17,9 +17,7 @@ TestCase("formerlyValidationValueMissing", {
 		
 		var ret = el.checkValidity();
 		
-		assertFalse(ret);
-		assertTrue(el.validity.valueMissing);
-		assertFalse(el.validity.valid);
+		assertInvalid(ret, el, 'valueMissing');
 	},
 	
 	"test should not set valueMissing": function () {
@@ -27,9 +25,7 @@ TestCase("formerlyValidationValueMissing", {
 		
 		var ret = el.checkValidity();
 		
-		assertTrue(ret);
-		assertFalse(el.validity.valueMissing);
-		assertTrue(el.validity.valid);
+		assertValid(ret, el, 'valueMissing');
 	},
 
 	"test should not clear customError on checkValidity": function () {
@@ -63,7 +59,7 @@ TestCase("formerlyValidationTypeMismatchEmail", {
 		
 		var ret = el.checkValidity();
 		
-		assertTypeMismatch(ret, el);
+		assertInvalid(ret, el, 'typeMismatch');
 	},
 	
 	"test should not set typeMismatch for valid email": function () {
@@ -71,7 +67,7 @@ TestCase("formerlyValidationTypeMismatchEmail", {
 		
 		var ret = el.checkValidity();
 		
-		assertNoTypeMismatch(ret, el);
+		assertValid(ret, el, 'typeMismatch');
 	},
 	
 	"test should not set typeMismatch for empty string": function () {
@@ -79,7 +75,7 @@ TestCase("formerlyValidationTypeMismatchEmail", {
 		
 		var ret = el.checkValidity();
 		
-		assertNoTypeMismatch(ret, el);
+		assertValid(ret, el, 'typeMismatch');
 	}
 
 	
@@ -95,7 +91,7 @@ TestCase("formerlyValidationTypeMismatchUrl", {
 		
 		var ret = el.checkValidity();
 
-		assertTypeMismatch(ret, el);
+		assertInvalid(ret, el, 'typeMismatch');
 	},
 	
 	"test should set typeMismatch for a relative url": function () {
@@ -103,7 +99,7 @@ TestCase("formerlyValidationTypeMismatchUrl", {
 		
 		var ret = el.checkValidity();
 
-		assertTypeMismatch(ret, el);
+		assertInvalid(ret, el, 'typeMismatch');
 	},
 	
 	"test should not set typeMismatch for valid url": function () {
@@ -111,7 +107,7 @@ TestCase("formerlyValidationTypeMismatchUrl", {
 		
 		var ret = el.checkValidity();
 
-		assertNoTypeMismatch(ret, el);
+		assertValid(ret, el, 'typeMismatch');
 	},
 
 	"test should not set typeMismatch for valid url surrounded by spaces": function () {
@@ -119,7 +115,7 @@ TestCase("formerlyValidationTypeMismatchUrl", {
 		
 		var ret = el.checkValidity();
 
-		assertNoTypeMismatch(ret, el);
+		assertValid(ret, el, 'typeMismatch');
 	},
 
 	"test should not set typeMismatch for empty string": function () {
@@ -127,7 +123,7 @@ TestCase("formerlyValidationTypeMismatchUrl", {
 		
 		var ret = el.checkValidity();
 		
-		assertNoTypeMismatch(ret, el);
+		assertValid(ret, el, 'typeMismatch');
 	}
 });
 
@@ -138,9 +134,7 @@ TestCase("formerlyValidationPatternMismatch", {
 
 		var ret = el.checkValidity();
 		
-		assertFalse(ret);
-		assertTrue(el.validity.patternMismatch);
-		assertFalse(el.validity.valid);
+		assertInvalid(ret, el, 'patternMismatch');
 	},
 	
 	"test should not set patternMismatch on match": function () {
@@ -148,29 +142,26 @@ TestCase("formerlyValidationPatternMismatch", {
 
 		var ret = el.checkValidity();
 		
-		assertTrue(ret);
-		assertFalse(el.validity.patternMismatch);
-		assertTrue(el.validity.valid);
+		assertValid(ret, el, 'patternMismatch');
 	},
 
 	"test should not set patternMismatch on invalid pattern": function () {
 		var el = createElement("text", "123", { pattern: '[z-a]' });
 
+		var ret;
 		assertNoException(function () {
-			el.checkValidity();
+			ret = el.checkValidity();
 		});
 		
-		assertFalse(el.validity.patternMismatch);
-		assertTrue(el.validity.valid);
+		assertValid(ret, el, 'patternMismatch');
 	},
 
 	"test should not set patternMismatch empty value": function () {
 		var el = createElement("text", "", { pattern: '\\d+' });
 
-		el.checkValidity();
+		var ret = el.checkValidity();
 		
-		assertFalse(el.validity.patternMismatch);
-		assertTrue(el.validity.valid);
+		assertValid(ret, el, 'patternMismatch');
 	}
 	
 	// TODO: Multiple
@@ -180,34 +171,141 @@ TestCase("formerlyValidationPatternMismatch", {
 TestCase("formerlyValidationTooLong", {
 	
 	"test should set tooLong": function () {
-		var el = createElement("text", "Longer than 20 characters", { maxlength: 20 });
+		var el = createElement("text", "Longer than 20 characters", { maxlength: "20" });
 		
 		var ret = el.checkValidity();
 		
-		assertFalse(ret);
-		assertTrue(el.validity.tooLong);
-		assertFalse(el.validity.valid);
+		assertInvalid(ret, el, 'tooLong');
 	},
 	
 	"test should not set tooLong for shorter string": function () {
-		var el = createElement("text", "Shorter than 20", { maxlength: 20 });
+		var el = createElement("text", "Shorter than 20", { maxlength: "20" });
 		
 		var ret = el.checkValidity();
 		
-		assertTrue(ret);
-		assertFalse(el.validity.tooLong);
-		assertTrue(el.validity.valid);
+		assertValid(ret, el, 'tooLong');
 	},
 
 	"test should not set tooLong for empty string": function () {
-		var el = createElement("text", "", { maxlength: 20 });
+		var el = createElement("text", "", { maxlength: "20" });
 		
 		var ret = el.checkValidity();
 		
-		assertTrue(ret);
-		assertFalse(el.validity.tooLong);
+		assertValid(ret, el, 'tooLong');
+	},
+
+	"test should not set tooLong with illegal maxlength": function () {
+		var el = createElement("text", "", { maxlength: "illegal" });
+		
+		var ret = el.checkValidity();
+		
+		assertValid(ret, el, 'tooLong');
 	}
 	
+});
+
+TestCase("formerlyValidationRangeUnderflow", {
+	
+	"test should set rangeUnderflow": function () {
+		var el = createElement("number", "8", { min: "10" });
+		
+		var ret = el.checkValidity();
+		
+		assertInvalid(ret, el, 'rangeUnderflow');
+	},
+
+	"test should not set rangeUnderflow": function () {
+		var el = createElement("number", "11", { min: "10" });
+		
+		var ret = el.checkValidity();
+		
+		assertValid(ret, el, 'rangeUnderflow');
+	},
+
+	"test should not set rangeUnderflow when equal": function () {
+		var el = createElement("number", "10", { min: "10" });
+		
+		var ret = el.checkValidity();
+		
+		assertValid(ret, el, 'rangeUnderflow');
+	},
+
+	"test should not set rangeUnderflow for empty string": function () {
+		var el = createElement("number", "", { min: "10" });
+		
+		var ret = el.checkValidity();
+		
+		assertValid(ret, el, 'rangeUnderflow');
+	},
+
+	"test should not set rangeUnderflow with illegal min": function () {
+		var el = createElement("number", "8", { min: "illegal" });
+		
+		var ret = el.checkValidity();
+		
+		assertValid(ret, el, 'rangeUnderflow');
+	},
+
+	"test should not set rangeUnderflow with illegal value": function () {
+		var el = createElement("number", "illegal", { min: "10" });
+		
+		var ret = el.checkValidity();
+		
+		assertValid(ret, el, 'rangeUnderflow');
+	}
+	
+});
+
+TestCase("formerlyValidationRangeOverflow", {
+	
+	"test should set rangeOverflow": function () {
+		var el = createElement("number", "12", { max: "10" });
+		
+		var ret = el.checkValidity();
+		
+		assertInvalid(ret, el, 'rangeOverflow');
+	},
+
+	"test should not set rangeOverflow": function () {
+		var el = createElement("number", "9", { max: "10" });
+		
+		var ret = el.checkValidity();
+		
+		assertValid(ret, el, 'rangeOverflow');
+	},
+
+	"test should not set rangeOverflow when equal": function () {
+		var el = createElement("number", "10", { max: "10" });
+		
+		var ret = el.checkValidity();
+		
+		assertValid(ret, el, 'rangeOverflow');
+	},
+
+	"test should not set rangeOverflow when empty string": function () {
+		var el = createElement("number", "", { max: "10" });
+		
+		var ret = el.checkValidity();
+		
+		assertValid(ret, el, 'rangeOverflow');
+	},
+
+	"test should not set rangeOverflow with illegal max": function () {
+		var el = createElement("number", "12", { max: "illegal" });
+		
+		var ret = el.checkValidity();
+		
+		assertValid(ret, el, 'rangeOverflow');
+	},
+
+	"test should not set rangeOverflow with illegal value": function () {
+		var el = createElement("number", "illegal", { max: "10" });
+		
+		var ret = el.checkValidity();
+		
+		assertValid(ret, el, 'rangeOverflow');
+	}
+
 });
 
 TestCase("formerlyValidationClassNames", {	
@@ -319,14 +417,14 @@ TestCase("formerlyValidationClassNames", {
 
 });
 
-function assertTypeMismatch (ret, el) {
+function assertInvalid (ret, el, validityState) {
 	assertFalse(ret);
-	assertTrue(el.validity.typeMismatch);
+	assertTrue(el.validity[validityState]);
 	assertFalse(el.validity.valid);
 }
 
-function assertNoTypeMismatch (ret, el) {
+function assertValid (ret, el, validityState) {
 	assertTrue(ret);
-	assertFalse(el.validity.typeMismatch);
+	assertFalse(el.validity[validityState]);
 	assertTrue(el.validity.valid);
 }

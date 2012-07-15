@@ -76,6 +76,28 @@ var formerly = (function () {
 		var maxlength = el.attributes['maxlength'];
 		return ((maxlength !== undefined) && (el.value.length > parseInt(maxlength)));
 	}
+	
+	function _checkRangeUnderflow (el) {
+		var val, min;
+		if ((el.value !== '') && (el.attributes['min'] !== undefined)) {
+			val = parseFloat(el.value);
+			min = parseFloat(el.attributes['min']);
+			return (min > val);
+		}
+		
+		return false;
+	}
+
+	function _checkRangeOverflow (el) {
+		var val, max;
+		if ((el.value !== '') && (el.attributes['max'] !== undefined)) {
+			val = parseFloat(el.value);
+			max = parseFloat(el.attributes['max']);
+			return (val > max);
+		}
+	
+		return false;
+	}
 
 	/*
 	 * Constraints interface
@@ -95,13 +117,17 @@ var formerly = (function () {
 			typeMismatch = _checkTypeMismatch(this),
 			patternMismatch = _checkPatternMismatch(this),
 			tooLong = _checkTooLong(this),
+			rangeUnderflow = _checkRangeUnderflow(this),
+			rangeOverflow = _checkRangeOverflow(this),
 			customError = this.validity.customError;
 
 		this.validity.valueMissing = valueMissing;
 		this.validity.typeMismatch = typeMismatch;
 		this.validity.patternMismatch = patternMismatch;
 		this.validity.tooLong = tooLong;
-		this.validity.valid = !(valueMissing || typeMismatch || patternMismatch || tooLong || customError);
+		this.validity.rangeUnderflow = rangeUnderflow;
+		this.validity.rangeOverflow = rangeOverflow;
+		this.validity.valid = !(valueMissing || typeMismatch || patternMismatch || tooLong || rangeUnderflow || rangeOverflow || customError);
 		
 		_addClass(this, (this.validity.valid) ? 'valid' : 'invalid');
 		_removeClass(this, (this.validity.valid) ? 'invalid' : 'valid');
