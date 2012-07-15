@@ -1,14 +1,14 @@
 /*
-* h5formPoly
+* formpoly
 *
-* @package h5formPoly
+* @package formpoly
 * @author $Author: kjellmorten $
-* @version $Id: h5formPoly.js, v 0.1 $
+* @version $Id: formpoly.js, v 0.1 $
 * @license GNU
 * @copyright (c) Kjell-Morten Bratsberg Thorsen http://kjellmorten.no/
 */
 
-var h5formPoly = (function () {
+var formpoly = (function () {
 	var _elsToValidate = 'text search tel url email password datetime date month week ' +
 						'time datetime-local number range color checkbox radio file ' +
 						'submit select-one select-multiple textarea'.split(' '),
@@ -34,6 +34,10 @@ var h5formPoly = (function () {
 		}
 		el.validity[trueProp] = true;
 	}
+	
+	function _checkRequired (el) {
+		return ((el.attributes['required'] !== undefined) && !(el.value));
+	}
 
 	/*
 	 * Constraints interface
@@ -49,6 +53,11 @@ var h5formPoly = (function () {
 	}
 	
 	function _checkValidity () {
+		var valueMissing = _checkRequired(this);
+		if (valueMissing) {
+			_setValidity (this, 'valueMissing');
+		}
+		return !valueMissing;
 	}
 
 
@@ -74,7 +83,7 @@ var h5formPoly = (function () {
 	}
 	
 	/*
-	 * The h5formPoly object.
+	 * The formpoly object.
 	 */
 	
 	return {
