@@ -4,7 +4,7 @@
 * @package formerly
 * @author $Author: kjellmorten $
 * @version $Id: formerly.js, v 0.1 $
-* @license GNU
+* @license BSD
 * @copyright (c) Kjell-Morten Bratsberg Thorsen http://kjellmorten.no/
 */
 
