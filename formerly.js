@@ -98,6 +98,22 @@ var formerly = (function () {
 	
 		return false;
 	}
+	
+	function _checkStepMismatch (el) {
+		var val, step, min;
+		if ((el.value !== '') && (el.attributes['step'] !== undefined)) {
+			val = parseFloat(el.value);
+			step = parseFloat(el.attributes['step']);
+			if ((val) && (step)) {
+				if ((el.attributes['min'] !== undefined) && (min = parseFloat(el.attributes['min']))) {
+					val -= min;
+				}
+				return ((val % step) !== 0);
+			}
+		}
+		
+		return false;
+	}
 
 	/*
 	 * Constraints interface
@@ -119,6 +135,7 @@ var formerly = (function () {
 			tooLong = _checkTooLong(this),
 			rangeUnderflow = _checkRangeUnderflow(this),
 			rangeOverflow = _checkRangeOverflow(this),
+			stepMismatch = _checkStepMismatch(this),
 			customError = this.validity.customError;
 
 		this.validity.valueMissing = valueMissing;
@@ -127,7 +144,8 @@ var formerly = (function () {
 		this.validity.tooLong = tooLong;
 		this.validity.rangeUnderflow = rangeUnderflow;
 		this.validity.rangeOverflow = rangeOverflow;
-		this.validity.valid = !(valueMissing || typeMismatch || patternMismatch || tooLong || rangeUnderflow || rangeOverflow || customError);
+		this.validity.stepMismatch = stepMismatch;
+		this.validity.valid = !(valueMissing || typeMismatch || patternMismatch || tooLong || rangeUnderflow || rangeOverflow || stepMismatch || customError);
 		
 		_addClass(this, (this.validity.valid) ? 'valid' : 'invalid');
 		_removeClass(this, (this.validity.valid) ? 'invalid' : 'valid');

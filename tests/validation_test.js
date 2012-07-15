@@ -308,6 +308,66 @@ TestCase("formerlyValidationRangeOverflow", {
 
 });
 
+TestCase("formerlyValidationStepMismatch", {
+
+	"test should set stepMismatch": function () {
+		var el = createElement("number", "1.5", { step: "1" });
+		
+		var ret = el.checkValidity();
+		
+		assertInvalid(ret, el, 'stepMismatch');
+	},
+
+	"test should not set stepMismatch": function () {
+		var el = createElement("number", "2", { step: "1" });
+		
+		var ret = el.checkValidity();
+		
+		assertValid(ret, el, 'stepMismatch');
+	},
+
+	"test should not set stepMismatch when valid steps from min": function () {
+		var el = createElement("number", "3.5", { step: "1", min: "0.5" });
+		
+		var ret = el.checkValidity();
+		
+		assertValid(ret, el, 'stepMismatch');
+	},
+
+	"test should not set stepMismatch with empty string": function () {
+		var el = createElement("number", "", { step: "1" });
+		
+		var ret = el.checkValidity();
+		
+		assertValid(ret, el, 'stepMismatch');
+	},
+
+	"test should not set stepMismatch with illegal step": function () {
+		var el = createElement("number", "3.5", { step: "illegal" });
+		
+		var ret = el.checkValidity();
+		
+		assertValid(ret, el, 'stepMismatch');
+	},
+
+	"test should not set stepMismatch with step 'any'": function () {
+		var el = createElement("number", "3.5", { step: "any" });
+		
+		var ret = el.checkValidity();
+		
+		assertValid(ret, el, 'stepMismatch');
+	},
+
+	"test should not set stepMismatch with illegal value": function () {
+		var el = createElement("number", "illegal", { step: "1" });
+		
+		var ret = el.checkValidity();
+		
+		assertValid(ret, el, 'stepMismatch');
+	}
+
+});
+
 TestCase("formerlyValidationClassNames", {	
 	"test should set valid class": function () {
 		var el = createElement("text", "");
