@@ -7,14 +7,232 @@ TestCase("formpolyValidation", {
 		
 		assertTrue(ret);
 		assertTrue(el.validity.valid);
+	}
+});
+
+TestCase("formpolyValidationValueMissing", {
+	
+	"test should set valueMissing": function () {
+		var el = createElement("text", "", { required: "required" });
+		
+		var ret = el.checkValidity();
+		
+		assertFalse(ret);
+		assertTrue(el.validity.valueMissing);
+		assertFalse(el.validity.valid);
 	},
 	
+	"test should not set valueMissing": function () {
+		var el = createElement("text", "A value", { required: "required" }, "valid");
+		
+		var ret = el.checkValidity();
+		
+		assertTrue(ret);
+		assertFalse(el.validity.valueMissing);
+		assertTrue(el.validity.valid);
+	},
+
+	"test should not clear customError on checkValidity": function () {
+		var el = createElement("text", "");
+
+		el.setCustomValidity('A message');
+		el.checkValidity();
+		
+		assertTrue(el.validity.customError);
+		assertEquals('A message', el.validationMessage);
+		assertFalse(el.validity.valid);
+	},
+
+	"test should not clear customError on checkValidity with other invalidity": function () {
+		var el = createElement("text", "", { required: "required" });
+
+		el.setCustomValidity('A message');
+		el.checkValidity();
+		
+		assertTrue(el.validity.customError);
+		assertEquals('A message', el.validationMessage);
+		assertFalse(el.validity.valid);
+	}
+	
+});
+
+TestCase("formpolyValidationTypeMismatchEmail", {
+	
+	"test should set typeMismatch for invalid email": function () {
+		var el = createElement("email", "noemail");
+		
+		var ret = el.checkValidity();
+		
+		assertTypeMismatch(ret, el);
+	},
+	
+	"test should not set typeMismatch for valid email": function () {
+		var el = createElement("email", "email@company.com");
+		
+		var ret = el.checkValidity();
+		
+		assertNoTypeMismatch(ret, el);
+	},
+	
+	"test should not set typeMismatch for empty string": function () {
+		var el = createElement("email", "");
+		
+		var ret = el.checkValidity();
+		
+		assertNoTypeMismatch(ret, el);
+	}
+
+	
+	// TODO: More tests with different e-mail addresses
+	// TODO: multiple e-mail addresses
+		
+});
+
+TestCase("formpolyValidationTypeMismatchUrl", {
+	
+	"test should set typeMismatch for invalid url": function () {
+		var el = createElement("url", "nourl");
+		
+		var ret = el.checkValidity();
+
+		assertTypeMismatch(ret, el);
+	},
+	
+	"test should set typeMismatch for a relative url": function () {
+		var el = createElement("url", "//www.relative.com/");
+		
+		var ret = el.checkValidity();
+
+		assertTypeMismatch(ret, el);
+	},
+	
+	"test should not set typeMismatch for valid url": function () {
+		var el = createElement("url", "http://www.valid.com/");
+		
+		var ret = el.checkValidity();
+
+		assertNoTypeMismatch(ret, el);
+	},
+
+	"test should not set typeMismatch for valid url surrounded by spaces": function () {
+		var el = createElement("url", " http://www.valid.com/ ");
+		
+		var ret = el.checkValidity();
+
+		assertNoTypeMismatch(ret, el);
+	},
+
+	"test should not set typeMismatch for empty string": function () {
+		var el = createElement("url", "");
+		
+		var ret = el.checkValidity();
+		
+		assertNoTypeMismatch(ret, el);
+	}
+});
+
+TestCase("formpolyValidationPatternMismatch", {
+
+	"test should set patternMismatch": function () {
+		var el = createElement("text", "letters", { pattern: '\\d*' });
+
+		var ret = el.checkValidity();
+		
+		assertFalse(ret);
+		assertTrue(el.validity.patternMismatch);
+		assertFalse(el.validity.valid);
+	},
+	
+	"test should not set patternMismatch on match": function () {
+		var el = createElement("text", "123", { pattern: '\\d*' });
+
+		var ret = el.checkValidity();
+		
+		assertTrue(ret);
+		assertFalse(el.validity.patternMismatch);
+		assertTrue(el.validity.valid);
+	},
+
+	"test should not set patternMismatch on invalid pattern": function () {
+		var el = createElement("text", "123", { pattern: '[z-a]' });
+
+		assertNoException(function () {
+			el.checkValidity();
+		});
+		
+		assertFalse(el.validity.patternMismatch);
+		assertTrue(el.validity.valid);
+	},
+
+	"test should not set patternMismatch empty value": function () {
+		var el = createElement("text", "", { pattern: '\\d+' });
+
+		el.checkValidity();
+		
+		assertFalse(el.validity.patternMismatch);
+		assertTrue(el.validity.valid);
+	}
+	
+	// TODO: Multiple
+	
+});
+
+TestCase("formpolyValidationTooLong", {
+	
+	"test should set tooLong": function () {
+		var el = createElement("text", "Longer than 20 characters", { maxlength: 20 });
+		
+		var ret = el.checkValidity();
+		
+		assertFalse(ret);
+		assertTrue(el.validity.tooLong);
+		assertFalse(el.validity.valid);
+	},
+	
+	"test should not set tooLong for shorter string": function () {
+		var el = createElement("text", "Shorter than 20", { maxlength: 20 });
+		
+		var ret = el.checkValidity();
+		
+		assertTrue(ret);
+		assertFalse(el.validity.tooLong);
+		assertTrue(el.validity.valid);
+	},
+
+	"test should not set tooLong for empty string": function () {
+		var el = createElement("text", "", { maxlength: 20 });
+		
+		var ret = el.checkValidity();
+		
+		assertTrue(ret);
+		assertFalse(el.validity.tooLong);
+	}
+	
+});
+
+TestCase("formpolyValidationClassNames", {	
 	"test should set valid class": function () {
 		var el = createElement("text", "");
 
 		var ret = el.checkValidity();
 		
 		assertEquals('valid', el.className);
+	},
+
+	"test should set valid class and remove invalid class": function () {
+		var el = createElement("text", "invalid");
+
+		var ret = el.checkValidity();
+		
+		assertEquals('valid', el.className);
+	},
+
+	"test should set invalid and remove valid class": function () {
+		var el = createElement("text", "", { required: "required" }, "valid");
+		
+		var ret = el.checkValidity();
+		
+		assertEquals("invalid", el.className);
 	},
 
 	"test should preserve other class names": function () {
@@ -99,128 +317,6 @@ TestCase("formpolyValidation", {
 		assertTrue("Has class 'notinvalid'", classNames.indexOf('invalidlike') > -1);
 	}
 
-});
-
-TestCase("formpolyValidationValueMissing", {
-	
-	"test should set valueMissing": function () {
-		var el = createElement("text", "", { required: "required" });
-		
-		var ret = el.checkValidity();
-		
-		assertFalse(ret);
-		assertTrue(el.validity.valueMissing);
-		assertFalse(el.validity.valid);
-	},
-	
-	"test should set invalid and remove valid class": function () {
-		var el = createElement("text", "", { required: "required" }, "valid");
-		
-		var ret = el.checkValidity();
-		
-		assertEquals("invalid", el.className);
-	}
-	
-});
-
-TestCase("formpolyValidationTypeMismatchEmail", {
-	
-	"test should set typeMismatch for invalid email": function () {
-		var el = createElement("email", "noemail");
-		
-		var ret = el.checkValidity();
-		
-		assertTypeMismatch(ret, el);
-	},
-	
-	"test should not set typeMismatch for valid email": function () {
-		var el = createElement("email", "email@company.com");
-		
-		var ret = el.checkValidity();
-		
-		assertNoTypeMismatch(ret, el);
-	},
-	
-	"test should not set typeMismatch for empty string": function () {
-		var el = createElement("email", "");
-		
-		var ret = el.checkValidity();
-		
-		assertNoTypeMismatch(ret, el);
-	}
-
-	
-	// TODO: More tests with different e-mail addresses
-	// TODO: multiple e-mail addresses
-		
-});
-
-TestCase("formpolyValidationTypeMismatchUrl", {
-	
-	"test should set typeMismatch for invalid url": function () {
-		var el = createElement("url", "nourl");
-		
-		var ret = el.checkValidity();
-
-		assertTypeMismatch(ret, el);
-	},
-	
-	"test should set typeMismatch for a relative url": function () {
-		var el = createElement("url", "//www.relative.com/");
-		
-		var ret = el.checkValidity();
-
-		assertTypeMismatch(ret, el);
-	},
-	
-	"test should not set typeMismatch for valid url": function () {
-		var el = createElement("url", "http://www.valid.com/");
-		
-		var ret = el.checkValidity();
-
-		assertNoTypeMismatch(ret, el);
-	},
-
-	"test should not set typeMismatch for valid url surrounded by spaces": function () {
-		var el = createElement("url", " http://www.valid.com/ ");
-		
-		var ret = el.checkValidity();
-
-		assertNoTypeMismatch(ret, el);
-	}
-});
-
-TestCase("formpolyValidationTooLong", {
-	
-	"test should set tooLong": function () {
-		var el = createElement("text", "Longer than 20 characters", { maxlength: 20 });
-		
-		var ret = el.checkValidity();
-		
-		assertFalse(ret);
-		assertTrue(el.validity.tooLong);
-		assertFalse(el.validity.valid);
-	},
-	
-	"test should not set tooLong for shorter string": function () {
-		var el = createElement("text", "Shorter than 20", { maxlength: 20 });
-		
-		var ret = el.checkValidity();
-		
-		assertTrue(ret);
-		assertFalse(el.validity.tooLong);
-		assertTrue(el.validity.valid);
-	},
-
-	"test should not set tooLong for empty string": function () {
-		var el = createElement("text", "", { maxlength: 20 });
-		
-		var ret = el.checkValidity();
-		
-		assertTrue(ret);
-		assertFalse(el.validity.tooLong);
-	}
-	
 });
 
 function assertTypeMismatch (ret, el) {
