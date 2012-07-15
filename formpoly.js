@@ -12,6 +12,7 @@ var formpoly = (function () {
 	var _elsToValidate = 'text search tel url email password datetime date month week ' +
 						'time datetime-local number range color checkbox radio file ' +
 						'submit select-one select-multiple textarea'.split(' '),
+		_emailRegExp = /^[a-zA-Z][a-zA-Z0-9!#$%&'*+\-\/=?^_`{|}~\.]*@[a-zA-Z0-9\-]+(\.[a-zA-Z0-9\-]+)*$/,
 		_validity = {
 						valueMissing: false,
 						typeMismatch: false,
@@ -35,8 +36,23 @@ var formpoly = (function () {
 		el.validity[trueProp] = true;
 	}
 	
-	function _checkRequired (el) {
+	function _checkValueMissing (el) {
 		return ((el.attributes['required'] !== undefined) && !(el.value));
+	}
+	
+	function _checkTypeMismatch(el) {
+		var type = el.type;
+		
+		if (type === 'email') {
+			return ((el.value === '') || !_emailRegExp.test(el.value));
+		}
+		
+		return false;
+	}
+	
+	function _checkTooLong (el) {
+		var maxlength = el.attributes['maxlength'];
+		return ((maxlength !== undefined) && (el.value.length > parseInt(maxlength)));
 	}
 
 	/*
@@ -53,11 +69,16 @@ var formpoly = (function () {
 	}
 	
 	function _checkValidity () {
-		var valueMissing = _checkRequired(this);
-		if (valueMissing) {
-			_setValidity (this, 'valueMissing');
-		}
-		return !valueMissing;
+		var valueMissing = _checkValueMissing(this),
+			typeMismatch = _checkTypeMismatch(this),
+			tooLong = _checkTooLong(this);
+
+		this.validity.valueMissing = valueMissing;
+		this.validity.typeMismatch = typeMismatch;
+		this.validity.tooLong = tooLong;
+		this.validity.valid = !(valueMissing || typeMismatch || tooLong);
+
+		return this.validity.valid;
 	}
 
 
