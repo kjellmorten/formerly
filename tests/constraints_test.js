@@ -1,4 +1,4 @@
-TestCase("formpolyElementConstraintInterface", {
+TestCase("formerlyElementConstraintInterface", {
 
 	setUp: function () {
 		this.func = function () {};
@@ -15,61 +15,61 @@ TestCase("formpolyElementConstraintInterface", {
 	},
 	
 	"test should set willValidate attribute": function () {
-		formpoly.initElement(this.unsupEl);
+		formerly.initElement(this.unsupEl);
 		
 		assertBoolean(this.unsupEl.willValidate);
 	},
 	
 	"test should not set willValidate when existing": function () {
-		formpoly.initElement(this.supEl);
+		formerly.initElement(this.supEl);
 		
 		assertSame(this.obj, this.supEl.willValidate);
 	},
 
 	"test should set setCustomValidity function": function () {
-		formpoly.initElement(this.unsupEl);
+		formerly.initElement(this.unsupEl);
 		
 		assertFunction(this.unsupEl.setCustomValidity);
 	},
 		
 	"test should not set setCustomValidity when existing": function () {
-		formpoly.initElement(this.supEl);
+		formerly.initElement(this.supEl);
 		
 		assertSame(this.func, this.supEl.setCustomValidity);
 	},
 
 	"test should set validity object": function () {
-		formpoly.initElement(this.unsupEl);
+		formerly.initElement(this.unsupEl);
 		
 		assertObject(this.unsupEl.validity);
 	},
 	
 	"test should not set validity object when existing": function () {
-		formpoly.initElement(this.supEl);
+		formerly.initElement(this.supEl);
 		
 		assertSame(this.obj, this.supEl.validity);
 	},
 
 	"test should set checkValidity function": function () {
-		formpoly.initElement(this.unsupEl);
+		formerly.initElement(this.unsupEl);
 		
 		assertFunction(this.unsupEl.checkValidity);
 	},
 
 	"test should not set checkValidity when existing": function () {
-		formpoly.initElement(this.supEl);
+		formerly.initElement(this.supEl);
 		
 		assertSame(this.func, this.supEl.checkValidity);
 	},
 
 	"test should set validationMessage": function () {
-		formpoly.initElement(this.unsupEl);
+		formerly.initElement(this.unsupEl);
 		
 		assertString(this.unsupEl.validationMessage);
 	},
 	
 	"test should not set validationMessage when existing": function () {
-		formpoly.initElement(this.supEl);
+		formerly.initElement(this.supEl);
 		
 		assertSame(this.obj, this.supEl.validationMessage);
 	},
@@ -82,7 +82,7 @@ TestCase("formpolyElementConstraintInterface", {
 			validationMessage: this.obj
 		}
 
-		formpoly.initElement(partlySupEl);
+		formerly.initElement(partlySupEl);
 		
 		assertFunction(partlySupEl.checkValidity);
 		assertNotSame(this.func, partlySupEl.setCustomValidity);
@@ -94,7 +94,7 @@ TestCase("formpolyElementConstraintInterface", {
 });
 
 
-TestCase("formpolyElementWillValidate", {
+TestCase("formerlyElementWillValidate", {
 
 	"test should return false for hidden input": function () {
 		var el = createElement('hidden');
@@ -284,69 +284,69 @@ TestCase("formpolyElementWillValidate", {
 	
 });
 
-TestCase("formpolyElementValidityInterface", {
+TestCase("formerlyElementValidityInterface", {
 
 	setUp: function () {
 		this.unsupEl = {};
 	},
 
 	"test should set validity.valueMissing": function () {
-		formpoly.initElement(this.unsupEl);
+		formerly.initElement(this.unsupEl);
 		
 		assertFalse(this.unsupEl.validity.valueMissing);
 	},
 	
 	"test should set validity.typeMismatch": function () {
-		formpoly.initElement(this.unsupEl);
+		formerly.initElement(this.unsupEl);
 		
 		assertFalse(this.unsupEl.validity.typeMismatch);
 	},
 	
 	"test should set validity.patternMismatch": function () {
-		formpoly.initElement(this.unsupEl);
+		formerly.initElement(this.unsupEl);
 		
 		assertFalse(this.unsupEl.validity.patternMismatch);
 	},
 	
 	"test should set validity.tooLong": function () {
-		formpoly.initElement(this.unsupEl);
+		formerly.initElement(this.unsupEl);
 		
 		assertFalse(this.unsupEl.validity.tooLong);
 	},
 	
 	"test should set validity.rangeUnderflow": function () {
-		formpoly.initElement(this.unsupEl);
+		formerly.initElement(this.unsupEl);
 		
 		assertFalse(this.unsupEl.validity.rangeUnderflow);
 	},
 	
 	"test should set validity.rangeOverflow": function () {
-		formpoly.initElement(this.unsupEl);
+		formerly.initElement(this.unsupEl);
 		
 		assertFalse(this.unsupEl.validity.rangeOverflow);
 	},
 	
 	"test should set validity.stepMismatch": function () {
-		formpoly.initElement(this.unsupEl);
+		formerly.initElement(this.unsupEl);
 		
 		assertFalse(this.unsupEl.validity.stepMismatch);
 	},
 
 	"test should set validity.customError": function () {
-		formpoly.initElement(this.unsupEl);
+		formerly.initElement(this.unsupEl);
 		
 		assertFalse(this.unsupEl.validity.customError);
 	},
 	
 	"test should set validity.valid": function () {
-		formpoly.initElement(this.unsupEl);
+		formerly.initElement(this.unsupEl);
 		
 		assertTrue(this.unsupEl.validity.valid);
 	}
 	
 });
 
-TestCase("formpolyElementCustomError", {
+TestCase("formerlyElementCustomError", {
 	setUp: function () {
 		this.el = createElement('text');
 	},

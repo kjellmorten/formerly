@@ -1,14 +1,14 @@
 /*
-* formpoly
+* formerly
 *
-* @package formpoly
+* @package formerly
 * @author $Author: kjellmorten $
-* @version $Id: formpoly.js, v 0.1 $
+* @version $Id: formerly.js, v 0.1 $
 * @license GNU
 * @copyright (c) Kjell-Morten Bratsberg Thorsen http://kjellmorten.no/
 */
 
-var formpoly = (function () {
+var formerly = (function () {
 	var _elsToValidate = 'text search tel url email password datetime date month week ' +
 						'time datetime-local number range color checkbox radio file ' +
 						'submit select-one select-multiple textarea'.split(' '),
@@ -142,7 +142,7 @@ var formpoly = (function () {
 	}
 	
 	/*
-	 * The formpoly object.
+	 * The formerly object.
 	 */
 	
 	return {

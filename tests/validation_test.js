@@ -1,4 +1,4 @@
-TestCase("formpolyValidation", {
+TestCase("formerlyValidation", {
 	
 	"test should set valid": function () {
 		var el = createElement("text", "");
@@ -10,7 +10,7 @@ TestCase("formpolyValidation", {
 	}
 });
 
-TestCase("formpolyValidationValueMissing", {
+TestCase("formerlyValidationValueMissing", {
 	
 	"test should set valueMissing": function () {
 		var el = createElement("text", "", { required: "required" });
@@ -56,7 +56,7 @@ TestCase("formpolyValidationValueMissing", {
 	
 });
 
-TestCase("formpolyValidationTypeMismatchEmail", {
+TestCase("formerlyValidationTypeMismatchEmail", {
 	
 	"test should set typeMismatch for invalid email": function () {
 		var el = createElement("email", "noemail");
@@ -88,7 +88,7 @@ TestCase("formpolyValidationTypeMismatchEmail", {
 		
 });
 
-TestCase("formpolyValidationTypeMismatchUrl", {
+TestCase("formerlyValidationTypeMismatchUrl", {
 	
 	"test should set typeMismatch for invalid url": function () {
 		var el = createElement("url", "nourl");
@@ -131,7 +131,7 @@ TestCase("formpolyValidationTypeMismatchUrl", {
 	}
 });
 
-TestCase("formpolyValidationPatternMismatch", {
+TestCase("formerlyValidationPatternMismatch", {
 
 	"test should set patternMismatch": function () {
 		var el = createElement("text", "letters", { pattern: '\\d*' });
@@ -177,7 +177,7 @@ TestCase("formpolyValidationPatternMismatch", {
 	
 });
 
-TestCase("formpolyValidationTooLong", {
+TestCase("formerlyValidationTooLong", {
 	
 	"test should set tooLong": function () {
 		var el = createElement("text", "Longer than 20 characters", { maxlength: 20 });
@@ -210,7 +210,7 @@ TestCase("formpolyValidationTooLong", {
 	
 });
 
-TestCase("formpolyValidationClassNames", {	
+TestCase("formerlyValidationClassNames", {	
 	"test should set valid class": function () {
 		var el = createElement("text", "");
 

@@ -7,7 +7,7 @@ function createElement(type, value, attrs, className, init) {
 	el.className = className || '';
 
 	if (init === undefined || init) {
-		formpoly.initElement(el);
+		formerly.initElement(el);
 	}
 
 	return el;

@@ -1,15 +1,15 @@
-TestCase("formpoly", {
+TestCase("formerly", {
 	
 	"test object should exist": function () {
-		assertObject(formpoly);
+		assertObject(formerly);
 	},
 	
 	"test should have init function": function () {
-		assertFunction(formpoly.init);
+		assertFunction(formerly.init);
 	},
 	
 	"test should have initElement function": function () {
-		assertFunction(formpoly.initElement);
+		assertFunction(formerly.initElement);
 	}
 	
 });
