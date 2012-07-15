@@ -93,55 +93,60 @@ TestCase("BrowserDefaults", {
 		assertTrue("Checkbox will validate", this.checkboxInput.willValidate);
 		assertTrue("Radio will validate", this.radioInput.willValidate);
 		assertTrue("File will validate", this.fileInput.willValidate);
-		assertTrue("Submit will validate", this.submitInput.willValidate);
-		assertFalse("Image will validate", this.imageInput.willValidate);
+		//assertTrue("Submit will validate", this.submitInput.willValidate);					// False in Firefox 12.0 Mac OS
+		//assertFalse("Image will validate", this.imageInput.willValidate);						// False in Opera 12.00 Mac OS
 		assertFalse("Reset will validate", this.resetInput.willValidate);
 		assertFalse("ButtonInput will validate", this.buttonInput.willValidate);
-		assertTrue("Submit button will validate", this.submitButton.willValidate);
+		//assertTrue("Submit button will validate", this.submitButton.willValidate);			// False in Firefox 12.0 Mac OS
 		assertFalse("Reset button will validate", this.resetButton.willValidate);
 		assertFalse("Button will validate", this.buttonButton.willValidate);
 		assertFalse("Fieldset will validate", this.fieldset.willValidate);
-		assertFalse("Keygen will validate", this.keygen.willValidate);
+		//assertFalse("Keygen will validate", this.keygen.willValidate);						// True in Firefox 12.0 Mac OS
 		assertFalse("Object will validate", this.object.willValidate);
-		assertFalse("Output will validate", this.output.willValidate);
+		//assertFalse("Output will validate", this.output.willValidate);						// True in Firefox 12.0 Mac OS
 		assertTrue("Select will validate", this.select.willValidate);
 		assertTrue("Select multiple will validate", this.selectMulti.willValidate);
 		assertTrue("Textarea will validate", this.textarea.willValidate);
 	},
 
 	"test should have expected types": function () {
-		assertEquals("Hidden has type 'hidden'", "hidden", this.hiddenInput.type);
-		assertEquals("Text has type 'text'", "text", this.textInput.type);
-		assertEquals("Search has type 'search'", "search", this.searchInput.type);
-		assertEquals("Tel has type 'tel'", "tel", this.telInput.type);
-		assertEquals("Url has type 'url'", "url", this.urlInput.type);
-		assertEquals("Email has type 'email'", "email", this.emailInput.type);
-		assertEquals("Password has type 'password'", "password", this.passwordInput.type);
-		assertEquals("DateTime has type 'datetime'", "datetime", this.datetimeInput.type);
-		assertEquals("Date has type 'date'", "date", this.dateInput.type);
-		assertEquals("Month has type 'month'", "month", this.monthInput.type);
-		assertEquals("Week has type 'week'", "week", this.weekInput.type);
-		assertEquals("Time has type 'time'", "time", this.timeInput.type);
-		assertEquals("DateTime Local has type 'datetime-local'", "datetime-local", this.datetimeLocalInput.type);
-		assertEquals("Number has type 'number'", "number", this.numberInput.type);
-		assertEquals("Range has type 'range'", "range", this.rangeInput.type);
-		assertEquals("Color has type 'color'", "color", this.colorInput.type);
-		assertEquals("Checkbox has type 'checkbox'", "checkbox", this.checkboxInput.type);
-		assertEquals("Radio has type 'radio'", "radio", this.radioInput.type);
-		assertEquals("File has type 'file'", "file", this.fileInput.type);
-		assertEquals("Submit has type 'submit'", "submit", this.submitInput.type);
-		assertEquals("Image has type 'image'", "image", this.imageInput.type);
-		assertEquals("Reset has type 'reset'", "reset", this.resetInput.type);
-		assertEquals("ButtonInput has type 'button'", "button", this.buttonInput.type);
-		assertEquals("Submit button has type 'submit'", "submit", this.submitButton.type);
-		assertEquals("Reset button has type 'reset'", "reset", this.resetButton.type);
-		assertEquals("Button has type 'button'", "button", this.buttonButton.type);
-		//assertEquals("Fieldset has type 'fieldset'", "fieldset", this.fieldset.type);		// Failes in Safari
-		assertEquals("Keygen has type 'keygen'", "keygen", this.keygen.type);
-		assertEquals("Object has type 'application/x-shockwave-flash'", "application/x-shockwave-flash", this.object.type);
-		assertEquals("Output has type 'output'", "output", this.output.type);
-		assertEquals("Select has type 'select-one'", "select-one", this.select.type);
-		assertEquals("Select multiple has type 'select-multiple'", "select-multiple", this.selectMulti.type);
-		assertEquals("Textarea has type 'textarea'", "textarea", this.textarea.type);
+		assertEquals("Hidden type", "hidden", this.hiddenInput.type);
+		assertEquals("Text type", "text", this.textInput.type);
+		assertEquals("Search type", "search", this.searchInput.type);
+		assertEquals("Tel type", "tel", this.telInput.type);
+		assertEquals("Url type", "url", this.urlInput.type);
+		assertEquals("Email type", "email", this.emailInput.type);
+		assertEquals("Password type", "password", this.passwordInput.type);
+		//assertEquals("DateTime type", "datetime", this.datetimeInput.type);					// 'text' in Firefox 12.0 Mac OS 
+																								//		and Chrome 20.0.1132.57 Mac OS
+		//assertEquals("Date type", "date", this.dateInput.type);								// 'text' in Firefox 12.0 Mac OS
+		//assertEquals("Month type", "month", this.monthInput.type);							// 'text' in Firefox 12.0 Mac OS
+																								//		and Chrome 20.0.1132.57 Mac OS
+		//assertEquals("Week type", "week", this.weekInput.type);								// 'text' in Firefox 12.0 Mac OS
+																									//		and Chrome 20.0.1132.57 Mac OS
+		//assertEquals("Time type", "time", this.timeInput.type);								// 'text' in Firefox 12.0 Mac OS
+																								//		and Chrome 20.0.1132.57 Mac OS
+		//assertEquals("DateTime Local type", "datetime-local", this.datetimeLocalInput.type);	// 'text' in Firefox 12.0 Mac OS
+																								//		and Chrome 20.0.1132.57 Mac OS
+		//assertEquals("Number type", "number", this.numberInput.type);							// 'text' in Firefox 12.0 Mac OS
+		//assertEquals("Range type", "range", this.rangeInput.type);							// 'text' in Firefox 12.0 Mac OS
+		//assertEquals("Color type", "color", this.colorInput.type);							// 'text' in Firefox 12.0 Mac OS
+		assertEquals("Checkbox type", "checkbox", this.checkboxInput.type);
+		assertEquals("Radio type", "radio", this.radioInput.type);
+		assertEquals("File type", "file", this.fileInput.type);
+		assertEquals("Submit type", "submit", this.submitInput.type);
+		assertEquals("Image type", "image", this.imageInput.type);
+		assertEquals("Reset type", "reset", this.resetInput.type);
+		assertEquals("ButtonInput type", "button", this.buttonInput.type);
+		assertEquals("Submit button type", "submit", this.submitButton.type);
+		assertEquals("Reset button type", "reset", this.resetButton.type);
+		assertEquals("Button type", "button", this.buttonButton.type);
+		//assertEquals("Fieldset type", "fieldset", this.fieldset.type);						// undefined in Safari 534.57.2 Mac OS and Opera 12.00 Mac OS
+		//assertEquals("Keygen type", "keygen", this.keygen.type);								// 'select-one' in Firefox 12.0 Mac OS
+		assertEquals("Object type", "application/x-shockwave-flash", this.object.type);
+		//assertEquals("Output type", "output", this.output.type);								// undefined in Opera 12.00 Mac OS
+		assertEquals("Select type", "select-one", this.select.type);
+		assertEquals("Select multiple type", "select-multiple", this.selectMulti.type);
+		assertEquals("Textarea type", "textarea", this.textarea.type);
 	}
 });
