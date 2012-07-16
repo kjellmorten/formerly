@@ -153,4 +153,3 @@ TestCase("formerlyFormConstraintInterface", sinon.testCase({
 
 
 // TODO: Only validate button input keygen object select textarea
-// TODO: Fire invalid event.

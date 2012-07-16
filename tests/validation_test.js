@@ -9,7 +9,6 @@ TestCase("formerlyValidation", {
 		assertTrue(el.validity.valid);
 	}
 	
-	// TODO: Throw invalid event when invalid
 });
 
 TestCase("formerlyValidationValueMissing", {
@@ -376,11 +375,54 @@ TestCase("formerlyValidationStepMismatch", {
 		assertValid(ret, el, 'stepMismatch');
 	}
 	
-	// TODO: Write for range and the dates and times
+	// TODO: Implement step for range and dates/times
 	// TODO: Honour default min, max, step
 	// TODO: Skip check for types this does not apply to
 
 });
+
+TestCase("formerlyValidationInvalidEvent", {
+	
+	"test should throw invalid event on checkValidity": function () {
+		var el = createElement("text", "", { required: 'required' });
+		formerly.initElement(el);
+		
+		el.checkValidity();
+		
+		assertCalledOnce(el.dispatchEvent);
+		var event = el.dispatchEvent.args[0][0];
+		assertObject(event);
+		assertEquals('invalid', event.type);
+		assertFalse('Bubbles', event.bubbles);
+		assertTrue('Cancelable', event.cancelable);
+	},
+	
+	"test should not throw invalid event when element valid": function () {
+		var el = createElement("text", "");
+		formerly.initElement(el);
+		
+		el.checkValidity();
+		
+		assertNotCalled(el.dispatchEvent);
+	},
+	
+	"test should throw invalid event in older IE": function () {
+		var el = { type: "text", value: "", attributes: { required: 'required' } };
+		el.fireEvent = sinon.stub();
+		formerly.initElement(el);
+		document.createEventObject = function () { return { eventType: null } };
+		
+		el.checkValidity();
+		
+		assertCalledOnce(el.fireEvent);
+		assertEquals('oninvalid', el.fireEvent.args[0][0]);
+		var event = el.fireEvent.args[0][1];
+		assertObject(event);
+		assertEquals('invalid', event.eventType);
+	}
+	
+});
+
 
 TestCase("formerlyValidationClassNames", {	
 	"test should set valid class": function () {

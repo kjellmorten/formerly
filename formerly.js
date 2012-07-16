@@ -119,6 +119,19 @@ var formerly = (function () {
 		return this.checkValidity();
 	}
 	
+	function _throwEvent (el, type) {
+		var event;
+		if (el.dispatchEvent) {
+			event = document.createEvent("HTMLEvents");
+			event.initEvent(type, false, true);
+			el.dispatchEvent(event);
+		} else {
+		    event = document.createEventObject();
+		    event.eventType = type;
+		    el.fireEvent("on" + type, event);
+		}
+	}
+	
 
 	/*
 	 * Constraints interface
@@ -154,6 +167,10 @@ var formerly = (function () {
 		
 		_addClass(this, (this.validity.valid) ? 'valid' : 'invalid');
 		_removeClass(this, (this.validity.valid) ? 'invalid' : 'valid');
+		
+		if (!this.validity.valid) {
+			_throwEvent(this, 'invalid');
+		}
 
 		return this.validity.valid;
 	}
