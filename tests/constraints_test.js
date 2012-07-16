@@ -4,13 +4,14 @@ TestCase("formerlyElementConstraintInterface", {
 		this.func = function () {};
 		this.obj = {};
 		
-		this.unsupEl = {};
+		this.unsupEl = { attributes: {} };
 		this.supEl = {
 			willValidate: this.obj,
 			validity: this.obj,
 			setCustomValidity: this.func,
 			checkValidity: this.func,
-			validationMessage: this.obj
+			validationMessage: this.obj,
+			attributes: {}
 		}
 	},
 	
@@ -88,7 +89,7 @@ TestCase("formerlyElementConstraintInterface", {
 		assertNotSame(this.func, partlySupEl.setCustomValidity);
 		assertNotSame(this.obj, partlySupEl.validity);
 		assertNotSame(this.obj, partlySupEl.validationMessage);
-		//willValidate is treated seperately, as the rest functions independent of it
+		//willValidate is treated seperately, as the rest function independent of it
 	}
 
 });
@@ -246,6 +247,12 @@ TestCase("formerlyElementWillValidate", {
 		assertFalse(el.willValidate);
 	},
 
+	"test should return false for object": function () {
+		var el = createElement('application/x-shockwave-flash');
+		
+		assertFalse(el.willValidate);
+	},
+
 	"test should return false for output": function () {
 		var el = createElement('output');
 		
@@ -280,16 +287,20 @@ TestCase("formerlyElementWillValidate", {
 		var el = createElement(undefined);
 		
 		assertFalse(el.willValidate);
-	}
+	},
 	
-	// TODO: Take into account disabled state etc.?
+	"test should return false for disabled element": function () {
+		var el = createElement('text', '', { disabled: 'disabled' });
+		
+		assertFalse(el.willValidate);
+	}
 	
 });
 
 TestCase("formerlyElementValidityInterface", {
 
 	setUp: function () {
-		this.unsupEl = {};
+		this.unsupEl = { attributes: {} };
 	},
 
 	"test should set validity.valueMissing": function () {

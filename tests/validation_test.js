@@ -530,3 +530,5 @@ function assertValid (ret, el, validityState) {
 	assertFalse(el.validity[validityState]);
 	assertTrue(el.validity.valid);
 }
+
+// TODO: Validation messages

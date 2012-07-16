@@ -138,7 +138,7 @@ var formerly = (function () {
 	 */
 
 	function _willValidate (el) {
-		return (_elsToValidate.indexOf(el.type) !== -1);
+		return ((el.attributes['disabled'] === undefined) && (_elsToValidate.indexOf(el.type) !== -1));
 	}
 	
 	function _setCustomValidity (message) {

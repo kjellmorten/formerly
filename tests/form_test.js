@@ -151,5 +151,4 @@ TestCase("formerlyFormConstraintInterface", sinon.testCase({
 
 }));
 
-
-// TODO: Only validate button input keygen object select textarea
+// TODO: Honour novalidate
