@@ -28,27 +28,13 @@ TestCase("formerlyValidationValueMissing", {
 		
 		assertValid(ret, el, 'valueMissing');
 	},
-
-	"test should not clear customError on checkValidity": function () {
-		var el = createElement("text", "");
-
-		el.setCustomValidity('A message');
-		el.checkValidity();
+	
+	"test should not validate an element where willValidate is false": function () {
+		var el = createElement('image', "", { required: "required" });
 		
-		assertTrue(el.validity.customError);
-		assertEquals('A message', el.validationMessage);
-		assertFalse(el.validity.valid);
-	},
-
-	"test should not clear customError on checkValidity with other invalidity": function () {
-		var el = createElement("text", "", { required: "required" });
-
-		el.setCustomValidity('A message');
-		el.checkValidity();
+		var ret = el.checkValidity();
 		
-		assertTrue(el.validity.customError);
-		assertEquals('A message', el.validationMessage);
-		assertFalse(el.validity.valid);
+		assertValid(ret, el, 'valueMissing');
 	}
 	
 });

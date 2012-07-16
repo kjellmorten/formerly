@@ -147,6 +147,10 @@ var formerly = (function () {
 	}
 	
 	function _checkValidity () {
+		if (!this.willValidate) {
+			return true;
+		}
+	
 		var valueMissing = _checkValueMissing(this),
 			typeMismatch = _checkTypeMismatch(this),
 			patternMismatch = _checkPatternMismatch(this),
