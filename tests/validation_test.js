@@ -8,6 +8,8 @@ TestCase("formerlyValidation", {
 		assertTrue(ret);
 		assertTrue(el.validity.valid);
 	}
+	
+	// TODO: Throw invalid event when invalid
 });
 
 TestCase("formerlyValidationValueMissing", {
@@ -254,6 +256,10 @@ TestCase("formerlyValidationRangeUnderflow", {
 		assertValid(ret, el, 'rangeUnderflow');
 	}
 	
+	// TODO: Write for range and the dates and times
+	// TODO: Honour default min
+	// TODO: Skip check for types this does not apply to
+
 });
 
 TestCase("formerlyValidationRangeOverflow", {
@@ -305,6 +311,10 @@ TestCase("formerlyValidationRangeOverflow", {
 		
 		assertValid(ret, el, 'rangeOverflow');
 	}
+
+	// TODO: Write for range and the dates and times
+	// TODO: Honour default max
+	// TODO: Skip check for types this does not apply to
 
 });
 
@@ -365,6 +375,10 @@ TestCase("formerlyValidationStepMismatch", {
 		
 		assertValid(ret, el, 'stepMismatch');
 	}
+	
+	// TODO: Write for range and the dates and times
+	// TODO: Honour default min, max, step
+	// TODO: Skip check for types this does not apply to
 
 });
 

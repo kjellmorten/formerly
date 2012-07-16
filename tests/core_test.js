@@ -1,3 +1,5 @@
+sinon.assert.expose(this, { includeFail: false });
+
 TestCase("formerly", {
 	
 	"test object should exist": function () {

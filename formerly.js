@@ -115,6 +115,11 @@ var formerly = (function () {
 		return false;
 	}
 
+	function _submitHandler () {
+		return this.checkValidity();
+	}
+	
+
 	/*
 	 * Constraints interface
 	 */
@@ -153,11 +158,27 @@ var formerly = (function () {
 		return this.validity.valid;
 	}
 
-
+	function _checkValidityForm () {
+		var valid = true;
+		
+		for (i = 0, il = this.elements.length; i < il; i++) {
+			valid = valid && this.elements[i].checkValidity();
+		}
+		
+		return valid;
+	}
+	
 	/*
 	 * Initialization
 	 */
 
+	// Returns an array of all forms in the document.
+	// Abstracted for testing purposes.
+	function getForms() {
+		return document.forms;
+	}
+
+	// Inits an element
 	function initElement (el) {
 		if (el.willValidate === undefined) {
 			el.willValidate = _willValidate(el);
@@ -181,8 +202,40 @@ var formerly = (function () {
 		}
 	}
 	
-	function init (form) {
+	// Inits a form
+	function _initForm (form) {
+		var i, il;
+
+		if (form.checkValidity === undefined) {
+			form.checkValidity = _checkValidityForm;
 		
+			for (i = 0, il = form.length; i < il; i++) {
+				this.initElement(form.elements[i]);
+			}
+		
+			// Listen for submit event and cancel if form not valid
+			if (form.addEventListener) {
+				form.addEventListener('submit', _submitHandler, false);		// Modern browsers
+			} else {
+				form.attachEvent('onsubmit', _submitHandler);				// Old IEs
+			}
+		}
+	}
+
+	// Inits the given form or, if none is given, all forms.
+	function init (form) {
+		var i, il, forms;
+	
+		if (form) {
+			// Init the given form
+			_initForm.call(this, form);
+		} else {
+			// Init all forms in document
+			forms = this.getForms();
+			for (i = 0, il = forms.length; i < il; i++) {
+				_initForm.call(this, forms[i]);
+			}
+		}
 	}
 	
 	/*
@@ -191,7 +244,8 @@ var formerly = (function () {
 	
 	return {
 		init: init,
-		initElement: initElement
+		initElement: initElement,
+		getForms: getForms
 	};
 	
 })();

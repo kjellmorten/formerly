@@ -282,6 +282,8 @@ TestCase("formerlyElementWillValidate", {
 		assertFalse(el.willValidate);
 	}
 	
+	// TODO: Take into account disabled state etc.?
+	
 });
 
 TestCase("formerlyElementValidityInterface", {
