@@ -73,8 +73,7 @@ var formerly = (function () {
 	}
 	
 	function _checkTooLong (el) {
-		var maxlength = el.attributes['maxlength'];
-		return ((maxlength !== undefined) && (el.value.length > parseInt(maxlength)));
+		return (el.value.length > el.maxLength);
 	}
 	
 	function _checkRangeUnderflow (el) {
@@ -138,7 +137,7 @@ var formerly = (function () {
 	 */
 
 	function _willValidate (el) {
-		return ((el.attributes['disabled'] === undefined) && (_elsToValidate.indexOf(el.type) !== -1));
+		return ((!el.disabled) && (_elsToValidate.indexOf(el.type) !== -1));
 	}
 	
 	function _setCustomValidity (message) {

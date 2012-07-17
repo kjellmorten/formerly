@@ -1,9 +1,9 @@
-TestCase("BrowserDefaults", {
+TestCase("HTMLElements", {
 	setUp: function () {
 		/*:DOC += 
-			<form>
+			<form id="form1">
 				<input type="hidden" id="hiddenInput" />
-				<input type="text" id="textInput" />
+				<input type="text" id="textInput" maxlength="20" />
 				<input type="search" id="searchInput" />
 				<input type="tel" id="telInput" />
 				<input type="url" id="urlInput" />
@@ -35,6 +35,8 @@ TestCase("BrowserDefaults", {
 				<select id="select"></select>
 				<select id="selectMulti" multiple="multiple"></select>
 				<textarea id="textarea"></textarea>
+				<input type="text" id="disabledInput" disabled="disabled" />
+				<input type="text" id="readonlyInput" readonly="readonly" />
 			</form>
 		*/
 
@@ -71,6 +73,11 @@ TestCase("BrowserDefaults", {
 		this.select = document.getElementById('select');
 		this.selectMulti = document.getElementById('selectMulti');
 		this.textarea = document.getElementById('textarea');
+		this.disabledInput = document.getElementById('disabledInput');
+		this.readonlyInput = document.getElementById('readonlyInput');
+
+		this.form1 = document.getElementById('form1');
+		formerly.init(this.form1);
 	},
 
 	"test should have expected willValidate values": function () {
@@ -107,8 +114,10 @@ TestCase("BrowserDefaults", {
 		assertTrue("Select will validate", this.select.willValidate);
 		assertTrue("Select multiple will validate", this.selectMulti.willValidate);
 		assertTrue("Textarea will validate", this.textarea.willValidate);
+		assertFalse("Disabled element will validate", this.disabledInput.willValidate);
+		assertFalse("Readonly element will validate", this.readonlyInput.willValidate);
 	},
-
+	
 	"test should have expected types": function () {
 		assertEquals("Hidden type", "hidden", this.hiddenInput.type);
 		assertEquals("Text type", "text", this.textInput.type);
@@ -148,5 +157,120 @@ TestCase("BrowserDefaults", {
 		assertEquals("Select type", "select-one", this.select.type);
 		assertEquals("Select multiple type", "select-multiple", this.selectMulti.type);
 		assertEquals("Textarea type", "textarea", this.textarea.type);
+	},
+	
+	"test should have maxLength 20": function () {
+		assertEquals(20, this.textInput.maxLength);
+	},
+
+	"test should have no maxLength": function () {
+		assertEquals(524288, this.disabledInput.maxLength);
 	}
 });
+
+TestCase("HTMLElementsValidity", {
+	setUp: function () {
+		/*:DOC +=
+			<form id="form1">
+				<input type="text" value="" id="validEl" />
+				<input type="text" value="" id="invalidEl" required="required" />
+			</form>
+		*/
+		this.validEl = document.getElementById('validEl');
+		this.invalidEl = document.getElementById('invalidEl');
+
+		this.form1 = document.getElementById('form1');
+		formerly.init(form1);
+
+		this.handler = sinon.stub();
+	},
+
+	"test form should have checkValidity function": function () {
+		assertFunction(this.form1.checkValidity);
+	},
+	
+	"test element should have checkValidity function": function () {
+		assertFunction(this.validEl.checkValidity);
+	},
+	
+	"test element should have validity object": function () {
+		assertObject(this.validEl.validity);
+	},
+	
+	"test should be valid": function () {
+		var ret = this.validEl.checkValidity();
+		
+		assertTrue(ret);
+		assertTrue(this.validEl.validity.valid)
+	},
+	
+	"test should be invalid": function () {
+		var ret = this.invalidEl.checkValidity();
+		
+		assertInvalid(ret, this.invalidEl, 'valueMissing');
+	},
+	
+	"test should fire invalid event": function () {
+		listenForEvent(this.invalidEl, 'invalid', this.handler);
+		
+		this.invalidEl.checkValidity();
+		
+		assertCalledOnce(this.handler);
+	},
+	
+	"test should not fire invalid event": function () {
+		listenForEvent(this.validEl, 'invalid', this.handler);
+		
+		this.validEl.checkValidity();
+		
+		assertNotCalled(this.handler);
+	},
+	
+	"test should find form invalid and fire one invalid event": function () {
+		listenForEvent(this.validEl, 'invalid', this.handler);
+		listenForEvent(this.invalidEl, 'invalid', this.handler);
+		
+		this.form1.checkValidity();
+		
+		assertCalledOnce(this.handler);
+	},
+	
+	"test element should have setCustomValidity function": function () {
+		assertFunction(this.validEl.setCustomValidity);
+	},
+	
+	"test should set custom validity": function () {
+		this.validEl.setCustomValidity('A message');
+		
+		var ret = this.validEl.checkValidity();
+		
+		assertInvalid(ret, this.validEl, 'customError');
+		assertEquals('A message', this.validEl.validationMessage);
+	},
+
+	"test should clear custom validity": function () {
+		this.validEl.setCustomValidity('');
+		
+		var ret = this.validEl.checkValidity();
+		
+		assertValid(ret, this.validEl, 'customError');
+		assertEquals('', this.validEl.validationMessage);
+	},
+	
+	"test should not validate disabled element": function () {
+		this.invalidEl.disabled = true;
+		
+		var ret = this.invalidEl.checkValidity();
+		
+		assertValid(ret, this.invalidEl, 'valueMissing');
+	}
+	
+});
+
+function listenForEvent (el, event, handler) {
+	if (el.addEventListener) {
+		el.addEventListener(event, handler, false);
+	} else {
+		el.attachEven('on' + event, handler);
+	}
+}
