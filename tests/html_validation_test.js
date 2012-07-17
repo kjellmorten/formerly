@@ -164,8 +164,9 @@ TestCase("formerlyHTMLValidations", {
 
 	"test should set tooLong": function () {
 		/*:DOC field1 = <input type="text" value="" maxlength="20" /> */
+
 		if (this.field1.checkValidity === undefined) {
-			// Not working properly in Chrome and Firefox, so check only for formerly....
+			// Not working properly in Firefox, so test only formerly implementation....
 			
 			formerly.initElement(this.field1);
 			this.field1.value = "Longer than 20 characters";
@@ -175,6 +176,66 @@ TestCase("formerlyHTMLValidations", {
 			assertInvalid(ret, this.field1, 'tooLong');
 		}
 	},
+
+	"test should set rangeUnderflow": function () {
+		/*:DOC field1 = <input type="number" value="8" min="10" /> */
+
+		if (this.field1.checkValidity === undefined) {
+			// Not working properly in Firefox, so test only formerly implementation....
+			
+			var ret = this.field1.checkValidity();
+			
+			assertInvalid(ret, this.field1, 'rangeUnderflow');
+		}
+	},
+
+	"test should not set rangeUnderflow": function () {
+		/*:DOC field1 = <input type="number" value="11" min="10" /> */
+		
+		var ret = this.field1.checkValidity();
+		
+		assertValid(ret, this.field1, 'rangeUnderflow');
+	},
+
+	"test should set rangeOverflow": function () {
+		/*:DOC field1 = <input type="number" value="12" max="10" /> */
+		
+		if (this.field1.checkValidity === undefined) {
+			// Not working properly in Firefox, so test only formerly implementation....
+
+			var ret = this.field1.checkValidity();
+			
+			assertInvalid(ret, this.field1, 'rangeOverflow');
+		}
+	},
+
+	"test should not set rangeOverflow": function () {
+		/*:DOC field1 = <input type="number" value="9" max="10" /> */
+		
+		var ret = this.field1.checkValidity();
+		
+		assertValid(ret, this.field1, 'rangeOverflow');
+	},
+
+	"test should set stepMismatch": function () {
+		/*:DOC field1 = <input type="number" value="1.5" step="1" /> */
+		
+		if (this.field1.checkValidity === undefined) {
+			// Not working properly in Firefox, so test only formerly implementation....
+
+			var ret = this.field1.checkValidity();
+			
+			assertInvalid(ret, this.field1, 'stepMismatch');
+		}
+	},
+
+	"test should not set stepMismatch when valid steps from min": function () {
+		/*:DOC field1 = <input type="number" value="3.5" step="1" min="0.5" /> */
+		
+		var ret = this.field1.checkValidity();
+		
+		assertValid(ret, this.field1, 'stepMismatch');
+	}
 
 });
 
