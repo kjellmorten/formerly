@@ -107,134 +107,153 @@ TestCase("formerlyHTMLConstraints", {
 });
 
 TestCase("formerlyHTMLValidations", {
+	setUp: function () {
+		/*:DOC += 
+			<form>
+				<input type="email" id="field1" value="noemail" />
+				<input type="email" id="field2" value="email@company.com" />
+				<input type="url" id="field3" value="nourl" />
+				<input type="url" id="field4" value="http://www.valid.com/" />
+				<input type="text" id="field5" value="letters" pattern="\d*" />
+				<input type="text" id="field6" value="123" pattern="\d*" />
+				<input type="text" id="field7" value="" maxlength="20" />
+				<input type="number" id="field8" value="8" min="10" />
+				<input type="number" id="field9" value="11" min="10" />
+				<input type="number" id="field10" value="12" max="10" />
+				<input type="number" id="field11" value="9" max="10" />
+				<input type="number" id="field12" value="1.5" step="1" />
+				<input type="number" id="field13" value="3.5" step="1" min="0.5" />
+			</form>
+		*/
+	},
 
 	"test should set typeMismatch for invalid email": function () {
-		/*:DOC field1 = <input type="email" value="noemail" /> */
-		formerly.initElement(this.field1);
+		var field = document.getElementById("field1");
+		formerly.initElement(field);
 		
-		var ret = this.field1.checkValidity();
+		var ret = field.checkValidity();
 		
-		assertInvalid(ret, this.field1, 'typeMismatch');
+		assertInvalid(ret, field, 'typeMismatch');
 	},
 
 	"test should not set typeMismatch for valid email": function () {
-		/*:DOC field1 = <input type="email" value="email@company.com" /> */
-		formerly.initElement(this.field1);
+		var field = document.getElementById("field2");
+		formerly.initElement(field);
 		
-		var ret = this.field1.checkValidity();
+		var ret = field.checkValidity();
 		
-		assertValid(ret, this.field1, 'typeMismatch');
+		assertValid(ret, field, 'typeMismatch');
 	},
 
 	"test should set typeMismatch for invalid url": function () {
-		/*:DOC field1 = <input type="url" value="nourl" /> */
-		formerly.initElement(this.field1);
+		var field = document.getElementById("field3");
+		formerly.initElement(field);
 		
-		var ret = this.field1.checkValidity();
+		var ret = field.checkValidity();
 
-		assertInvalid(ret, this.field1, 'typeMismatch');
+		assertInvalid(ret, field, 'typeMismatch');
 	},
 
 	"test should not set typeMismatch for valid url": function () {
-		/*:DOC field1 = <input type="url" value="http://www.valid.com/" /> */
-		formerly.initElement(this.field1);
+		var field = document.getElementById("field4");
+		formerly.initElement(field);
 		
-		var ret = this.field1.checkValidity();
+		var ret = field.checkValidity();
 
-		assertValid(ret, this.field1, 'typeMismatch');
+		assertValid(ret, field, 'typeMismatch');
 	},
 
 	"test should set patternMismatch": function () {
-		/*:DOC field1 = <input type="text" value="letters" pattern="\d*" /> */
-		formerly.initElement(this.field1);
+		var field = document.getElementById("field5");
+		formerly.initElement(field);
 
-		var ret = this.field1.checkValidity();
+		var ret = field.checkValidity();
 		
-		assertInvalid(ret, this.field1, 'patternMismatch');
+		assertInvalid(ret, field, 'patternMismatch');
 	},
 
 	"test should not set patternMismatch on match": function () {
-		/*:DOC field1 = <input type="text" value="123" pattern="\d*" /> */
-		formerly.initElement(this.field1);
+		var field = document.getElementById("field6");
+		formerly.initElement(field);
 
-		var ret = this.field1.checkValidity();
+		var ret = field.checkValidity();
 		
-		assertValid(ret, this.field1, 'patternMismatch');
+		assertValid(ret, field, 'patternMismatch');
 	},
 
 	"test should set tooLong": function () {
-		/*:DOC field1 = <input type="text" value="" maxlength="20" /> */
+		var field = document.getElementById("field7");
 
-		if (this.field1.checkValidity === undefined) {
-			// Not working properly in Firefox, so test only formerly implementation....
+		if (field.checkValidity === undefined) {
+			// Not working properly in Firefox and Chrome, so test only formerly implementation....
+
+			formerly.initElement(field);
+			field.value = "Longer than 20 characters";
 			
-			formerly.initElement(this.field1);
-			this.field1.value = "Longer than 20 characters";
+			var ret = field.checkValidity();
 			
-			var ret = this.field1.checkValidity();
-			
-			assertInvalid(ret, this.field1, 'tooLong');
+			assertInvalid(ret, field, 'tooLong');
 		}
 	},
 
 	"test should set rangeUnderflow": function () {
-		/*:DOC field1 = <input type="number" value="8" min="10" /> */
-
-		if (this.field1.checkValidity === undefined) {
+		var field = document.getElementById("field8");
+			
+		if (field.checkValidity === undefined) {
 			// Not working properly in Firefox, so test only formerly implementation....
+
+			var ret = field.checkValidity();
 			
-			var ret = this.field1.checkValidity();
-			
-			assertInvalid(ret, this.field1, 'rangeUnderflow');
+			assertInvalid(ret, field, 'rangeUnderflow');
 		}
 	},
 
 	"test should not set rangeUnderflow": function () {
-		/*:DOC field1 = <input type="number" value="11" min="10" /> */
+		var field = document.getElementById("field9");
 		
-		var ret = this.field1.checkValidity();
+		var ret = field.checkValidity();
 		
-		assertValid(ret, this.field1, 'rangeUnderflow');
+		assertValid(ret, field, 'rangeUnderflow');
 	},
 
 	"test should set rangeOverflow": function () {
-		/*:DOC field1 = <input type="number" value="12" max="10" /> */
+		var field = document.getElementById("field10");
 		
-		if (this.field1.checkValidity === undefined) {
+		if (field.checkValidity === undefined) {
 			// Not working properly in Firefox, so test only formerly implementation....
 
-			var ret = this.field1.checkValidity();
+			var ret = field.checkValidity();
 			
-			assertInvalid(ret, this.field1, 'rangeOverflow');
+			assertInvalid(ret, field, 'rangeOverflow');
 		}
 	},
 
 	"test should not set rangeOverflow": function () {
-		/*:DOC field1 = <input type="number" value="9" max="10" /> */
+		var field = document.getElementById("field11");
 		
-		var ret = this.field1.checkValidity();
+		var ret = field.checkValidity();
 		
-		assertValid(ret, this.field1, 'rangeOverflow');
+		assertValid(ret, field, 'rangeOverflow');
 	},
 
 	"test should set stepMismatch": function () {
-		/*:DOC field1 = <input type="number" value="1.5" step="1" /> */
+		var field = document.getElementById("field12");
 		
-		if (this.field1.checkValidity === undefined) {
+		if (field.checkValidity === undefined) {
 			// Not working properly in Firefox, so test only formerly implementation....
 
-			var ret = this.field1.checkValidity();
+			var ret = field.checkValidity();
 			
-			assertInvalid(ret, this.field1, 'stepMismatch');
+			assertInvalid(ret, field, 'stepMismatch');
 		}
 	},
 
 	"test should not set stepMismatch when valid steps from min": function () {
-		/*:DOC field1 = <input type="number" value="3.5" step="1" min="0.5" /> */
+		var field = document.getElementById("field13");
 		
-		var ret = this.field1.checkValidity();
+		var ret = field.checkValidity();
 		
-		assertValid(ret, this.field1, 'stepMismatch');
+		assertValid(ret, field, 'stepMismatch');
 	}
 
 });
@@ -245,5 +264,18 @@ function listenForEvent (el, event, handler) {
 		el.addEventListener(event, handler, false);
 	} else {
 		el.attachEven('on' + event, handler);
+	}
+}
+
+function throwEvent (el, type) {
+	var event;
+	if (el.dispatchEvent) {
+		event = document.createEvent("HTMLEvents");
+		event.initEvent(type, false, true);
+		el.dispatchEvent(event);
+	} else {
+	    event = document.createEventObject();
+	    event.eventType = type;
+	    el.fireEvent("on" + type, event);
 	}
 }
