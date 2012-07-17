@@ -44,7 +44,7 @@ var formerly = (function () {
 	}
 	
 	function _submitHandler () {
-		return this.checkValidity();
+		return (this.novalidate === true) || this.checkValidity();
 	}
 	
 	function _throwEvent (el, type) {
@@ -69,10 +69,8 @@ var formerly = (function () {
 	}
 	
 	function _checkTypeMismatch (el) {
-		var type = el.type;
-		
 		if (el.value !== '') {
-			switch (type) {
+			switch (el.type) {
 				case 'email':
 					return !(_emailRegExp.test(el.value));
 				case 'url':
@@ -85,8 +83,8 @@ var formerly = (function () {
 	}
 	
 	function _checkPatternMismatch (el) {
-		var pattern = el.attributes['pattern'];
-		if ((el.value !== '') && (pattern !== undefined)) {
+		var pattern;
+		if ((el.value !== '') && (pattern = el.attributes['pattern'])) {
 			try {
 				return !(new RegExp('^' + pattern + '$').test(el.value));
 			} catch (err) {}

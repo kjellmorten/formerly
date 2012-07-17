@@ -139,6 +139,16 @@ TestCase("formerlyFormConstraintInterface", sinon.testCase({
 		assertTrue(ret);
 	},
 
+	"test should return true when submit event fired on form with novalidate attribute": function () {
+		this.makeFormInvalid(this.unsupForm);
+		this.unsupForm.novalidate = true;
+		formerly.init(this.unsupForm);
+		
+		var handler = this.unsupForm.addEventListener.args[0][1];
+		var ret = handler.call(this.unsupForm);
+		assertTrue(ret);
+	},
+
 	"test should listen for submit event in older IE": function () {
 		var ieForm = { attachEvent: sinon.stub() };
 
@@ -151,4 +161,4 @@ TestCase("formerlyFormConstraintInterface", sinon.testCase({
 
 }));
 
-// TODO: Honour novalidate
+// TODO: formnovalidate
