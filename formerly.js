@@ -228,7 +228,7 @@ var formerly = (function () {
 		
 			// Listen for submit event and cancel if form not valid
 			if (form.addEventListener) {
-				form.addEventListener('submit', _submitHandler, false);		// Modern browsers
+				form.addEventListener('submit', _submitHandler, true);		// Modern browsers
 			} else {
 				form.attachEvent('onsubmit', _submitHandler);				// Old IEs
 			}

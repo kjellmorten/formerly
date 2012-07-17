@@ -112,7 +112,7 @@ TestCase("formerlyFormConstraintInterface", sinon.testCase({
 		assertCalledOnce(this.unsupForm.addEventListener);
 		assertEquals('submit', this.unsupForm.addEventListener.args[0][0]);
 		assertFunction(this.unsupForm.addEventListener.args[0][1]);
-		assertFalse(this.unsupForm.addEventListener.args[0][2]);
+		assertTrue(this.unsupForm.addEventListener.args[0][2]);
 	},
 	
 	"test should not listen for submit event in supporting browsers": function () {
