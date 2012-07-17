@@ -2,8 +2,9 @@ function createElement(type, value, attrs, className, init) {
 	var el = {};
 	
 	el.type = type;
-	el.value = value || "";
+	el.value = el.defaultValue = value || "";
 	el.attributes = createAttributes(attrs);
+	el.attributes['type'] = { name: 'type', value: type };
 	el.className = className || '';
 	el.dispatchEvent = sinon.stub();
 	el.disabled = (el.attributes['disabled'] !== undefined);

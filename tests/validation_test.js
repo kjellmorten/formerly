@@ -158,15 +158,25 @@ TestCase("formerlyValidationPatternMismatch", {
 TestCase("formerlyValidationTooLong", {
 	
 	"test should set tooLong": function () {
-		var el = createElement("text", "Longer than 20 characters", { maxlength: "20" });
+		var el = createElement("text", "", { maxlength: "20" });
+		el.value = "Longer than 20 characters";
 		
 		var ret = el.checkValidity();
 		
 		assertInvalid(ret, el, 'tooLong');
 	},
 	
+	"test should not set tooLong when value not dirty": function () {
+		var el = createElement("text", "Longer than 20 characters", { maxlength: "20" });
+		
+		var ret = el.checkValidity();
+		
+		assertValid(ret, el, 'tooLong');
+	},
+
 	"test should not set tooLong for shorter string": function () {
-		var el = createElement("text", "Shorter than 20", { maxlength: "20" });
+		var el = createElement("text", "", { maxlength: "20" });
+		el.value = "Shorter than 20";
 		
 		var ret = el.checkValidity();
 		
@@ -174,7 +184,8 @@ TestCase("formerlyValidationTooLong", {
 	},
 
 	"test should not set tooLong for empty string": function () {
-		var el = createElement("text", "", { maxlength: "20" });
+		var el = createElement("text", "Default", { maxlength: "20" });
+		el.value = "";
 		
 		var ret = el.checkValidity();
 		
@@ -183,6 +194,7 @@ TestCase("formerlyValidationTooLong", {
 
 	"test should not set tooLong with illegal maxlength": function () {
 		var el = createElement("text", "", { maxlength: "illegal" });
+		el.value = "Longer than 20 characters";
 		
 		var ret = el.checkValidity();
 		
@@ -192,6 +204,7 @@ TestCase("formerlyValidationTooLong", {
 	"test should not set tooLong with maxLength -1": function () {
 		// Note: This is the default maxLength in Firefox
 		var el = createElement("text", "", { maxlength: "-1" });
+		el.value = "Longer than 20 characters";
 		
 		var ret = el.checkValidity();
 		
@@ -529,15 +542,15 @@ TestCase("formerlyValidationClassNames", {
 });
 
 function assertInvalid (ret, el, validityState) {
-	assertFalse(ret);
-	assertTrue(el.validity[validityState]);
-	assertFalse(el.validity.valid);
+	assertFalse("Return value", ret);
+	assertTrue("validity." + validityState, el.validity[validityState]);
+	assertFalse("validity.valid", el.validity.valid);
 }
 
 function assertValid (ret, el, validityState) {
-	assertTrue(ret);
-	assertFalse(el.validity[validityState]);
-	assertTrue(el.validity.valid);
+	assertTrue("Return value", ret);
+	assertFalse("validity." + validityState, el.validity[validityState]);
+	assertTrue("validity.valid", el.validity.valid);
 }
 
 // TODO: Validation messages

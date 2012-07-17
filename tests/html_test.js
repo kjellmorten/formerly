@@ -487,7 +487,7 @@ TestCase("HTMLElementsType", {
 		/*:DOC field1 = <keygen /> */
 		formerly.initElement(this.field1);
 
-		assertEquals("KEYGEN", this.field1.tagName);
+		//assertEquals("KEYGEN", this.field1.tagName);
 		// 'SELECT' in Firefox 12.0 Mac OS
 		//assertEquals("keygen", this.field1.type);
 		// 'select-one' in Firefox 12.0 Mac OS
@@ -536,7 +536,7 @@ TestCase("HTMLElementsType", {
 	}
 	
 });
-	
+
 TestCase("HTMLElementsMaxLength", {
 	"test should have maxLength 20": function () {
 		/*:DOC field1 = <input type="text" maxlength="20" /> */
@@ -548,124 +548,11 @@ TestCase("HTMLElementsMaxLength", {
 		//assertEquals(524288, this.field1.maxLength);
 		// -1 in Firefox 12.0 Mac OS and Opera 12.00 Mac OS
 		// 2147483647 in Microsoft Internet Explorer 9.0 Windows
+	},
+	
+	"test should have defaultValue": function () {
+		/*:DOC field1 = <input type="text" value="A value" /> */
+		assertEquals("A value", this.field1.defaultValue);
 	}
 
 });
-
-TestCase("HTMLElementsValidity", {
-	setUp: function () {
-		/*:DOC +=
-			<form id="form1">
-				<input type="text" value="" id="field1" />
-				<input type="text" value="" id="field2" required="required" />
-			</form>
-		*/
-		this.form1 = document.getElementById('form1');
-		this.field1 = document.getElementById('field1');
-		this.field2 = document.getElementById('field2');
-		
-		formerly.init(this.form1);
-		
-		this.handler = sinon.stub();
-	},
-	
-	"test form should have checkValidity function": function () {
-		assertFunction(this.form1.checkValidity);
-	},
-	
-	"test element should have checkValidity function": function () {
-		assertFunction(this.field1.checkValidity);
-	},
-	
-	"test element should have validity object": function () {
-		assertObject(this.field1.validity);
-	},
-
-	"test should be valid": function () {
-		var ret = this.field1.checkValidity();
-		
-		assertTrue(ret);
-		assertTrue(this.field1.validity.valid)
-	},
-
-	"test should be invalid": function () {
-		var ret = this.field2.checkValidity();
-		
-		assertInvalid(ret, this.field2, 'valueMissing');
-	},
-
-	"test should fire invalid event": function () {
-		listenForEvent(this.field2, 'invalid', this.handler);
-		
-		this.field2.checkValidity();
-		
-		assertCalledOnce(this.handler);
-	},
-
-	"test should not fire invalid event": function () {
-		listenForEvent(this.field1, 'invalid', this.handler);
-		
-		this.field1.checkValidity();
-		
-		assertNotCalled(this.handler);
-	},
-
-	"test should find form invalid and fire one invalid event": function () {
-		listenForEvent(this.field1, 'invalid', this.handler);
-		listenForEvent(this.field2, 'invalid', this.handler);
-		
-		this.form1.checkValidity();
-		
-		assertCalledOnce(this.handler);
-	},
-
-	"test element should have setCustomValidity function": function () {
-		assertFunction(this.field1.setCustomValidity);
-	},
-
-	"test should set custom validity": function () {
-		this.field1.setCustomValidity('A message');
-		
-		var ret = this.field1.checkValidity();
-		
-		assertInvalid(ret, this.field1, 'customError');
-		assertEquals('A message', this.field1.validationMessage);
-	},
-
-	"test should clear custom validity": function () {
-		this.field1.setCustomValidity('');
-		
-		var ret = this.field1.checkValidity();
-		
-		assertValid(ret, this.field1, 'customError');
-		assertEquals('', this.field1.validationMessage);
-	},
-
-	"test should not fire invalid event on setCustomValidity": function () {
-		listenForEvent(this.field1, 'invalid', this.handler);
-		
-		this.field1.setCustomValidity('A message');
-		
-		assertNotCalled(this.handler);
-	},
-
-	"test should not validate disabled element": function () {
-		/*:DOC field3 = <input type="text" value="" required="required" disabled="disabled" /> */
-		//this.field2.disabled = true;
-		formerly.initElement(this.field3);
-		
-		var ret = this.field3.checkValidity();
-		
-		assertValid(ret, this.field3, 'valueMissing');
-	}
-
-});
-
-
-function listenForEvent (el, event, handler) {
-	if (el.addEventListener) {
-		el.addEventListener(event, handler, false);
-	} else {
-		el.attachEven('on' + event, handler);
-	}
-}
