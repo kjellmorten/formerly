@@ -102,7 +102,7 @@ var formerly = (function () {
 	}
 	
 	function _checkTooLong (el) {
-		return (el.value.length > el.maxLength);
+		return ((el.maxLength !== -1) && (el.value.length > el.maxLength));
 	}
 	
 	function _checkRangeUnderflow (el) {

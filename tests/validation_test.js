@@ -187,6 +187,15 @@ TestCase("formerlyValidationTooLong", {
 		var ret = el.checkValidity();
 		
 		assertValid(ret, el, 'tooLong');
+	},
+
+	"test should not set tooLong with maxLength -1": function () {
+		// Note: This is the default maxLength in Firefox
+		var el = createElement("text", "", { maxlength: "-1" });
+		
+		var ret = el.checkValidity();
+		
+		assertValid(ret, el, 'tooLong');
 	}
 	
 });

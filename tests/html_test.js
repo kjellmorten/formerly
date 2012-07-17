@@ -1,279 +1,624 @@
-TestCase("HTMLElements", {
-	setUp: function () {
-		/*:DOC += 
-			<form id="form1">
-				<input type="hidden" id="hiddenInput" />
-				<input type="text" id="textInput" maxlength="20" />
-				<input type="search" id="searchInput" />
-				<input type="tel" id="telInput" />
-				<input type="url" id="urlInput" />
-				<input type="email" id="emailInput" />
-				<input type="password" id="passwordInput" />
-				<input type="datetime" id="datetimeInput" />
-				<input type="date" id="dateInput" />
-				<input type="month" id="monthInput" />
-				<input type="week" id="weekInput" />
-				<input type="time" id="timeInput" />
-				<input type="datetime-local" id="datetimeLocalInput" />
-				<input type="number" id="numberInput" />
-				<input type="range" id="rangeInput" />
-				<input type="color" id="colorInput" />
-				<input type="checkbox" id="checkboxInput" />
-				<input type="radio" id="radioInput" />
-				<input type="file" id="fileInput" />
-				<input type="submit" id="submitInput" />
-				<input type="image" id="imageInput" />
-				<input type="reset" id="resetInput" />
-				<input type="button" id="buttonInput" />
-				<button type="submit" id="submitButton"></button>
-				<button type="reset" id="resetButton"></button>
-				<button type="button" id="buttonButton"></button>
-				<fieldset id="fieldset"></fieldset>
-				<keygen id="keygen" />
-				<object id="object" type="application/x-shockwave-flash" />
-				<output id="output" />
-				<select id="select"></select>
-				<select id="selectMulti" multiple="multiple"></select>
-				<textarea id="textarea"></textarea>
-				<input type="text" id="disabledInput" disabled="disabled" />
-				<input type="text" id="readonlyInput" readonly="readonly" />
-			</form>
-		*/
+TestCase("HTMLElementsWillValidate", {
 
-		this.hiddenInput = document.getElementById('hiddenInput');
-		this.textInput = document.getElementById('textInput');
-		this.searchInput = document.getElementById('searchInput');
-		this.telInput = document.getElementById('telInput');
-		this.urlInput = document.getElementById('urlInput');
-		this.emailInput = document.getElementById('emailInput');
-		this.passwordInput = document.getElementById('passwordInput');
-		this.datetimeInput = document.getElementById('datetimeInput');
-		this.dateInput = document.getElementById('dateInput');
-		this.monthInput = document.getElementById('monthInput');
-		this.weekInput = document.getElementById('weekInput');
-		this.timeInput = document.getElementById('timeInput');
-		this.datetimeLocalInput = document.getElementById('datetimeLocalInput');
-		this.numberInput = document.getElementById('numberInput');
-		this.rangeInput = document.getElementById('rangeInput');
-		this.colorInput = document.getElementById('colorInput');
-		this.checkboxInput = document.getElementById('checkboxInput');
-		this.radioInput = document.getElementById('radioInput');
-		this.fileInput = document.getElementById('fileInput');
-		this.submitInput = document.getElementById('submitInput');
-		this.imageInput = document.getElementById('imageInput');
-		this.resetInput = document.getElementById('resetInput');
-		this.buttonInput = document.getElementById('buttonInput');
-		this.submitButton = document.getElementById('submitButton');
-		this.resetButton = document.getElementById('resetButton');
-		this.buttonButton = document.getElementById('buttonButton');
-		this.fieldset = document.getElementById('fieldset');
-		this.keygen = document.getElementById('keygen');
-		this.object = document.getElementById('object');
-		this.output = document.getElementById('output');
-		this.select = document.getElementById('select');
-		this.selectMulti = document.getElementById('selectMulti');
-		this.textarea = document.getElementById('textarea');
-		this.disabledInput = document.getElementById('disabledInput');
-		this.readonlyInput = document.getElementById('readonlyInput');
+	"test willValidate should be false for hidden input": function() {
+		/*:DOC field1 = <input type="hidden" /> */
+		formerly.initElement(this.field1);
 
-		this.form1 = document.getElementById('form1');
-		formerly.init(this.form1);
+		assertFalse(this.field1.willValidate);
 	},
 
-	"test should have expected willValidate values": function () {
-		assertFalse("Hidden will validate", this.hiddenInput.willValidate);
-		assertTrue("Text will validate", this.textInput.willValidate);
-		assertTrue("Search will validate", this.searchInput.willValidate);
-		assertTrue("Tel will validate", this.telInput.willValidate);
-		assertTrue("Url will validate", this.urlInput.willValidate);
-		assertTrue("Email will validate", this.emailInput.willValidate);
-		assertTrue("Password will validate", this.passwordInput.willValidate);
-		assertTrue("DateTime will validate", this.datetimeInput.willValidate);
-		assertTrue("Date will validate", this.dateInput.willValidate);
-		assertTrue("Month will validate", this.monthInput.willValidate);
-		assertTrue("Week will validate", this.weekInput.willValidate);
-		assertTrue("Time will validate", this.timeInput.willValidate);
-		assertTrue("DateTime Local will validate", this.datetimeLocalInput.willValidate);
-		assertTrue("Number will validate", this.numberInput.willValidate);
-		assertTrue("Range will validate", this.rangeInput.willValidate);
-		assertTrue("Color will validate", this.colorInput.willValidate);
-		assertTrue("Checkbox will validate", this.checkboxInput.willValidate);
-		assertTrue("Radio will validate", this.radioInput.willValidate);
-		assertTrue("File will validate", this.fileInput.willValidate);
-		//assertTrue("Submit will validate", this.submitInput.willValidate);					// False in Firefox 12.0 Mac OS
-		//assertFalse("Image will validate", this.imageInput.willValidate);						// False in Opera 12.00 Mac OS
-		assertFalse("Reset will validate", this.resetInput.willValidate);
-		assertFalse("ButtonInput will validate", this.buttonInput.willValidate);
-		//assertTrue("Submit button will validate", this.submitButton.willValidate);			// False in Firefox 12.0 Mac OS
-		assertFalse("Reset button will validate", this.resetButton.willValidate);
-		assertFalse("Button will validate", this.buttonButton.willValidate);
-		assertFalse("Fieldset will validate", this.fieldset.willValidate);
-		//assertFalse("Keygen will validate", this.keygen.willValidate);						// True in Firefox 12.0 Mac OS
-		assertFalse("Object will validate", this.object.willValidate);
-		//assertFalse("Output will validate", this.output.willValidate);						// True in Firefox 12.0 Mac OS
-		assertTrue("Select will validate", this.select.willValidate);
-		assertTrue("Select multiple will validate", this.selectMulti.willValidate);
-		assertTrue("Textarea will validate", this.textarea.willValidate);
-		assertFalse("Disabled element will validate", this.disabledInput.willValidate);
-		assertFalse("Readonly element will validate", this.readonlyInput.willValidate);
+	"test willValidate should be true for text input": function() {
+		/*:DOC field1 = <input type="text" /> */
+		formerly.initElement(this.field1);
+
+		assertTrue(this.field1.willValidate);
 	},
+
+	"test willValidate should be true for search input": function() {
+		/*:DOC field1 = <input type="search" /> */
+		formerly.initElement(this.field1);
+
+		assertTrue(this.field1.willValidate);
+	},
+
+	"test willValidate should be true for tel input": function() {
+		/*:DOC field1 = <input type="tel" /> */
+		formerly.initElement(this.field1);
+
+		assertTrue(this.field1.willValidate);
+	},
+
+	"test willValidate should be true for url input": function() {
+		/*:DOC field1 = <input type="url" /> */
+		formerly.initElement(this.field1);
+
+		assertTrue(this.field1.willValidate);
+	},
+
+	"test willValidate should be true for email input": function() {
+		/*:DOC field1 = <input type="email" /> */
+		formerly.initElement(this.field1);
+
+		assertTrue(this.field1.willValidate);
+	},
+
+	"test willValidate should be true for password input": function() {
+		/*:DOC field1 = <input type="password" /> */
+		formerly.initElement(this.field1);
+
+		assertTrue(this.field1.willValidate);
+	},
+
+	"test willValidate should be true for datetime input": function() {
+		/*:DOC field1 = <input type="datetime" /> */
+		formerly.initElement(this.field1);
+
+		assertTrue(this.field1.willValidate);
+	},
+
+	"test willValidate should be true for date input": function() {
+		/*:DOC field1 = <input type="date" /> */
+		formerly.initElement(this.field1);
+
+		assertTrue(this.field1.willValidate);
+	},
+
+	"test willValidate should be true for month input": function() {
+		/*:DOC field1 = <input type="month" /> */
+		formerly.initElement(this.field1);
+
+		assertTrue(this.field1.willValidate);
+	},
+
+	"test willValidate should be true for week input": function() {
+		/*:DOC field1 = <input type="week" /> */
+		formerly.initElement(this.field1);
+
+		assertTrue(this.field1.willValidate);
+	},
+
+	"test willValidate should be true for time input": function() {
+		/*:DOC field1 = <input type="time" /> */
+		formerly.initElement(this.field1);
+
+		assertTrue(this.field1.willValidate);
+	},
+
+	"test willValidate should be true for datetime local input": function() {
+		/*:DOC field1 = <input type="datetime-local" /> */
+		formerly.initElement(this.field1);
+
+		assertTrue(this.field1.willValidate);
+	},
+
+	"test willValidate should be true for number input": function() {
+		/*:DOC field1 = <input type="number" /> */
+		formerly.initElement(this.field1);
+
+		assertTrue(this.field1.willValidate);
+	},
+
+	"test willValidate should be true for range input": function() {
+		/*:DOC field1 = <input type="range" /> */
+		formerly.initElement(this.field1);
+
+		assertTrue(this.field1.willValidate);
+	},
+
+	"test willValidate should be true for color input": function() {
+		/*:DOC field1 = <input type="color" /> */
+		formerly.initElement(this.field1);
+
+		assertTrue(this.field1.willValidate);
+	},
+
+	"test willValidate should be true for checkbox input": function() {
+		/*:DOC field1 = <input type="checkbox" /> */
+		formerly.initElement(this.field1);
+
+		assertTrue(this.field1.willValidate);
+	},
+
+	"test willValidate should be true for radio input": function() {
+		/*:DOC field1 = <input type="radio" /> */
+		formerly.initElement(this.field1);
+
+		assertTrue(this.field1.willValidate);
+	},
+
+	"test willValidate should be true for file input": function() {
+		/*:DOC field1 = <input type="file" /> */
+		formerly.initElement(this.field1);
+
+		assertTrue(this.field1.willValidate);
+	},
+
+	"test willValidate should be true for submit input": function() {
+		/*:DOC field1 = <input type="submit" /> */
+		formerly.initElement(this.field1);
+
+		//assertTrue(this.field1.willValidate);
+		// False in Firefox 12.0 Mac OS
+	},
+
+	"test willValidate should be false for image input": function() {
+		/*:DOC field1 = <input type="image" /> */
+		formerly.initElement(this.field1);
+
+		//assertFalse(this.field1.willValidate);
+		// True in Opera 12.00 Mac OS
+	},
+
+	"test willValidate should be false for reset input": function() {
+		/*:DOC field1 = <input type="reset" /> */
+		formerly.initElement(this.field1);
+
+		assertFalse(this.field1.willValidate);
+	},
+
+	"test willValidate should be false for button input": function() {
+		/*:DOC field1 = <input type="button" /> */
+		formerly.initElement(this.field1);
+
+		assertFalse(this.field1.willValidate);
+	},
+
+	"test willValidate should be true for submit button": function() {
+		/*:DOC field1 = <button type="submit" /> */
+		formerly.initElement(this.field1);
+
+		//assertTrue(this.field1.willValidate);
+		// False in Firefox 12.0 Mac OS
+	},
+
+	"test willValidate should be false for reset button": function() {
+		/*:DOC field1 = <button type="reset" /> */
+		formerly.initElement(this.field1);
+
+		assertFalse(this.field1.willValidate);
+	},
+
+	"test willValidate should be false for button button": function() {
+		/*:DOC field1 = <button type="button" /> */
+		formerly.initElement(this.field1);
+
+		assertFalse(this.field1.willValidate);
+	},
+
+	"test willValidate should be false for fieldset": function() {
+		/*:DOC field1 = <fieldset></fieldset> */
+		formerly.initElement(this.field1);
+
+		assertFalse(this.field1.willValidate);
+	},
+
+	"test willValidate should be false for keygen": function() {
+		/*:DOC field1 = <keygen /> */
+		formerly.initElement(this.field1);
+
+		//assertFalse(this.field1.willValidate);
+		// True in Firefox 12.0 Mac OS
+	},
+
+	"test willValidate should be false for object": function() {
+		/*:DOC field1 = <object type="application/x-shockwave-flash" /> */
+		formerly.initElement(this.field1);
+
+		assertFalse(this.field1.willValidate);
+	},
+
+	"test willValidate should be false for output": function() {
+		/*:DOC field1 = <output /> */
+		formerly.initElement(this.field1);
+
+		//assertFalse(this.field1.willValidate);
+		// True in Firefox 12.0 Mac OS
+	},
+
+	"test willValidate should be true for select": function() {
+		/*:DOC field1 = <select></select> */
+		formerly.initElement(this.field1);
+
+		assertTrue(this.field1.willValidate);
+	},
+
+	"test willValidate should be true for select multiple": function() {
+		/*:DOC field1 = <select multiple="multiple"></select> */
+		formerly.initElement(this.field1);
+
+		assertTrue(this.field1.willValidate);
+	},
+
+	"test willValidate should be true for textarea": function() {
+		/*:DOC field1 = <textarea></textarea> */
+		formerly.initElement(this.field1);
+
+		assertTrue(this.field1.willValidate);
+	},
+
+	"test willValidate should be false for disabled element": function() {
+		/*:DOC field1 = <input type="text" disabled="disabled" /> */
+		formerly.initElement(this.field1);
+
+		assertFalse(this.field1.willValidate);
+	},
+
+	"test willValidate should be false for readonly element": function() {
+		/*:DOC field1 = <input type="text" readonly="readonly" /> */
+		formerly.initElement(this.field1);
+
+		assertFalse(this.field1.willValidate);
+	}
+});
 	
-	"test should have expected types": function () {
-		assertEquals("Hidden type", "hidden", this.hiddenInput.type);
-		assertEquals("Text type", "text", this.textInput.type);
-		assertEquals("Search type", "search", this.searchInput.type);
-		assertEquals("Tel type", "tel", this.telInput.type);
-		assertEquals("Url type", "url", this.urlInput.type);
-		assertEquals("Email type", "email", this.emailInput.type);
-		assertEquals("Password type", "password", this.passwordInput.type);
-		//assertEquals("DateTime type", "datetime", this.datetimeInput.type);					// 'text' in Firefox 12.0 Mac OS 
-																								//		and Chrome 20.0.1132.57 Mac OS
-		//assertEquals("Date type", "date", this.dateInput.type);								// 'text' in Firefox 12.0 Mac OS
-		//assertEquals("Month type", "month", this.monthInput.type);							// 'text' in Firefox 12.0 Mac OS
-																								//		and Chrome 20.0.1132.57 Mac OS
-		//assertEquals("Week type", "week", this.weekInput.type);								// 'text' in Firefox 12.0 Mac OS
-																									//		and Chrome 20.0.1132.57 Mac OS
-		//assertEquals("Time type", "time", this.timeInput.type);								// 'text' in Firefox 12.0 Mac OS
-																								//		and Chrome 20.0.1132.57 Mac OS
-		//assertEquals("DateTime Local type", "datetime-local", this.datetimeLocalInput.type);	// 'text' in Firefox 12.0 Mac OS
-																								//		and Chrome 20.0.1132.57 Mac OS
-		//assertEquals("Number type", "number", this.numberInput.type);							// 'text' in Firefox 12.0 Mac OS
-		//assertEquals("Range type", "range", this.rangeInput.type);							// 'text' in Firefox 12.0 Mac OS
-		//assertEquals("Color type", "color", this.colorInput.type);							// 'text' in Firefox 12.0 Mac OS
-		assertEquals("Checkbox type", "checkbox", this.checkboxInput.type);
-		assertEquals("Radio type", "radio", this.radioInput.type);
-		assertEquals("File type", "file", this.fileInput.type);
-		assertEquals("Submit type", "submit", this.submitInput.type);
-		assertEquals("Image type", "image", this.imageInput.type);
-		assertEquals("Reset type", "reset", this.resetInput.type);
-		assertEquals("ButtonInput type", "button", this.buttonInput.type);
-		assertEquals("Submit button type", "submit", this.submitButton.type);
-		assertEquals("Reset button type", "reset", this.resetButton.type);
-		assertEquals("Button type", "button", this.buttonButton.type);
-		//assertEquals("Fieldset type", "fieldset", this.fieldset.type);						// undefined in Safari 534.57.2 Mac OS and Opera 12.00 Mac OS
-		//assertEquals("Keygen type", "keygen", this.keygen.type);								// 'select-one' in Firefox 12.0 Mac OS
-		assertEquals("Object type", "application/x-shockwave-flash", this.object.type);
-		//assertEquals("Output type", "output", this.output.type);								// undefined in Opera 12.00 Mac OS
-		assertEquals("Select type", "select-one", this.select.type);
-		assertEquals("Select multiple type", "select-multiple", this.selectMulti.type);
-		assertEquals("Textarea type", "textarea", this.textarea.type);
+TestCase("HTMLElementsType", {
+
+	"test type should be hidden for hidden input": function() {
+		/*:DOC field1 = <input type="hidden" /> */
+		formerly.initElement(this.field1);
+
+		assertEquals("hidden", this.field1.type);
 	},
+
+	"test type should be text for text input": function() {
+		/*:DOC field1 = <input type="text" /> */
+		formerly.initElement(this.field1);
+
+		assertEquals("text", this.field1.type);
+	},
+
+	"test type should be search for search input": function() {
+		/*:DOC field1 = <input type="search" /> */
+		formerly.initElement(this.field1);
+
+		assertEquals("search", this.field1.type);
+	},
+
+	"test type should be tel for tel input": function() {
+		/*:DOC field1 = <input type="tel" /> */
+		formerly.initElement(this.field1);
+
+		assertEquals("tel", this.field1.type);
+	},
+
+	"test type should be url for url input": function() {
+		/*:DOC field1 = <input type="url" /> */
+		formerly.initElement(this.field1);
+
+		assertEquals("url", this.field1.type);
+	},
+
+	"test type should be email for email input": function() {
+		/*:DOC field1 = <input type="email" /> */
+		formerly.initElement(this.field1);
+
+		assertEquals("email", this.field1.type);
+	},
+
+	"test type should be password for password input": function() {
+		/*:DOC field1 = <input type="password" /> */
+		formerly.initElement(this.field1);
+
+		assertEquals("password", this.field1.type);
+	},
+
+	"test type should be datetime for datetime input": function() {
+		/*:DOC field1 = <input type="datetime" /> */
+		formerly.initElement(this.field1);
+
+		//assertEquals("datetime", this.field1.type);
+		// 'text' in Firefox 12.0 Mac OS and Chrome 20.0.1132.57 Mac OS
+	},
+
+	"test type should be date for date input": function() {
+		/*:DOC field1 = <input type="date" /> */
+		formerly.initElement(this.field1);
+
+		assertEquals("date", this.field1.type);
+		// 'text' in Firefox 12.0 Mac OS
+	},
+
+	"test type should be month for month input": function() {
+		/*:DOC field1 = <input type="month" /> */
+		formerly.initElement(this.field1);
+
+		//assertEquals("month", this.field1.type);
+		// 'text' in Firefox 12.0 Mac OS and Chrome 20.0.1132.57 Mac OS
+	},
+
+	"test type should be week for week input": function() {
+		/*:DOC field1 = <input type="week" /> */
+		formerly.initElement(this.field1);
+
+		//assertEquals("week", this.field1.type);
+		// 'text' in Firefox 12.0 Mac OS and Chrome 20.0.1132.57 Mac OS
+	},
+
+	"test type should be time for time input": function() {
+		/*:DOC field1 = <input type="time" /> */
+		formerly.initElement(this.field1);
+
+		//assertEquals("time", this.field1.type);
+		// 'text' in Firefox 12.0 Mac OS and Chrome 20.0.1132.57 Mac OS
+	},
+
+	"test type should be datetime-local for datetime local input": function() {
+		/*:DOC field1 = <input type="datetime-local" /> */
+		formerly.initElement(this.field1);
+
+		//assertEquals("datetime-local", this.field1.type);
+		// 'text' in Firefox 12.0 Mac OS and Chrome 20.0.1132.57 Mac OS
+	},
+
+	"test type should be number for number input": function() {
+		/*:DOC field1 = <input type="number" /> */
+		formerly.initElement(this.field1);
+
+		//assertEquals("number", this.field1.type);
+		// 'text' in Firefox 12.0 Mac OS
+	},
+
+	"test type should be range for range input": function() {
+		/*:DOC field1 = <input type="range" /> */
+		formerly.initElement(this.field1);
+
+		//assertEquals("range", this.field1.type);
+		// 'text' in Firefox 12.0 Mac OS
+	},
+
+	"test type should be color for color input": function() {
+		/*:DOC field1 = <input type="color" /> */
+		formerly.initElement(this.field1);
+
+		//assertEquals("color", this.field1.type);
+		// 'text' in Firefox 12.0 Mac OS
+	},
+
+	"test type should be checkbox for checkbox input": function() {
+		/*:DOC field1 = <input type="checkbox" /> */
+		formerly.initElement(this.field1);
+
+		assertEquals("checkbox", this.field1.type);
+	},
+
+	"test type should be radio for radio input": function() {
+		/*:DOC field1 = <input type="radio" /> */
+		formerly.initElement(this.field1);
+
+		assertEquals("radio", this.field1.type);
+	},
+
+	"test type should be file for file input": function() {
+		/*:DOC field1 = <input type="file" /> */
+		formerly.initElement(this.field1);
+
+		assertEquals("file", this.field1.type);
+	},
+
+	"test type should be submit for submit input": function() {
+		/*:DOC field1 = <input type="submit" /> */
+		formerly.initElement(this.field1);
+
+		assertEquals("submit", this.field1.type);
+	},
+
+	"test type should be image for image input": function() {
+		/*:DOC field1 = <input type="image" /> */
+		formerly.initElement(this.field1);
+
+		assertEquals("image", this.field1.type);
+	},
+
+	"test type should be reset for reset input": function() {
+		/*:DOC field1 = <input type="reset" /> */
+		formerly.initElement(this.field1);
+
+		assertEquals("reset", this.field1.type);
+	},
+
+	"test type should be button for button input": function() {
+		/*:DOC field1 = <input type="button" /> */
+		formerly.initElement(this.field1);
+
+		assertEquals("button", this.field1.type);
+	},
+
+	"test type should be submit for submit button": function() {
+		/*:DOC field1 = <button type="submit" /> */
+		formerly.initElement(this.field1);
+
+		assertEquals("submit", this.field1.type);
+	},
+
+	"test type should be reset for reset button": function() {
+		/*:DOC field1 = <button type="reset" /> */
+		formerly.initElement(this.field1);
+
+		assertEquals("reset", this.field1.type);
+	},
+
+	"test type should be button for button button": function() {
+		/*:DOC field1 = <button type="button" /> */
+		formerly.initElement(this.field1);
+
+		assertEquals("button", this.field1.type);
+	},
+
+	"test type should be fieldset for fieldset": function() {
+		/*:DOC field1 = <fieldset></fieldset> */
+		formerly.initElement(this.field1);
+
+		//assertEquals("fieldset", this.field1.type);
+		// undefined in Safari 534.57.2 Mac OS and Opera 12.00 Mac OS
+	},
+
+	"test type should be keygen for keygen": function() {
+		/*:DOC field1 = <keygen /> */
+		formerly.initElement(this.field1);
+
+		//assertEquals("keygen", this.field1.type);
+		// 'select-one' in Firefox 12.0 Mac OS
+	},
+
+	"test type should be a mime-type for object": function() {
+		/*:DOC field1 = <object type="application/x-shockwave-flash" /> */
+		formerly.initElement(this.field1);
+
+		assertEquals("application/x-shockwave-flash", this.field1.type);
+	},
+
+	"test type should be output for output": function() {
+		/*:DOC field1 = <output /> */
+		formerly.initElement(this.field1);
+
+		//assertEquals("output", this.field1.type);
+		// undefined in Opera 12.00 Mac OS
+	},
+
+	"test type should be select-one for select": function() {
+		/*:DOC field1 = <select></select> */
+		formerly.initElement(this.field1);
+
+		assertEquals("select-one", this.field1.type);
+	},
+
+	"test type should be select-multiple for select multiple": function() {
+		/*:DOC field1 = <select multiple="multiple"></select> */
+		formerly.initElement(this.field1);
+
+		assertEquals("select-multiple", this.field1.type);
+	},
+
+	"test type should be textarea for textarea": function() {
+		/*:DOC field1 = <textarea></textarea> */
+		formerly.initElement(this.field1);
+
+		assertEquals("textarea", this.field1.type);
+	}
 	
+});
+	
+TestCase("HTMLElementsMaxLength", {
 	"test should have maxLength 20": function () {
-		assertEquals(20, this.textInput.maxLength);
+		/*:DOC field1 = <input type="text" maxlength="20" /> */
+		assertEquals(20, this.field1.maxLength);
 	},
 
 	"test should have no maxLength": function () {
-		assertEquals(524288, this.disabledInput.maxLength);
+		/*:DOC field1 = <input type="text" /> */
+		//assertEquals(524288, this.field1.maxLength);
+		// -1 in Firefox 12.0 Mac OS and Opera 12.00 Mac OS
 	}
+
 });
 
 TestCase("HTMLElementsValidity", {
 	setUp: function () {
 		/*:DOC +=
 			<form id="form1">
-				<input type="text" value="" id="validEl" />
-				<input type="text" value="" id="invalidEl" required="required" />
+				<input type="text" value="" id="field1" />
+				<input type="text" value="" id="field2" required="required" />
 			</form>
 		*/
-		this.validEl = document.getElementById('validEl');
-		this.invalidEl = document.getElementById('invalidEl');
-
 		this.form1 = document.getElementById('form1');
-		formerly.init(form1);
-
+		this.field1 = document.getElementById('field1');
+		this.field2 = document.getElementById('field2');
+		
+		formerly.init(this.form1);
+		
 		this.handler = sinon.stub();
 	},
-
+	
 	"test form should have checkValidity function": function () {
 		assertFunction(this.form1.checkValidity);
 	},
 	
 	"test element should have checkValidity function": function () {
-		assertFunction(this.validEl.checkValidity);
+		assertFunction(this.field1.checkValidity);
 	},
 	
 	"test element should have validity object": function () {
-		assertObject(this.validEl.validity);
+		assertObject(this.field1.validity);
 	},
-	
+
 	"test should be valid": function () {
-		var ret = this.validEl.checkValidity();
+		var ret = this.field1.checkValidity();
 		
 		assertTrue(ret);
-		assertTrue(this.validEl.validity.valid)
+		assertTrue(this.field1.validity.valid)
 	},
-	
+
 	"test should be invalid": function () {
-		var ret = this.invalidEl.checkValidity();
+		var ret = this.field2.checkValidity();
 		
-		assertInvalid(ret, this.invalidEl, 'valueMissing');
+		assertInvalid(ret, this.field2, 'valueMissing');
 	},
-	
+
 	"test should fire invalid event": function () {
-		listenForEvent(this.invalidEl, 'invalid', this.handler);
+		listenForEvent(this.field2, 'invalid', this.handler);
 		
-		this.invalidEl.checkValidity();
+		this.field2.checkValidity();
 		
 		assertCalledOnce(this.handler);
 	},
-	
+
 	"test should not fire invalid event": function () {
-		listenForEvent(this.validEl, 'invalid', this.handler);
+		listenForEvent(this.field1, 'invalid', this.handler);
 		
-		this.validEl.checkValidity();
+		this.field1.checkValidity();
 		
 		assertNotCalled(this.handler);
 	},
-	
+
 	"test should find form invalid and fire one invalid event": function () {
-		listenForEvent(this.validEl, 'invalid', this.handler);
-		listenForEvent(this.invalidEl, 'invalid', this.handler);
+		listenForEvent(this.field1, 'invalid', this.handler);
+		listenForEvent(this.field2, 'invalid', this.handler);
 		
 		this.form1.checkValidity();
 		
 		assertCalledOnce(this.handler);
 	},
-	
+
 	"test element should have setCustomValidity function": function () {
-		assertFunction(this.validEl.setCustomValidity);
+		assertFunction(this.field1.setCustomValidity);
 	},
-	
+
 	"test should set custom validity": function () {
-		this.validEl.setCustomValidity('A message');
+		this.field1.setCustomValidity('A message');
 		
-		var ret = this.validEl.checkValidity();
+		var ret = this.field1.checkValidity();
 		
-		assertInvalid(ret, this.validEl, 'customError');
-		assertEquals('A message', this.validEl.validationMessage);
+		assertInvalid(ret, this.field1, 'customError');
+		assertEquals('A message', this.field1.validationMessage);
 	},
 
 	"test should clear custom validity": function () {
-		this.validEl.setCustomValidity('');
+		this.field1.setCustomValidity('');
 		
-		var ret = this.validEl.checkValidity();
+		var ret = this.field1.checkValidity();
 		
-		assertValid(ret, this.validEl, 'customError');
-		assertEquals('', this.validEl.validationMessage);
+		assertValid(ret, this.field1, 'customError');
+		assertEquals('', this.field1.validationMessage);
 	},
 
 	"test should not fire invalid event on setCustomValidity": function () {
-		listenForEvent(this.validEl, 'invalid', this.handler);
+		listenForEvent(this.field1, 'invalid', this.handler);
 		
-		this.validEl.setCustomValidity('A message');
+		this.field1.setCustomValidity('A message');
 		
 		assertNotCalled(this.handler);
 	},
-	
+
 	"test should not validate disabled element": function () {
-		this.invalidEl.disabled = true;
+		this.field2.disabled = true;
 		
-		var ret = this.invalidEl.checkValidity();
+		var ret = this.field2.checkValidity();
 		
-		assertValid(ret, this.invalidEl, 'valueMissing');
+		assertValid(ret, this.field2, 'valueMissing');
 	}
-	
+
 });
+
 
 function listenForEvent (el, event, handler) {
 	if (el.addEventListener) {
