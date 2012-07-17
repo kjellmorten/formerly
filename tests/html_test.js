@@ -257,6 +257,7 @@ TestCase("HTMLElementsType", {
 		/*:DOC field1 = <input type="hidden" /> */
 		formerly.initElement(this.field1);
 
+		assertEquals("hidden", this.field1.attributes['type'].value);
 		assertEquals("hidden", this.field1.type);
 	},
 
@@ -264,6 +265,7 @@ TestCase("HTMLElementsType", {
 		/*:DOC field1 = <input type="text" /> */
 		formerly.initElement(this.field1);
 
+		assertEquals("text", this.field1.attributes['type'].value);
 		assertEquals("text", this.field1.type);
 	},
 
@@ -271,34 +273,43 @@ TestCase("HTMLElementsType", {
 		/*:DOC field1 = <input type="search" /> */
 		formerly.initElement(this.field1);
 
-		assertEquals("search", this.field1.type);
+		assertEquals("search", this.field1.attributes['type'].value);
+		//assertEquals("search", this.field1.type);
+		// 'text' in Microsoft Internet Explorer 9.0 Windows
 	},
 
 	"test type should be tel for tel input": function() {
 		/*:DOC field1 = <input type="tel" /> */
 		formerly.initElement(this.field1);
 
-		assertEquals("tel", this.field1.type);
+		assertEquals("tel", this.field1.attributes['type'].value);
+		//assertEquals("tel", this.field1.type);
+		// 'text' in Microsoft Internet Explorer 9.0 Windows
 	},
 
 	"test type should be url for url input": function() {
 		/*:DOC field1 = <input type="url" /> */
 		formerly.initElement(this.field1);
 
-		assertEquals("url", this.field1.type);
+		assertEquals("url", this.field1.attributes['type'].value);
+		//assertEquals("url", this.field1.type);
+		// 'text' in Microsoft Internet Explorer 9.0 Windows
 	},
 
 	"test type should be email for email input": function() {
 		/*:DOC field1 = <input type="email" /> */
 		formerly.initElement(this.field1);
 
-		assertEquals("email", this.field1.type);
+		assertEquals("email", this.field1.attributes['type'].value);
+		//assertEquals("email", this.field1.type);
+		// 'text' in Microsoft Internet Explorer 9.0 Windows
 	},
 
 	"test type should be password for password input": function() {
 		/*:DOC field1 = <input type="password" /> */
 		formerly.initElement(this.field1);
 
+		assertEquals("password", this.field1.attributes['type'].value);
 		assertEquals("password", this.field1.type);
 	},
 
@@ -306,78 +317,88 @@ TestCase("HTMLElementsType", {
 		/*:DOC field1 = <input type="datetime" /> */
 		formerly.initElement(this.field1);
 
+		assertEquals("datetime", this.field1.attributes['type'].value);
 		//assertEquals("datetime", this.field1.type);
-		// 'text' in Firefox 12.0 Mac OS and Chrome 20.0.1132.57 Mac OS
+		// 'text' in Firefox 12.0 Mac OS, Chrome 20.0.1132.57 Mac OS, and Microsoft Internet Explorer 9.0 Windows
 	},
 
 	"test type should be date for date input": function() {
 		/*:DOC field1 = <input type="date" /> */
 		formerly.initElement(this.field1);
 
-		assertEquals("date", this.field1.type);
-		// 'text' in Firefox 12.0 Mac OS
+		assertEquals("date", this.field1.attributes['type'].value);
+		//assertEquals("date", this.field1.type);
+		// 'text' in Firefox 12.0 Mac OS and Microsoft Internet Explorer 9.0 Windows
 	},
 
 	"test type should be month for month input": function() {
 		/*:DOC field1 = <input type="month" /> */
 		formerly.initElement(this.field1);
 
+		assertEquals("month", this.field1.attributes['type'].value);
 		//assertEquals("month", this.field1.type);
-		// 'text' in Firefox 12.0 Mac OS and Chrome 20.0.1132.57 Mac OS
+		// 'text' in Firefox 12.0 Mac OS, Chrome 20.0.1132.57 Mac OS, and Microsoft Internet Explorer 9.0 Windows
 	},
 
 	"test type should be week for week input": function() {
 		/*:DOC field1 = <input type="week" /> */
 		formerly.initElement(this.field1);
 
+		assertEquals("week", this.field1.attributes['type'].value);
 		//assertEquals("week", this.field1.type);
-		// 'text' in Firefox 12.0 Mac OS and Chrome 20.0.1132.57 Mac OS
+		// 'text' in Firefox 12.0 Mac OS, Chrome 20.0.1132.57 Mac OS, and Microsoft Internet Explorer 9.0 Windows
 	},
 
 	"test type should be time for time input": function() {
 		/*:DOC field1 = <input type="time" /> */
 		formerly.initElement(this.field1);
 
+		assertEquals("time", this.field1.attributes['type'].value);
 		//assertEquals("time", this.field1.type);
-		// 'text' in Firefox 12.0 Mac OS and Chrome 20.0.1132.57 Mac OS
+		// 'text' in Firefox 12.0 Mac OS, Chrome 20.0.1132.57 Mac OS, and Microsoft Internet Explorer 9.0 Windows
 	},
 
 	"test type should be datetime-local for datetime local input": function() {
 		/*:DOC field1 = <input type="datetime-local" /> */
 		formerly.initElement(this.field1);
 
+		assertEquals("datetime-local", this.field1.attributes['type'].value);
 		//assertEquals("datetime-local", this.field1.type);
-		// 'text' in Firefox 12.0 Mac OS and Chrome 20.0.1132.57 Mac OS
+		// 'text' in Firefox 12.0 Mac OS, Chrome 20.0.1132.57 Mac OS, and Microsoft Internet Explorer 9.0 Windows
 	},
 
 	"test type should be number for number input": function() {
 		/*:DOC field1 = <input type="number" /> */
 		formerly.initElement(this.field1);
 
+		assertEquals("number", this.field1.attributes['type'].value);
 		//assertEquals("number", this.field1.type);
-		// 'text' in Firefox 12.0 Mac OS
+		// 'text' in Firefox 12.0 Mac OS and Microsoft Internet Explorer 9.0 Windows
 	},
 
 	"test type should be range for range input": function() {
 		/*:DOC field1 = <input type="range" /> */
 		formerly.initElement(this.field1);
 
+		assertEquals("range", this.field1.attributes['type'].value);
 		//assertEquals("range", this.field1.type);
-		// 'text' in Firefox 12.0 Mac OS
+		// 'text' in Firefox 12.0 Mac OS and Microsoft Internet Explorer 9.0 Windows
 	},
 
 	"test type should be color for color input": function() {
 		/*:DOC field1 = <input type="color" /> */
 		formerly.initElement(this.field1);
 
+		assertEquals("color", this.field1.attributes['type'].value);
 		//assertEquals("color", this.field1.type);
-		// 'text' in Firefox 12.0 Mac OS
+		// 'text' in Firefox 12.0 Mac OS and Microsoft Internet Explorer 9.0 Windows
 	},
 
 	"test type should be checkbox for checkbox input": function() {
 		/*:DOC field1 = <input type="checkbox" /> */
 		formerly.initElement(this.field1);
 
+		assertEquals("checkbox", this.field1.attributes['type'].value);
 		assertEquals("checkbox", this.field1.type);
 	},
 
@@ -385,6 +406,7 @@ TestCase("HTMLElementsType", {
 		/*:DOC field1 = <input type="radio" /> */
 		formerly.initElement(this.field1);
 
+		assertEquals("radio", this.field1.attributes['type'].value);
 		assertEquals("radio", this.field1.type);
 	},
 
@@ -392,6 +414,7 @@ TestCase("HTMLElementsType", {
 		/*:DOC field1 = <input type="file" /> */
 		formerly.initElement(this.field1);
 
+		assertEquals("file", this.field1.attributes['type'].value);
 		assertEquals("file", this.field1.type);
 	},
 
@@ -399,6 +422,7 @@ TestCase("HTMLElementsType", {
 		/*:DOC field1 = <input type="submit" /> */
 		formerly.initElement(this.field1);
 
+		assertEquals("submit", this.field1.attributes['type'].value);
 		assertEquals("submit", this.field1.type);
 	},
 
@@ -406,6 +430,7 @@ TestCase("HTMLElementsType", {
 		/*:DOC field1 = <input type="image" /> */
 		formerly.initElement(this.field1);
 
+		assertEquals("image", this.field1.attributes['type'].value);
 		assertEquals("image", this.field1.type);
 	},
 
@@ -413,6 +438,7 @@ TestCase("HTMLElementsType", {
 		/*:DOC field1 = <input type="reset" /> */
 		formerly.initElement(this.field1);
 
+		assertEquals("reset", this.field1.attributes['type'].value);
 		assertEquals("reset", this.field1.type);
 	},
 
@@ -420,6 +446,7 @@ TestCase("HTMLElementsType", {
 		/*:DOC field1 = <input type="button" /> */
 		formerly.initElement(this.field1);
 
+		assertEquals("button", this.field1.attributes['type'].value);
 		assertEquals("button", this.field1.type);
 	},
 
@@ -427,6 +454,7 @@ TestCase("HTMLElementsType", {
 		/*:DOC field1 = <button type="submit" /> */
 		formerly.initElement(this.field1);
 
+		assertEquals("submit", this.field1.attributes['type'].value);
 		assertEquals("submit", this.field1.type);
 	},
 
@@ -434,6 +462,7 @@ TestCase("HTMLElementsType", {
 		/*:DOC field1 = <button type="reset" /> */
 		formerly.initElement(this.field1);
 
+		assertEquals("reset", this.field1.attributes['type'].value);
 		assertEquals("reset", this.field1.type);
 	},
 
@@ -441,6 +470,7 @@ TestCase("HTMLElementsType", {
 		/*:DOC field1 = <button type="button" /> */
 		formerly.initElement(this.field1);
 
+		assertEquals("button", this.field1.attributes['type'].value);
 		assertEquals("button", this.field1.type);
 	},
 
@@ -448,22 +478,27 @@ TestCase("HTMLElementsType", {
 		/*:DOC field1 = <fieldset></fieldset> */
 		formerly.initElement(this.field1);
 
+		assertEquals("FIELDSET", this.field1.tagName);
 		//assertEquals("fieldset", this.field1.type);
-		// undefined in Safari 534.57.2 Mac OS and Opera 12.00 Mac OS
+		// undefined in Safari 534.57.2 Mac OS, Opera 12.00 Mac OS, and Microsoft Internet Explorer 9.0 Windows
 	},
 
 	"test type should be keygen for keygen": function() {
 		/*:DOC field1 = <keygen /> */
 		formerly.initElement(this.field1);
 
+		assertEquals("KEYGEN", this.field1.tagName);
+		// 'SELECT' in Firefox 12.0 Mac OS
 		//assertEquals("keygen", this.field1.type);
 		// 'select-one' in Firefox 12.0 Mac OS
+		// undefined in Microsoft Internet Explorer 9.0 Windows
 	},
 
 	"test type should be a mime-type for object": function() {
 		/*:DOC field1 = <object type="application/x-shockwave-flash" /> */
 		formerly.initElement(this.field1);
 
+		assertEquals("OBJECT", this.field1.tagName);
 		assertEquals("application/x-shockwave-flash", this.field1.type);
 	},
 
@@ -471,14 +506,16 @@ TestCase("HTMLElementsType", {
 		/*:DOC field1 = <output /> */
 		formerly.initElement(this.field1);
 
+		assertEquals("OUTPUT", this.field1.tagName);
 		//assertEquals("output", this.field1.type);
-		// undefined in Opera 12.00 Mac OS
+		// undefined in Opera 12.00 Mac OS and Microsoft Internet Explorer 9.0 Windows
 	},
 
 	"test type should be select-one for select": function() {
 		/*:DOC field1 = <select></select> */
 		formerly.initElement(this.field1);
 
+		assertEquals("SELECT", this.field1.tagName);
 		assertEquals("select-one", this.field1.type);
 	},
 
@@ -486,6 +523,7 @@ TestCase("HTMLElementsType", {
 		/*:DOC field1 = <select multiple="multiple"></select> */
 		formerly.initElement(this.field1);
 
+		assertEquals("SELECT", this.field1.tagName);
 		assertEquals("select-multiple", this.field1.type);
 	},
 
@@ -493,6 +531,7 @@ TestCase("HTMLElementsType", {
 		/*:DOC field1 = <textarea></textarea> */
 		formerly.initElement(this.field1);
 
+		assertEquals("TEXTAREA", this.field1.tagName);
 		assertEquals("textarea", this.field1.type);
 	}
 	
@@ -508,6 +547,7 @@ TestCase("HTMLElementsMaxLength", {
 		/*:DOC field1 = <input type="text" /> */
 		//assertEquals(524288, this.field1.maxLength);
 		// -1 in Firefox 12.0 Mac OS and Opera 12.00 Mac OS
+		// 2147483647 in Microsoft Internet Explorer 9.0 Windows
 	}
 
 });
@@ -610,11 +650,13 @@ TestCase("HTMLElementsValidity", {
 	},
 
 	"test should not validate disabled element": function () {
-		this.field2.disabled = true;
+		/*:DOC field3 = <input type="text" value="" required="required" disabled="disabled" /> */
+		//this.field2.disabled = true;
+		formerly.initElement(this.field3);
 		
-		var ret = this.field2.checkValidity();
+		var ret = this.field3.checkValidity();
 		
-		assertValid(ret, this.field2, 'valueMissing');
+		assertValid(ret, this.field3, 'valueMissing');
 	}
 
 });

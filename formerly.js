@@ -92,7 +92,7 @@ var formerly = (function () {
 	
 	function _checkPatternMismatch (el) {
 		var pattern;
-		if ((el.value !== '') && (pattern = el.attributes['pattern'])) {
+		if ((el.value !== '') && (el.attributes['pattern'] !== undefined) && (pattern = el.attributes['pattern'].value)) {
 			try {
 				return !(new RegExp('^' + pattern + '$').test(el.value));
 			} catch (err) {}
@@ -109,7 +109,7 @@ var formerly = (function () {
 		var val, min;
 		if ((el.value !== '') && (el.attributes['min'] !== undefined)) {
 			val = parseFloat(el.value);
-			min = parseFloat(el.attributes['min']);
+			min = parseFloat(el.attributes['min'].value);
 			return (min > val);
 		}
 		
@@ -120,7 +120,7 @@ var formerly = (function () {
 		var val, max;
 		if ((el.value !== '') && (el.attributes['max'] !== undefined)) {
 			val = parseFloat(el.value);
-			max = parseFloat(el.attributes['max']);
+			max = parseFloat(el.attributes['max'].value);
 			return (val > max);
 		}
 	
@@ -131,9 +131,9 @@ var formerly = (function () {
 		var val, step, min;
 		if ((el.value !== '') && (el.attributes['step'] !== undefined)) {
 			val = parseFloat(el.value);
-			step = parseFloat(el.attributes['step']);
+			step = parseFloat(el.attributes['step'].value);
 			if ((val) && (step)) {
-				if ((el.attributes['min'] !== undefined) && (min = parseFloat(el.attributes['min']))) {
+				if ((el.attributes['min'] !== undefined) && (min = parseFloat(el.attributes['min'].value))) {
 					val -= min;
 				}
 				return ((val % step) !== 0);
