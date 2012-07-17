@@ -143,7 +143,7 @@ var formerly = (function () {
 	 */
 	 
 	function _willValidate (el) {
-		return ((!el.disabled) && (_elsToValidate.indexOf(el.type) !== -1));
+		return ((!el.disabled) && (!el.readOnly) && (_elsToValidate.indexOf(el.type) !== -1));
 	}
 	
 	function _setCustomValidity (message) {

@@ -276,6 +276,12 @@ TestCase("formerlyElementWillValidate", {
 		var el = createElement('text', '', { disabled: 'disabled' });
 		
 		assertFalse(el.willValidate);
+	},
+
+	"test should return false for readonly element": function () {
+		var el = createElement('text', '', { readonly: 'readonly' });
+		
+		assertFalse(el.willValidate);
 	}
 	
 });

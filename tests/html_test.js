@@ -256,6 +256,14 @@ TestCase("HTMLElementsValidity", {
 		assertValid(ret, this.validEl, 'customError');
 		assertEquals('', this.validEl.validationMessage);
 	},
+
+	"test should not fire invalid event on setCustomValidity": function () {
+		listenForEvent(this.validEl, 'invalid', this.handler);
+		
+		this.validEl.setCustomValidity('A message');
+		
+		assertNotCalled(this.handler);
+	},
 	
 	"test should not validate disabled element": function () {
 		this.invalidEl.disabled = true;
