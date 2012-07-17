@@ -121,32 +121,52 @@ TestCase("formerlyFormConstraintInterface", sinon.testCase({
 		assertNotCalled(this.supForm.addEventListener);
 	},
 	
-	"test should return false when submit event fired on invalid form": function () {
+	"test should prevent default on submit event for invalid form": function () {
+		var event = { preventDefault: this.stub() };
 		this.makeFormInvalid(this.unsupForm);
 		formerly.init(this.unsupForm);
 		
 		var handler = this.unsupForm.addEventListener.args[0][1];
-		var ret = handler.call(this.unsupForm);
+		var ret = handler.call(this.unsupForm, event);
+		assertCalledOnce(event.preventDefault);
+	},
+
+	"test should set returnValue to false on submit event for invalid form": function () {
+		var event = { returnValue: true };
+		this.makeFormInvalid(this.unsupForm);
+		formerly.init(this.unsupForm);
+		
+		var handler = this.unsupForm.addEventListener.args[0][1];
+		var ret = handler.call(this.unsupForm, event);
+		assertFalse(event.returnValue);
+	},
+
+	"test should return false from submit event for invalid form": function () {
+		this.makeFormInvalid(this.unsupForm);
+		formerly.init(this.unsupForm);
+		
+		var handler = this.unsupForm.addEventListener.args[0][1];
+		var ret = handler.call(this.unsupForm, {});
 		assertFalse(ret);
 	},
 
-	"test should return true when submit event fired on valid form": function () {
+	"test should not cancel submit event for valid form": function () {
 		this.makeFormValid(this.unsupForm);
 		formerly.init(this.unsupForm);
 		
 		var handler = this.unsupForm.addEventListener.args[0][1];
-		var ret = handler.call(this.unsupForm);
-		assertTrue(ret);
+		var ret = handler.call(this.unsupForm, {});
+		assertUndefined(ret);
 	},
 
-	"test should return true when submit event fired on form with novalidate attribute": function () {
+	"test should not cancel submit event for form with novalidate attribute": function () {
 		this.makeFormInvalid(this.unsupForm);
 		this.unsupForm.novalidate = true;
 		formerly.init(this.unsupForm);
 		
 		var handler = this.unsupForm.addEventListener.args[0][1];
-		var ret = handler.call(this.unsupForm);
-		assertTrue(ret);
+		var ret = handler.call(this.unsupForm, {});
+		assertUndefined(ret);
 	},
 
 	"test should listen for submit event in older IE": function () {

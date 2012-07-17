@@ -43,8 +43,16 @@ var formerly = (function () {
 		}
 	}
 	
-	function _submitHandler () {
-		return (this.novalidate === true) || this.checkValidity();
+	function _submitHandler (event) {
+		if ((this.novalidate !== true) && !this.checkValidity()) {
+			if (event.preventDefault !== undefined) {
+				event.preventDefault();
+			} else if (event.returnValue !== undefined) {
+				event.returnValue = false;
+			} else {
+				return false;
+			}
+		};
 	}
 	
 	function _throwEvent (el, type) {
