@@ -200,11 +200,8 @@ var formerly = (function () {
 
 	// Inits an element
 	function initElement (el) {
-		if (el.willValidate === undefined) {
+		if (el.checkValidity === undefined) {
 			el.willValidate = _willValidate(el);
-		}
-		if ((el.setCustomValidity === undefined) || (el.validity === undefined) 
-				|| (el.checkValidity === undefined) || (el.validationMessage === undefined)) {
 			el.setCustomValidity = _setCustomValidity;
 			el.validity = {
 				valueMissing: false,

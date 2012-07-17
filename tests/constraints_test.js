@@ -21,7 +21,7 @@ TestCase("formerlyElementConstraintInterface", {
 		assertBoolean(this.unsupEl.willValidate);
 	},
 	
-	"test should not set willValidate when existing": function () {
+	"test should not set willValidate for supporting": function () {
 		formerly.initElement(this.supEl);
 		
 		assertSame(this.obj, this.supEl.willValidate);
@@ -33,7 +33,7 @@ TestCase("formerlyElementConstraintInterface", {
 		assertFunction(this.unsupEl.setCustomValidity);
 	},
 		
-	"test should not set setCustomValidity when existing": function () {
+	"test should not set setCustomValidity for supporting": function () {
 		formerly.initElement(this.supEl);
 		
 		assertSame(this.func, this.supEl.setCustomValidity);
@@ -45,7 +45,7 @@ TestCase("formerlyElementConstraintInterface", {
 		assertObject(this.unsupEl.validity);
 	},
 	
-	"test should not set validity object when existing": function () {
+	"test should not set validity object for supporting": function () {
 		formerly.initElement(this.supEl);
 		
 		assertSame(this.obj, this.supEl.validity);
@@ -57,7 +57,7 @@ TestCase("formerlyElementConstraintInterface", {
 		assertFunction(this.unsupEl.checkValidity);
 	},
 
-	"test should not set checkValidity when existing": function () {
+	"test should not set checkValidity for supporting": function () {
 		formerly.initElement(this.supEl);
 		
 		assertSame(this.func, this.supEl.checkValidity);
@@ -69,27 +69,10 @@ TestCase("formerlyElementConstraintInterface", {
 		assertString(this.unsupEl.validationMessage);
 	},
 	
-	"test should not set validationMessage when existing": function () {
+	"test should not set validationMessage for supporting": function () {
 		formerly.initElement(this.supEl);
 		
 		assertSame(this.obj, this.supEl.validationMessage);
-	},
-
-	"test should set one if any others are missing": function () {
-		var partlySupEl = {
-			willValidate: this.obj,
-			setCustomValidity: this.func,
-			validity: this.obj,
-			validationMessage: this.obj
-		}
-
-		formerly.initElement(partlySupEl);
-		
-		assertFunction(partlySupEl.checkValidity);
-		assertNotSame(this.func, partlySupEl.setCustomValidity);
-		assertNotSame(this.obj, partlySupEl.validity);
-		assertNotSame(this.obj, partlySupEl.validationMessage);
-		//willValidate is treated seperately, as the rest function independent of it
 	}
 
 });
