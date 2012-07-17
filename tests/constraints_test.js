@@ -367,7 +367,7 @@ TestCase("formerlyElementCustomError", {
 		assertTrue(this.el.validity.valid);
 	},
 
-	"test should not clear customError on checkValidity": function () {
+	"test should not clear customError on checkValidity when only error": function () {
 		var el = createElement("text", "");
 
 		el.setCustomValidity('A message');
@@ -378,7 +378,7 @@ TestCase("formerlyElementCustomError", {
 		assertFalse(el.validity.valid);
 	},
 
-	"test should not clear customError on checkValidity with other invalidity": function () {
+	"test should not clear customError on checkValidity with other errors": function () {
 		var el = createElement("text", "", { required: "required" });
 
 		el.setCustomValidity('A message');
@@ -387,6 +387,15 @@ TestCase("formerlyElementCustomError", {
 		assertTrue(el.validity.customError);
 		assertEquals('A message', el.validationMessage);
 		assertFalse(el.validity.valid);
+	},
+
+	"test customError should not clear other errors": function () {
+		var el = createElement("text", "", { required: "required" });
+
+		el.checkValidity();
+		el.setCustomValidity('A message');
+		
+		assertTrue(el.validity.valueMissing);
 	}
 	
 });
