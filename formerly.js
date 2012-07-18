@@ -57,7 +57,7 @@ var formerly = (function () {
 		}
 	}
 	
-	
+
 	/*
 	 * Validation methods
 	 */
@@ -141,6 +141,11 @@ var formerly = (function () {
 		);
 	}
 	
+	function _setValidityClass(el) {
+		_addClass(el, (el.validity.valid) ? 'valid' : 'invalid');
+		_removeClass(el, (el.validity.valid) ? 'invalid' : 'valid');
+	}
+
 	function _validate(el) {
 		if (el.willValidate) {
 			el.validity.valueMissing = _checkValueMissing(el);
@@ -152,8 +157,7 @@ var formerly = (function () {
 			el.validity.stepMismatch = _checkStepMismatch(el);
 			_updateValidState(el);
 			
-			_addClass(el, (el.validity.valid) ? 'valid' : 'invalid');
-			_removeClass(el, (el.validity.valid) ? 'invalid' : 'valid');
+			_setValidityClass(el);
 		}
 	}
 
@@ -176,6 +180,10 @@ var formerly = (function () {
 	
 	function _changeHandler(event) {
 		_validate(this);
+	}
+	
+	function _changeHandlerSupported(event) {
+		_setValidityClass(this);
 	}
 
 	
@@ -229,6 +237,7 @@ var formerly = (function () {
 
 	// Inits an element
 	function initElement(el) {
+		var handler;
 		if (el.checkValidity === undefined) {
 			el.willValidate = _willValidate(el);
 			el.setCustomValidity = _setCustomValidity;
@@ -246,21 +255,25 @@ var formerly = (function () {
 			el.checkValidity = _checkValidity;
 			el.validationMessage = '';
 			
-			_catchEvent(el, 'keyup', _changeHandler);
-			_catchEvent(el, 'change', _changeHandler);
+			handler = _changeHandler;
+		} else {
+			handler = _changeHandlerSupported;
 		}
+
+		_catchEvent(el, 'keyup', handler);
+		_catchEvent(el, 'change', handler);
 	}
 	
 	// Inits a form
 	function _initForm(form) {
 		var i, il;
 
+		for (i = 0, il = form.length; i < il; i++) {
+			this.initElement(form.elements[i]);
+		}
+		
 		if (form.checkValidity === undefined) {
 			form.checkValidity = _checkValidityForm;
-		
-			for (i = 0, il = form.length; i < il; i++) {
-				this.initElement(form.elements[i]);
-			}
 		
 			// Listen for submit event and cancel if form not valid
 			_catchEvent(form, 'submit', _submitHandler);

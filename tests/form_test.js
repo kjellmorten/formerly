@@ -39,14 +39,6 @@ TestCase("formerlyFormInit", sinon.testCase({
 		assertCalledWith(formerly.initElement, this.numberInput);
 	},
 	
-	"test should not init elements in supporting browser": function () {
-		this.form1.checkValidity = function () {};
-		
-		formerly.init(this.form1);
-		
-		assertNotCalled(formerly.initElement);
-	},
-		
 	"test should init all elements in all forms": function () {
 		this.stub(formerly, "getForms").returns([ this.form1, this.form2 ]);
 	
