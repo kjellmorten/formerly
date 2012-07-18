@@ -5,11 +5,15 @@ function createElement(type, value, attrs, className, init, ie) {
 	el.type = (unknownTypes.indexOf(type) !== -1) ? 'text' : type;		// To show that type can't be trusted for certain types
 	el.value = el.defaultValue = value || "";
 	el.attributes = createAttributes(attrs);
-	el.attributes['type'] = { name: 'type', value: type };
+	el.attributes['type'] = { name: 'type', value: el.type };
 	el.className = className || '';
 	el.disabled = (el.attributes['disabled'] !== undefined);
 	el.readOnly = (el.attributes['readonly'] !== undefined);
 	el.maxLength = (el.attributes['maxlength'] !== undefined) ? parseInt(el.attributes['maxlength'].value) : 524288;
+	
+	el.getAttribute = function (attr) {
+		return (attr === 'type') ? type : (el.attributes[attr]) ? el.attributes[attr].value : null;
+	}
 	
 	if (ie !== true) {
 		el.addEventListener = sinon.stub();

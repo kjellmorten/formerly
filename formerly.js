@@ -27,8 +27,7 @@ var formerly = (function () {
 	 */
 	 
 	function _getAttr(el, attr) {
-		var a = el.attributes[attr];
-		return (a !== undefined) ? a.value : null;
+		return el.getAttribute(attr);
 	}
 	 
 	function _removeLeadingSpace(str) {
