@@ -1,3 +1,6 @@
+/*global document */
+/*jslint white: true, plusplus: false, onevar: true, nomen: false, undef: true, newcap: true, regexp: true, bitwise: true, maxerr: 50, indent: 4 */
+
 /*
 * formerly
 *
@@ -9,10 +12,9 @@
 */
 
 var formerly = (function () {
-	var _elsToValidate = 'text search tel url email password datetime date month week ' +
-						'time datetime-local number range color checkbox radio file ' +
-						'submit select-one select-multiple textarea'.split(' '),
-		_emailRegExp = /^[a-z][a-z0-9!#$%&'*+\-\/=?^_`{|}~\.]*@[a-z0-9\-]+(\.[a-z0-9\-]+)*$/i,
+	var _elsToValidate = 'text search tel url email password datetime date month week time datetime-local number ' +
+						 'range color checkbox radio file submit select-one select-multiple textarea'.split(' '),
+		_emailRegExp = /^[a-z][a-z0-9!#$%&'*+\-\/=?\^_`{|}~\.]*@[a-z0-9\-]+(\.[a-z0-9\-]+)*$/i,
 		_urlRegExp = /^\s*[a-z][a-z0-9+\-\.]+:\/\//i;
 
 	/*
@@ -34,7 +36,7 @@ var formerly = (function () {
 		}
 	}
 	
-	function _catchEvent (el, type, handler) {
+	function _catchEvent(el, type, handler) {
 		if (el.addEventListener !== undefined) {
 			el.addEventListener(type, handler, true);		// Modern browsers
 		} else if (el.attachEvent !== undefined) {
@@ -42,7 +44,7 @@ var formerly = (function () {
 		}
 	}
 	
-	function _throwEvent (el, type) {
+	function _throwEvent(el, type) {
 		var event;
 		if (el.dispatchEvent !== undefined) {
 			event = document.createEvent("HTMLEvents");		// Modern browsers
@@ -57,51 +59,30 @@ var formerly = (function () {
 	
 	
 	/*
-	 * Event handlers
-	 */
-
-	function _submitHandler (event) {
-		if ((this.novalidate !== true) && !this.checkValidity()) {
-			if (event.preventDefault !== undefined) {
-				event.preventDefault();
-			} else if (event.returnValue !== undefined) {
-				event.returnValue = false;
-			} else {
-				return false;
-			}
-		};
-	}
-	
-	function _changeHandler (event) {
-		_validate(this);
-	}
-
-	
-	/*
 	 * Validation methods
 	 */
 	
-	function _checkValueMissing (el) {
-		return ((el.attributes['required'] !== undefined) && (el.value === ''));
+	function _checkValueMissing(el) {
+		return ((el.attributes.required !== undefined) && (el.value === ''));
 	}
 	
-	function _checkTypeMismatch (el) {
+	function _checkTypeMismatch(el) {
 		if (el.value !== '') {
 			switch (el.type) {
-				case 'email':
-					return !(_emailRegExp.test(el.value));
-				case 'url':
-					return !(_urlRegExp.test(el.value));
-				default:
+			case 'email':
+				return !(_emailRegExp.test(el.value));
+			case 'url':
+				return !(_urlRegExp.test(el.value));
+			default:
 			}
 		}
 		
 		return false;
 	}
 	
-	function _checkPatternMismatch (el) {
+	function _checkPatternMismatch(el) {
 		var pattern;
-		if ((el.value !== '') && (el.attributes['pattern'] !== undefined) && (pattern = el.attributes['pattern'].value)) {
+		if ((el.value !== '') && (el.attributes.pattern !== undefined) && (pattern = el.attributes.pattern.value)) {
 			try {
 				return !(new RegExp('^' + pattern + '$').test(el.value));
 			} catch (err) {}
@@ -110,39 +91,39 @@ var formerly = (function () {
 		return false;
 	}
 	
-	function _checkTooLong (el) {
+	function _checkTooLong(el) {
 		return ((el.maxLength !== -1) && (el.value !== el.defaultValue) && (el.value.length > el.maxLength));
 	}
 	
-	function _checkRangeUnderflow (el) {
+	function _checkRangeUnderflow(el) {
 		var val, min;
-		if ((el.value !== '') && (el.attributes['min'] !== undefined)) {
+		if ((el.value !== '') && (el.attributes.min !== undefined)) {
 			val = parseFloat(el.value);
-			min = parseFloat(el.attributes['min'].value);
+			min = parseFloat(el.attributes.min.value);
 			return (min > val);
 		}
 		
 		return false;
 	}
 
-	function _checkRangeOverflow (el) {
+	function _checkRangeOverflow(el) {
 		var val, max;
-		if ((el.value !== '') && (el.attributes['max'] !== undefined)) {
+		if ((el.value !== '') && (el.attributes.max !== undefined)) {
 			val = parseFloat(el.value);
-			max = parseFloat(el.attributes['max'].value);
+			max = parseFloat(el.attributes.max.value);
 			return (val > max);
 		}
 	
 		return false;
 	}
 	
-	function _checkStepMismatch (el) {
+	function _checkStepMismatch(el) {
 		var val, step, min;
-		if ((el.value !== '') && (el.attributes['step'] !== undefined)) {
+		if ((el.value !== '') && (el.attributes.step !== undefined)) {
 			val = parseFloat(el.value);
-			step = parseFloat(el.attributes['step'].value);
+			step = parseFloat(el.attributes.step.value);
 			if ((val) && (step)) {
-				if ((el.attributes['min'] !== undefined) && (min = parseFloat(el.attributes['min'].value))) {
+				if ((el.attributes.min !== undefined) && (min = parseFloat(el.attributes.min.value))) {
 					val -= min;
 				}
 				return ((val % step) !== 0);
@@ -152,16 +133,16 @@ var formerly = (function () {
 		return false;
 	}
 
-	 function _updateValidState (el) {
+	function _updateValidState(el) {
 		var val = el.validity;
 		el.validity.valid = !(
 			val.valueMissing || val.typeMismatch || val.patternMismatch || 
 			val.tooLong || val.rangeUnderflow || val.rangeOverflow || 
 			val.stepMismatch || val.customError
 		);
-	 }
+	}
 	
-	function _validate (el) {
+	function _validate(el) {
 		if (el.willValidate) {
 			el.validity.valueMissing = _checkValueMissing(el);
 			el.validity.typeMismatch = _checkTypeMismatch(el);
@@ -179,20 +160,41 @@ var formerly = (function () {
 
 
 	/*
+	 * Event handlers
+	 */
+
+	function _submitHandler(event) {
+		if ((this.novalidate !== true) && !this.checkValidity()) {
+			if (event.preventDefault !== undefined) {
+				event.preventDefault();
+			} else if (event.returnValue !== undefined) {
+				event.returnValue = false;
+			} else {
+				return false;
+			}
+		}
+	}
+	
+	function _changeHandler(event) {
+		_validate(this);
+	}
+
+	
+	/*
 	 * Constraints interface
 	 */
 	 
-	function _willValidate (el) {
+	function _willValidate(el) {
 		return ((!el.disabled) && (!el.readOnly) && (_elsToValidate.indexOf(el.type) !== -1));
 	}
 	
-	function _setCustomValidity (message) {
+	function _setCustomValidity(message) {
 		this.validationMessage = message;
 		this.validity.customError = (message !== '');
 		_updateValidState(this);
 	}
 	
-	function _checkValidity () {
+	function _checkValidity() {
 		if (!this.willValidate) {
 			return true;
 		}
@@ -206,8 +208,8 @@ var formerly = (function () {
 		return this.validity.valid;
 	}
 
-	function _checkValidityForm () {
-		var valid = true;
+	function _checkValidityForm() {
+		var valid = true, i, il;
 		
 		for (i = 0, il = this.elements.length; i < il; i++) {
 			valid = valid && this.elements[i].checkValidity();
@@ -227,7 +229,7 @@ var formerly = (function () {
 	}
 
 	// Inits an element
-	function initElement (el) {
+	function initElement(el) {
 		if (el.checkValidity === undefined) {
 			el.willValidate = _willValidate(el);
 			el.setCustomValidity = _setCustomValidity;
@@ -251,7 +253,7 @@ var formerly = (function () {
 	}
 	
 	// Inits a form
-	function _initForm (form) {
+	function _initForm(form) {
 		var i, il;
 
 		if (form.checkValidity === undefined) {
@@ -267,7 +269,7 @@ var formerly = (function () {
 	}
 
 	// Inits the given form or, if none is given, all forms.
-	function init (form) {
+	function init(form) {
 		var i, il, forms;
 	
 		if (form) {
@@ -292,4 +294,4 @@ var formerly = (function () {
 		getForms: getForms
 	};
 	
-})();
+}());
