@@ -57,12 +57,6 @@ TestCase("formerlyElementConstraintInterface", {
 		assertFunction(this.unsupEl.checkValidity);
 	},
 
-	"test should not set checkValidity for supporting": function () {
-		formerly.initElement(this.supEl);
-		
-		assertSame(this.func, this.supEl.checkValidity);
-	},
-
 	"test should set validationMessage": function () {
 		formerly.initElement(this.unsupEl);
 		

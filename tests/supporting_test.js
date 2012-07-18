@@ -4,10 +4,10 @@ TestCase("formerlySupportingClasses", sinon.testCase({
 	},
 
 	createSupportingForm: function () {
-		var form1 = { addEventListener: sinon.stub() };
+		var form1 = { addEventListener: this.stub() };
 		form1.elements = [ createElement("text", ""), createElement("number", "") ];
 		form1.length = form1.elements.length;
-		form1.checkValidity = function () {};
+		form1.checkValidity = this.stub();
 		this.spy(formerly, "initElement");
 		return form1;
 	},
@@ -89,6 +89,31 @@ TestCase("formerlySupportingClasses", sinon.testCase({
 		handler(event);
 		
 		assertEquals('invalid', el.className);
+	},
+	
+	"test should set validity class on checkValidity": function () {
+		var form1 = this.createSupportingForm();
+		var el = form1.elements[0];
+		var cv = el.checkValidity = this.stub();
+		el.validity = { valid: true };
+		formerly.init(form1);
+		
+		el.checkValidity();
+		
+		assertEquals('valid', el.className);
+		assertCalledOnce(cv);
+	},
+
+	"test should not set validity class on checkValidity when touchSupporting is false": function () {
+		var form1 = this.createSupportingForm();
+		var el = form1.elements[0];
+		var cv = el.checkValidity = this.stub();
+		el.validity = { valid: true };
+		formerly.init(form1, { touchSupporting: false });
+		
+		el.checkValidity();
+		
+		assertNotEquals('valid', el.className);
 	}
 	
 }));

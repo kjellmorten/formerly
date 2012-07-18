@@ -69,11 +69,6 @@ var formerly = (function () {
 		return (event) ? event : window.event;
 	}
 
-	function _getEventElement(event) {
-		event = _getEvent(event);
-		return event.target || event.srcElement;
-	}
-		
 	function _setConfig(config) {
 		var prop;
 		if (config) {
@@ -224,14 +219,6 @@ var formerly = (function () {
 			}
 		}
 	}
-	
-	function _changeHandler(event) {
-		_validate(_getEventElement(event));
-	}
-	
-	function _changeHandlerSupporting(event) {
-		_setValidityClass(_getEventElement(event));
-	}
 
 	
 	/*
@@ -284,8 +271,11 @@ var formerly = (function () {
 
 	// Inits an element
 	function initElement(el) {
-		var handler;
+		var handler, originalCheckValidity;
+
 		if (el.checkValidity === undefined) {
+
+			// Set up polyfills
 			el.willValidate = _willValidate(el);
 			el.setCustomValidity = _setCustomValidity;
 			el.validity = {};
@@ -293,11 +283,29 @@ var formerly = (function () {
 			el.checkValidity = _checkValidity;
 			el.validationMessage = '';
 			
-			handler = _changeHandler;
+			// Validate element on keyup, change and blur events
+			handler = function () {
+				_validate(el);
+			};
+
 		} else if (_config.touchSupporting) {
-			handler = _changeHandlerSupporting;
+
+			// Wrap browsers checkValidity to update validity classes at validation
+			originalCheckValidity = el.checkValidity;
+			el.checkValidity = function () {
+				var ret = originalCheckValidity.call(this);
+				_setValidityClass(el);
+				return ret;
+			};
+
+			// Update validity classes on keyup, change and blur events
+			handler = function () {
+				_setValidityClass(el);
+			};
+
 		}
-		
+
+		// Bind listeners to element
 		if (handler) {
 			_catchEvent(el, 'keyup', handler);
 			_catchEvent(el, 'change', handler);
