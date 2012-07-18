@@ -301,6 +301,7 @@ var formerly = (function () {
 		if (handler) {
 			_catchEvent(el, 'keyup', handler);
 			_catchEvent(el, 'change', handler);
+			_catchEvent(el, 'blur', handler);
 		}
 	}
 	

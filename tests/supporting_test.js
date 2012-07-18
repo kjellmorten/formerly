@@ -42,13 +42,16 @@ TestCase("formerlySupportingClasses", sinon.testCase({
 
 		formerly.initElement(el);
 		
-		assertCalledTwice(el.addEventListener);
+		assertCalledThrice(el.addEventListener);
 		assertCalledWith(el.addEventListener, "keyup");
 		assertCalledWith(el.addEventListener, "change");
+		assertCalledWith(el.addEventListener, "blur");
 		assertFunction(el.addEventListener.args[0][1]);
 		assertFunction(el.addEventListener.args[1][1]);
+		assertFunction(el.addEventListener.args[2][1]);
 		assertTrue(el.addEventListener.args[0][2]);
 		assertTrue(el.addEventListener.args[1][2]);
+		assertTrue(el.addEventListener.args[2][2]);
 	},
 
 	"test should not listen for keyup and change event when touchSupporting is false": function () {

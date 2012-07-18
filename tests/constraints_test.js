@@ -407,30 +407,35 @@ TestCase("formerlyElementCustomError", {
 });
 
 TestCase("formerlyUpdateValidity", {
-	"test should listen for keyup and change event on element": function () {
+	"test should listen for keyup, change and blur events on element": function () {
 		var el = createElement("text", "", null, "", false, false);
 
 		formerly.initElement(el);
 		
-		assertCalledTwice(el.addEventListener);
+		assertCalledThrice(el.addEventListener);
 		assertCalledWith(el.addEventListener, "keyup");
 		assertCalledWith(el.addEventListener, "change");
+		assertCalledWith(el.addEventListener, "blur");
 		assertFunction(el.addEventListener.args[0][1]);
 		assertFunction(el.addEventListener.args[1][1]);
+		assertFunction(el.addEventListener.args[2][1]);
 		assertTrue(el.addEventListener.args[0][2]);
 		assertTrue(el.addEventListener.args[1][2]);
+		assertTrue(el.addEventListener.args[2][2]);
 	},
 
-	"test should listen for keyup and change event on element in old IE": function () {
+	"test should listen for keyup, change and blur events on element in old IE": function () {
 		var el = createElement("text", "", null, "", false, true);
 
 		formerly.initElement(el);
 		
-		assertCalledTwice(el.attachEvent);
+		assertCalledThrice(el.attachEvent);
 		assertCalledWith(el.attachEvent, "onkeyup");
 		assertCalledWith(el.attachEvent, "onchange");
+		assertCalledWith(el.attachEvent, "onblur");
 		assertFunction(el.attachEvent.args[0][1]);
 		assertFunction(el.attachEvent.args[1][1]);
+		assertFunction(el.attachEvent.args[2][1]);
 	},
 
 	"test should be invalid after change": function () {
