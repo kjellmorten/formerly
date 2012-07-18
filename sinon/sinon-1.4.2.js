@@ -1,5 +1,5 @@
 /**
- * Sinon.JS 1.4.0, 2012/07/09
+ * Sinon.JS 1.4.2, 2012/07/11
  *
  * @author Christian Johansen (christian@cjohansen.no)
  * @author Contributors: https://github.com/cjohansen/Sinon.JS/blob/master/AUTHORS
@@ -179,7 +179,8 @@ var buster = (function (setTimeout, B) {
         }
     };
 
-    if (typeof process === "object") {
+    if (typeof process === "object" &&
+        typeof require === "function" && typeof module === "object") {
         var crypto = require("crypto");
         var path = require("path");
 
@@ -839,7 +840,7 @@ var sinon = (function (buster) {
                     if (!matchObject(exp, act)) {
                         return false;
                     }
-                } else if (exp !== act) {
+                } else if (!sinon.deepEqual(exp, act)) {
                     return false;
                 }
             }
