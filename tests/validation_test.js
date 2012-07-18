@@ -389,11 +389,10 @@ TestCase("formerlyValidationStepMismatch", {
 
 });
 
-TestCase("formerlyValidationInvalidEvent", {
+TestCase("formerlyValidationInvalidEvent", sinon.testCase({
 	
 	"test should throw invalid event on checkValidity": function () {
-		var el = createElement("text", "", { required: 'required' });
-		formerly.initElement(el);
+		var el = createElement("text", "", { required: 'required' }, "", true, false);
 		
 		el.checkValidity();
 		
@@ -407,7 +406,6 @@ TestCase("formerlyValidationInvalidEvent", {
 	
 	"test should not throw invalid event when element valid": function () {
 		var el = createElement("text", "");
-		formerly.initElement(el);
 		
 		el.checkValidity();
 		
@@ -415,10 +413,9 @@ TestCase("formerlyValidationInvalidEvent", {
 	},
 	
 	"test should throw invalid event in older IE": function () {
-		var el = { type: "text", value: "", attributes: { required: 'required' } };
-		el.fireEvent = sinon.stub();
-		formerly.initElement(el);
-		document.createEventObject = function () { return { eventType: null } };
+		var el = createElement("text", "", { required: 'required' }, "", true, true);
+		if (document.createEventObject === undefined) { document.createEventObject = function () {}; };
+		this.stub(document, "createEventObject").returns({ eventType: null });
 		
 		el.checkValidity();
 		
@@ -429,7 +426,7 @@ TestCase("formerlyValidationInvalidEvent", {
 		assertEquals('invalid', event.eventType);
 	}
 	
-});
+}));
 
 
 TestCase("formerlyValidationClassNames", {	

@@ -405,3 +405,51 @@ TestCase("formerlyElementCustomError", {
 	}
 	
 });
+
+TestCase("formerlyUpdateValidity", {
+	"test should listen for keyup and change event on element": function () {
+		var el = createElement("text", "", null, "", false, false);
+
+		formerly.initElement(el);
+		
+		assertCalledTwice(el.addEventListener);
+		assertCalledWith(el.addEventListener, "keyup");
+		assertCalledWith(el.addEventListener, "change");
+		assertFunction(el.addEventListener.args[0][1]);
+		assertFunction(el.addEventListener.args[1][1]);
+		assertTrue(el.addEventListener.args[0][2]);
+		assertTrue(el.addEventListener.args[1][2]);
+	},
+
+	"test should listen for keyup and change event on element in old IE": function () {
+		var el = createElement("text", "", null, "", false, true);
+
+		formerly.initElement(el);
+		
+		assertCalledTwice(el.attachEvent);
+		assertCalledWith(el.attachEvent, "onkeyup");
+		assertCalledWith(el.attachEvent, "onchange");
+		assertFunction(el.attachEvent.args[0][1]);
+		assertFunction(el.attachEvent.args[1][1]);
+	},
+
+	"test should be invalid after change": function () {
+		var el = createElement("text", "", { required: "required" }, "", true, false);		
+		var handler = el.addEventListener.args[0][1];
+		
+		handler.call(el);
+		
+		assertFalse(el.validity.valid);
+		assertTrue(el.validity.valueMissing);
+	},
+
+	"test should not throw invalid event on change": function () {
+		var el = createElement("text", "", { required: "required" }, "", true, false);		
+		var handler = el.addEventListener.args[0][1];
+		
+		handler.call(el);
+		
+		assertNotCalled(el.dispatchEvent);
+	}
+
+});

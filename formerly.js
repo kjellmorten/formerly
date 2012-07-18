@@ -3,7 +3,7 @@
 *
 * @package formerly
 * @author $Author: kjellmorten $
-* @version $Id: formerly.js, v 0.1 $
+* @version $Id: formerly.js, v 0.6 $
 * @license BSD
 * @copyright (c) Kjell-Morten Bratsberg Thorsen http://kjellmorten.no/
 */
@@ -18,15 +18,6 @@ var formerly = (function () {
 	/*
 	 * Private help functions
 	 */
-
-	 function _updateValidState (el) {
-		var val = el.validity;
-		el.validity.valid = !(
-			val.valueMissing || val.typeMismatch || val.patternMismatch || 
-			val.tooLong || val.rangeUnderflow || val.rangeOverflow || 
-			val.stepMismatch || val.customError
-		);
-	 }
 
 	function _addClass(el, className) {
 		if (el.className === '') {
@@ -43,6 +34,32 @@ var formerly = (function () {
 		}
 	}
 	
+	function _catchEvent (el, type, handler) {
+		if (el.addEventListener !== undefined) {
+			el.addEventListener(type, handler, true);		// Modern browsers
+		} else if (el.attachEvent !== undefined) {
+			el.attachEvent('on' + type, handler);			// Old IEs
+		}
+	}
+	
+	function _throwEvent (el, type) {
+		var event;
+		if (el.dispatchEvent !== undefined) {
+			event = document.createEvent("HTMLEvents");		// Modern browsers
+			event.initEvent(type, false, true);
+			el.dispatchEvent(event);
+		} else if (el.fireEvent !== undefined) {
+		    event = document.createEventObject();			// Old IEs
+		    event.eventType = type;
+		    el.fireEvent("on" + type, event);
+		}
+	}
+	
+	
+	/*
+	 * Event handlers
+	 */
+
 	function _submitHandler (event) {
 		if ((this.novalidate !== true) && !this.checkValidity()) {
 			if (event.preventDefault !== undefined) {
@@ -55,18 +72,10 @@ var formerly = (function () {
 		};
 	}
 	
-	function _throwEvent (el, type) {
-		var event;
-		if (el.dispatchEvent) {
-			event = document.createEvent("HTMLEvents");
-			event.initEvent(type, false, true);
-			el.dispatchEvent(event);
-		} else {
-		    event = document.createEventObject();
-		    event.eventType = type;
-		    el.fireEvent("on" + type, event);
-		}
+	function _changeHandler (event) {
+		_validate(this);
 	}
+
 	
 	/*
 	 * Validation methods
@@ -143,6 +152,31 @@ var formerly = (function () {
 		return false;
 	}
 
+	 function _updateValidState (el) {
+		var val = el.validity;
+		el.validity.valid = !(
+			val.valueMissing || val.typeMismatch || val.patternMismatch || 
+			val.tooLong || val.rangeUnderflow || val.rangeOverflow || 
+			val.stepMismatch || val.customError
+		);
+	 }
+	
+	function _validate (el) {
+		if (el.willValidate) {
+			el.validity.valueMissing = _checkValueMissing(el);
+			el.validity.typeMismatch = _checkTypeMismatch(el);
+			el.validity.patternMismatch = _checkPatternMismatch(el);
+			el.validity.tooLong = _checkTooLong(el);
+			el.validity.rangeUnderflow = _checkRangeUnderflow(el);
+			el.validity.rangeOverflow = _checkRangeOverflow(el);
+			el.validity.stepMismatch = _checkStepMismatch(el);
+			_updateValidState(el);
+			
+			_addClass(el, (el.validity.valid) ? 'valid' : 'invalid');
+			_removeClass(el, (el.validity.valid) ? 'invalid' : 'valid');
+		}
+	}
+
 
 	/*
 	 * Constraints interface
@@ -162,18 +196,8 @@ var formerly = (function () {
 		if (!this.willValidate) {
 			return true;
 		}
-	
-		this.validity.valueMissing = _checkValueMissing(this);
-		this.validity.typeMismatch = _checkTypeMismatch(this);
-		this.validity.patternMismatch = _checkPatternMismatch(this);
-		this.validity.tooLong = _checkTooLong(this);
-		this.validity.rangeUnderflow = _checkRangeUnderflow(this);
-		this.validity.rangeOverflow = _checkRangeOverflow(this);
-		this.validity.stepMismatch = _checkStepMismatch(this);
-		_updateValidState(this);
-		
-		_addClass(this, (this.validity.valid) ? 'valid' : 'invalid');
-		_removeClass(this, (this.validity.valid) ? 'invalid' : 'valid');
+
+		_validate(this);
 		
 		if (!this.validity.valid) {
 			_throwEvent(this, 'invalid');
@@ -220,6 +244,9 @@ var formerly = (function () {
 			};
 			el.checkValidity = _checkValidity;
 			el.validationMessage = '';
+			
+			_catchEvent(el, 'keyup', _changeHandler);
+			_catchEvent(el, 'change', _changeHandler);
 		}
 	}
 	
@@ -235,11 +262,7 @@ var formerly = (function () {
 			}
 		
 			// Listen for submit event and cancel if form not valid
-			if (form.addEventListener) {
-				form.addEventListener('submit', _submitHandler, true);		// Modern browsers
-			} else {
-				form.attachEvent('onsubmit', _submitHandler);				// Old IEs
-			}
+			_catchEvent(form, 'submit', _submitHandler);
 		}
 	}
 
