@@ -534,6 +534,30 @@ TestCase("formerlyValidationClassNames", {
 		assertTrue("Has class 'is'", classNames.indexOf('is') > -1);
 		assertTrue("Has class 'valid'", classNames.indexOf('valid') > -1);
 		assertTrue("Has class 'notinvalid'", classNames.indexOf('invalidlike') > -1);
+	},
+	
+	"test should use custom valid class name when set": function () {
+		var form1 = { addEventListener: sinon.stub() };
+		var el = createElement("text", "", null, "", false);
+		form1.elements = [ el ];
+		form1.length = form1.elements.length;
+		formerly.init(form1, { validClass: 'okay' });
+
+		var ret = el.checkValidity();
+		
+		assertEquals('okay', el.className);
+	},
+
+	"test should use custom invalid class name when set": function () {
+		var form1 = { addEventListener: sinon.stub() };
+		var el = createElement("text", "", { required: "required" }, "", false);
+		form1.elements = [ el ];
+		form1.length = form1.elements.length;
+		formerly.init(form1, { invalidClass: 'fail' });
+
+		var ret = el.checkValidity();
+		
+		assertEquals('fail', el.className);
 	}
 
 });

@@ -17,7 +17,9 @@ var formerly = (function () {
 		_emailRegExp = /^[a-z][a-z0-9!#$%&'*+\-\/=?\^_`{|}~\.]*@[a-z0-9\-]+(\.[a-z0-9\-]+)*$/i,
 		_urlRegExp = /^\s*[a-z][a-z0-9+\-\.]+:\/\//i,
 		_config = {
-			touchSupporting: true
+			touchSupporting: true,
+			validClass: 'valid',
+			invalidClass: 'invalid'
 		};
 
 	/*
@@ -183,8 +185,9 @@ var formerly = (function () {
 	}
 
 	function _setValidityClass(el) {
-		_addClass(el, (el.validity.valid) ? 'valid' : 'invalid');
-		_removeClass(el, (el.validity.valid) ? 'invalid' : 'valid');
+		var validClass = _config.validClass, invalidClass = _config.invalidClass;
+		_addClass(el, (el.validity.valid) ? validClass : invalidClass);
+		_removeClass(el, (el.validity.valid) ? invalidClass : validClass);
 	}
 
 	function _validate(el) {
