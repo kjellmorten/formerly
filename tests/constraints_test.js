@@ -436,8 +436,20 @@ TestCase("formerlyUpdateValidity", {
 	"test should be invalid after change": function () {
 		var el = createElement("text", "", { required: "required" }, "", true, false);		
 		var handler = el.addEventListener.args[0][1];
+		var event = { target: el };
 		
-		handler.call(el);
+		handler(event);
+		
+		assertFalse(el.validity.valid);
+		assertTrue(el.validity.valueMissing);
+	},
+
+	"test should be invalid after change in IE": function () {
+		var el = createElement("text", "", { required: "required" }, "", true, false);		
+		var handler = el.addEventListener.args[0][1];
+		var event = { srcElement: el };
+		
+		handler(event);
 		
 		assertFalse(el.validity.valid);
 		assertTrue(el.validity.valueMissing);
@@ -446,8 +458,9 @@ TestCase("formerlyUpdateValidity", {
 	"test should not throw invalid event on change": function () {
 		var el = createElement("text", "", { required: "required" }, "", true, false);		
 		var handler = el.addEventListener.args[0][1];
+		var event = { target: el };
 		
-		handler.call(el);
+		handler(event);
 		
 		assertNotCalled(el.dispatchEvent);
 	}

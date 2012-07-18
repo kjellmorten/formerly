@@ -1,4 +1,4 @@
-/*global document */
+/*global document, window */
 /*jslint white: true, plusplus: false, onevar: true, nomen: false, undef: true, newcap: true, regexp: true, bitwise: true, maxerr: 50, indent: 4 */
 
 /*
@@ -63,7 +63,16 @@ var formerly = (function () {
 		    el.fireEvent("on" + type, event);
 		}
 	}
-	
+
+	function _getEvent(event) {
+		return (event) ? event : window.event;
+	}
+
+	function _getEventElement(event) {
+		event = _getEvent(event);
+		return event.target || event.srcElement;
+	}
+		
 	function _setConfig(config) {
 		var prop;
 		if (config) {
@@ -202,6 +211,7 @@ var formerly = (function () {
 	 */
 
 	function _submitHandler(event) {
+		event = _getEvent(event);
 		if ((this.novalidate !== true) && !this.checkValidity()) {
 			if (event.preventDefault !== undefined) {
 				event.preventDefault();
@@ -214,11 +224,11 @@ var formerly = (function () {
 	}
 	
 	function _changeHandler(event) {
-		_validate(this);
+		_validate(_getEventElement(event));
 	}
 	
-	function _changeHandlerSupported(event) {
-		_setValidityClass(this);
+	function _changeHandlerSupporting(event) {
+		_setValidityClass(_getEventElement(event));
 	}
 
 	
@@ -283,7 +293,7 @@ var formerly = (function () {
 			
 			handler = _changeHandler;
 		} else if (_config.touchSupporting) {
-			handler = _changeHandlerSupported;
+			handler = _changeHandlerSupporting;
 		}
 		
 		if (handler) {

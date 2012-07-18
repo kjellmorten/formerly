@@ -67,9 +67,10 @@ TestCase("formerlySupportingClasses", sinon.testCase({
 		el.checkValidity = this.stub(); // Imitate supporting browser
 		el.validity = { valid: true };
 		formerly.initElement(el);
+		var event = { target: el };
 		
 		var handler = el.addEventListener.args[0][1];
-		handler.call(el);
+		handler(event);
 		
 		assertEquals('valid', el.className);
 	},
@@ -79,9 +80,10 @@ TestCase("formerlySupportingClasses", sinon.testCase({
 		el.checkValidity = this.stub(); // Imitate supporting browser
 		el.validity = { valid: false };
 		formerly.initElement(el);
+		var event = { target: el };
 		
 		var handler = el.addEventListener.args[0][1];
-		handler.call(el);
+		handler(event);
 		
 		assertEquals('invalid', el.className);
 	}
