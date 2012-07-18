@@ -23,20 +23,24 @@ var formerly = (function () {
 	/*
 	 * Private help functions
 	 */
+	 
+	function _getAttr(el, attr) {
+		var a = el.attributes[attr];
+		return (a !== undefined) ? a.value : null;
+	}
+	 
+	function _removeLeadingSpace(str) {
+		return (str.charAt(0) === ' ') ? str.substr(1) : str;
+	}
 
 	function _addClass(el, className) {
-		if (el.className === '') {
-			el.className = className;
-		} else if (!(new RegExp("(^|\\s)" + className + "(\\s||$)")).test(el.className)) {
-			el.className += ' ' + className;
+		if (!(new RegExp("(^|\\s)" + className + "(\\s||$)")).test(el.className)) {
+			el.className = _removeLeadingSpace(el.className + ' ' + className);
 		}
 	}
 	
 	function _removeClass(el, className) {
-		el.className = el.className.replace(new RegExp("(?:^|\\s)" + className + "(?!\\S)"), '');
-		if (el.className.charAt(0) === ' ') {
-			el.className = el.className.substr(1);
-		}
+		el.className = _removeLeadingSpace(el.className.replace(new RegExp("(?:^|\\s)" + className + "(?!\\S)"), ''));
 	}
 	
 	function _catchEvent(el, type, handler) {
@@ -81,8 +85,9 @@ var formerly = (function () {
 	}
 	
 	function _checkTypeMismatch(el) {
-		if ((el.value !== '') && (el.attributes.type !== undefined)) {
-			switch (el.attributes.type.value) {
+		var type = _getAttr(el, 'type');
+		if (type) {
+			switch (type) {
 			case 'email':
 				return !(_emailRegExp.test(el.value));
 			case 'url':
@@ -94,8 +99,8 @@ var formerly = (function () {
 	}
 	
 	function _checkPatternMismatch(el) {
-		var pattern;
-		if ((el.value !== '') && (el.attributes.pattern !== undefined) && (pattern = el.attributes.pattern.value)) {
+		var pattern = _getAttr(el, 'pattern');
+		if (pattern) {
 			try {
 				return !(new RegExp('^' + pattern + '$').test(el.value));
 			} catch (err) {}
@@ -109,10 +114,10 @@ var formerly = (function () {
 	}
 	
 	function _checkRangeUnderflow(el) {
-		var val, min;
-		if ((el.value !== '') && (el.attributes.min !== undefined)) {
+		var val, min = _getAttr(el, 'min');
+		if (min) {
 			val = parseFloat(el.value);
-			min = parseFloat(el.attributes.min.value);
+			min = parseFloat(min);
 			return (min > val);
 		}
 		
@@ -120,10 +125,10 @@ var formerly = (function () {
 	}
 
 	function _checkRangeOverflow(el) {
-		var val, max;
-		if ((el.value !== '') && (el.attributes.max !== undefined)) {
+		var val, max = _getAttr(el, 'max');
+		if (max) {
 			val = parseFloat(el.value);
-			max = parseFloat(el.attributes.max.value);
+			max = parseFloat(max);
 			return (val > max);
 		}
 	
@@ -131,12 +136,12 @@ var formerly = (function () {
 	}
 	
 	function _checkStepMismatch(el) {
-		var val, step, min;
-		if ((el.value !== '') && (el.attributes.step !== undefined)) {
+		var val, step = _getAttr(el, 'step'), min = _getAttr(el, 'min');
+		if (step) {
 			val = parseFloat(el.value);
-			step = parseFloat(el.attributes.step.value);
+			step = parseFloat(step);
 			if ((val) && (step)) {
-				if ((el.attributes.min !== undefined) && (min = parseFloat(el.attributes.min.value))) {
+				if ((min) && (min = parseFloat(min))) {
 					val -= min;
 				}
 				return ((val % step) !== 0);
@@ -146,15 +151,28 @@ var formerly = (function () {
 		return false;
 	}
 
-	function _updateValidState(el) {
+	function _getValidState(el) {
 		var val = el.validity;
-		el.validity.valid = !(
+		return !(
 			val.valueMissing || val.typeMismatch || val.patternMismatch || 
 			val.tooLong || val.rangeUnderflow || val.rangeOverflow || 
 			val.stepMismatch || val.customError
 		);
 	}
-	
+
+	function _setValidity(el, valueMissing, typeMismatch, patternMismatch, tooLong, rangeUnderflow, rangeOverflow, stepMismatch, customError) {
+		var val = el.validity;
+		val.valueMissing = valueMissing;
+		val.typeMismatch = typeMismatch;
+		val.patternMismatch = patternMismatch;
+		val.tooLong = tooLong;
+		val.rangeUnderflow = rangeUnderflow;
+		val.rangeOverflow = rangeOverflow;
+		val.stepMismatch = stepMismatch;
+		val.customError = customError;
+		val.valid = _getValidState(el);
+	}
+
 	function _setValidityClass(el) {
 		_addClass(el, (el.validity.valid) ? 'valid' : 'invalid');
 		_removeClass(el, (el.validity.valid) ? 'invalid' : 'valid');
@@ -162,14 +180,17 @@ var formerly = (function () {
 
 	function _validate(el) {
 		if (el.willValidate) {
-			el.validity.valueMissing = _checkValueMissing(el);
-			el.validity.typeMismatch = _checkTypeMismatch(el);
-			el.validity.patternMismatch = _checkPatternMismatch(el);
-			el.validity.tooLong = _checkTooLong(el);
-			el.validity.rangeUnderflow = _checkRangeUnderflow(el);
-			el.validity.rangeOverflow = _checkRangeOverflow(el);
-			el.validity.stepMismatch = _checkStepMismatch(el);
-			_updateValidState(el);
+			var hasval = (el.value !== '');
+			_setValidity(el,
+				_checkValueMissing(el),
+				(hasval && _checkTypeMismatch(el)),
+				(hasval && _checkPatternMismatch(el)),
+				(hasval && _checkTooLong(el)),
+				(hasval && _checkRangeUnderflow(el)),
+				(hasval && _checkRangeOverflow(el)),
+				(hasval && _checkStepMismatch(el)),
+				el.validity.customError
+			);
 			
 			_setValidityClass(el);
 		}
@@ -212,7 +233,7 @@ var formerly = (function () {
 	function _setCustomValidity(message) {
 		this.validationMessage = message;
 		this.validity.customError = (message !== '');
-		_updateValidState(this);
+		this.validity.valid = _getValidState(this);
 	}
 	
 	function _checkValidity() {
@@ -255,17 +276,8 @@ var formerly = (function () {
 		if (el.checkValidity === undefined) {
 			el.willValidate = _willValidate(el);
 			el.setCustomValidity = _setCustomValidity;
-			el.validity = {
-				valueMissing: false,
-				typeMismatch: false,
-				patternMismatch: false,
-				tooLong: false,
-				rangeUnderflow: false,
-				rangeOverflow: false,
-				stepMismatch: false,
-				customError: false,
-				valid: true
-			};
+			el.validity = {};
+			_setValidity(el, false, false, false, false, false, false, false, false);
 			el.checkValidity = _checkValidity;
 			el.validationMessage = '';
 			
@@ -300,19 +312,13 @@ var formerly = (function () {
 
 	// Inits the given form or, if none is given, all forms.
 	function init(form, config) {
-		var i, il, forms;
+		var i, il, 
+			forms = (form) ? [form] : this.getForms();
 		
 		_setConfig(config);
 	
-		if (form) {
-			// Init the given form
-			_initForm.call(this, form);
-		} else {
-			// Init all forms in document
-			forms = this.getForms();
-			for (i = 0, il = forms.length; i < il; i++) {
-				_initForm.call(this, forms[i]);
-			}
+		for (i = 0, il = forms.length; i < il; i++) {
+			_initForm.call(this, forms[i]);
 		}
 	}
 	
