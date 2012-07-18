@@ -1,21 +1,44 @@
-TestCase("formerlySupportingClases", sinon.testCase({
+TestCase("formerlySupportingClasses", sinon.testCase({
+	tearDown: function () {
+		formerly.init(null, { touchSupporting: true });
+	},
 
-	"test should init elements in supporting browser": function () {
+	createSupportingForm: function () {
 		var form1 = { addEventListener: sinon.stub() };
 		form1.elements = [ createElement("text", ""), createElement("number", "") ];
 		form1.length = form1.elements.length;
 		form1.checkValidity = function () {};
 		this.spy(formerly, "initElement");
+		return form1;
+	},
+
+	"test should init elements in supporting browser": function () {
+		var form1 = this.createSupportingForm();
 		
 		formerly.init(form1);
 		
 		assertCalledTwice(formerly.initElement);
 	},
-		
 	
+	"test should not init elements when touchSupporting is false": function () {
+		var form1 = this.createSupportingForm();
+		
+		formerly.init(form1, { touchSupporting: false });
+		
+		assertNotCalled(formerly.initElement);
+	},
+
+	"test should init elements when touchSupporting is not set": function () {
+		var form1 = this.createSupportingForm();
+		
+		formerly.init(form1, {});
+		
+		assertCalledTwice(formerly.initElement);
+	},
+
 	"test should listen for keyup and change event on element": function () {
 		var el = createElement("text", "", null, "", false, false);
-		el.checkValidity = sinon.stub(); // Imitate supporting browser
+		el.checkValidity = this.stub(); // Imitate supporting browser
 
 		formerly.initElement(el);
 		
@@ -27,10 +50,21 @@ TestCase("formerlySupportingClases", sinon.testCase({
 		assertTrue(el.addEventListener.args[0][2]);
 		assertTrue(el.addEventListener.args[1][2]);
 	},
+
+	"test should not listen for keyup and change event when touchSupporting is false": function () {
+		var form1 = this.createSupportingForm();
+		var el = form1.elements[0];
+		el.addEventListener = this.stub();
+		formerly.init(form1, { touchSupporting: false });
+		
+		formerly.initElement(el);
+
+		assertNotCalled(el.addEventListener);
+	},
 	
 	"test should set valid class when element valid": function () {
 		var el = createElement("text", "", null, "", false, false);
-		el.checkValidity = sinon.stub(); // Imitate supporting browser
+		el.checkValidity = this.stub(); // Imitate supporting browser
 		el.validity = { valid: true };
 		formerly.initElement(el);
 		
@@ -42,7 +76,7 @@ TestCase("formerlySupportingClases", sinon.testCase({
 
 	"test should set invalid class when element invalid": function () {
 		var el = createElement("text", "", { required: "required" }, "", false, false);
-		el.checkValidity = sinon.stub(); // Imitate supporting browser
+		el.checkValidity = this.stub(); // Imitate supporting browser
 		el.validity = { valid: false };
 		formerly.initElement(el);
 		

@@ -6,7 +6,7 @@
 *
 * @package formerly
 * @author $Author: kjellmorten $
-* @version $Id: formerly.js, v 0.6 $
+* @version $Id: formerly.js, v 0.6.2 $
 * @license BSD
 * @copyright (c) Kjell-Morten Bratsberg Thorsen http://kjellmorten.no/
 */
@@ -15,7 +15,10 @@ var formerly = (function () {
 	var _elsToValidate = 'text search tel url email password datetime date month week time datetime-local number ' +
 						 'range color checkbox radio file submit select-one select-multiple textarea'.split(' '),
 		_emailRegExp = /^[a-z][a-z0-9!#$%&'*+\-\/=?\^_`{|}~\.]*@[a-z0-9\-]+(\.[a-z0-9\-]+)*$/i,
-		_urlRegExp = /^\s*[a-z][a-z0-9+\-\.]+:\/\//i;
+		_urlRegExp = /^\s*[a-z][a-z0-9+\-\.]+:\/\//i,
+		_config = {
+			touchSupporting: true
+		};
 
 	/*
 	 * Private help functions
@@ -54,6 +57,17 @@ var formerly = (function () {
 		    event = document.createEventObject();			// Old IEs
 		    event.eventType = type;
 		    el.fireEvent("on" + type, event);
+		}
+	}
+	
+	function _setConfig(config) {
+		var prop;
+		if (config) {
+			for (prop in config) {
+				if (_config[prop] !== undefined) {
+					_config[prop] = config[prop];
+				}
+			}
 		}
 	}
 	
@@ -256,23 +270,27 @@ var formerly = (function () {
 			el.validationMessage = '';
 			
 			handler = _changeHandler;
-		} else {
+		} else if (_config.touchSupporting) {
 			handler = _changeHandlerSupported;
 		}
-
-		_catchEvent(el, 'keyup', handler);
-		_catchEvent(el, 'change', handler);
+		
+		if (handler) {
+			_catchEvent(el, 'keyup', handler);
+			_catchEvent(el, 'change', handler);
+		}
 	}
 	
 	// Inits a form
 	function _initForm(form) {
-		var i, il;
+		var i, il, supp = (form.checkValidity !== undefined);
 
-		for (i = 0, il = form.length; i < il; i++) {
-			this.initElement(form.elements[i]);
+		if ((_config.touchSupporting) || (!supp)) {
+			for (i = 0, il = form.length; i < il; i++) {
+				this.initElement(form.elements[i]);
+			}
 		}
 		
-		if (form.checkValidity === undefined) {
+		if (!supp) {
 			form.checkValidity = _checkValidityForm;
 		
 			// Listen for submit event and cancel if form not valid
@@ -281,8 +299,10 @@ var formerly = (function () {
 	}
 
 	// Inits the given form or, if none is given, all forms.
-	function init(form) {
+	function init(form, config) {
 		var i, il, forms;
+		
+		_setConfig(config);
 	
 		if (form) {
 			// Init the given form
