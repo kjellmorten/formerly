@@ -1,6 +1,6 @@
 body {
 	margin: 0;
-	padding: 24px 48px;
+	padding: 36px 48px;
 	background-color: #F8F8F8;
 }
 
@@ -12,7 +12,21 @@ body, input, button {
 
 h1 {
 	font-size: 36px;
-	line-height: 54px;
+	line-height: 36px;
+	margin: 0 0 24px;
+}
+
+p {
+	margin: 0 0 16px;
+}
+
+p.buttonRow {
+	margin-top: 24px;
+}
+
+small {
+	font-size: 12px;
+	color: #666;
 }
 
 button {
