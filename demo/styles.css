@@ -1,0 +1,37 @@
+body {
+	margin: 0;
+	padding: 24px 48px;
+	background-color: #F8F8F8;
+}
+
+body, input, button {
+	font-family: Helvetica, Arial, sans-serif;
+	font-size: 16px;
+	line-height: 24px;
+}
+
+h1 {
+	font-size: 36px;
+	line-height: 54px;
+}
+
+button {
+	font-weight: bold;
+	padding: 6px 24px;
+}
+
+input {
+	width: 20em;
+}
+
+input[type='number'] {
+	width: 10em;
+}
+
+input.valid {
+	background-color: #dfd;
+}
+
+input.invalid {
+	background-color: #fdd;
+}
