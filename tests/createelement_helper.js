@@ -1,7 +1,8 @@
 function createElement(type, value, attrs, className, init, ie) {
+	var unknownTypes = "search tel url email datetime date month week time datetime-local number range color".split(" ");
+
 	var el = {};
-	
-	el.type = type;
+	el.type = (unknownTypes.indexOf(type) !== -1) ? 'text' : type;		// To show that type can't be trusted for certain types
 	el.value = el.defaultValue = value || "";
 	el.attributes = createAttributes(attrs);
 	el.attributes['type'] = { name: 'type', value: type };
@@ -17,7 +18,6 @@ function createElement(type, value, attrs, className, init, ie) {
 		el.attachEvent = sinon.stub();
 		el.fireEvent = sinon.stub();
 	}
-
 
 	if (init === undefined || init) {
 		formerly.initElement(el);

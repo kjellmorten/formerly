@@ -186,8 +186,8 @@ TestCase("formerlyHTMLValidations", {
 
 		if (field.checkValidity === undefined) {
 			// Not working properly in Firefox and Chrome, so test only formerly implementation....
-
 			formerly.initElement(field);
+
 			field.value = "Longer than 20 characters";
 			
 			var ret = field.checkValidity();
@@ -201,7 +201,8 @@ TestCase("formerlyHTMLValidations", {
 			
 		if (field.checkValidity === undefined) {
 			// Not working properly in Firefox, so test only formerly implementation....
-
+			formerly.initElement(field);
+			
 			var ret = field.checkValidity();
 			
 			assertInvalid(ret, field, 'rangeUnderflow');
@@ -210,6 +211,7 @@ TestCase("formerlyHTMLValidations", {
 
 	"test should not set rangeUnderflow": function () {
 		var field = document.getElementById("field9");
+		formerly.initElement(field);
 		
 		var ret = field.checkValidity();
 		
@@ -221,6 +223,7 @@ TestCase("formerlyHTMLValidations", {
 		
 		if (field.checkValidity === undefined) {
 			// Not working properly in Firefox, so test only formerly implementation....
+			formerly.initElement(field);
 
 			var ret = field.checkValidity();
 			
@@ -230,6 +233,7 @@ TestCase("formerlyHTMLValidations", {
 
 	"test should not set rangeOverflow": function () {
 		var field = document.getElementById("field11");
+		formerly.initElement(field);
 		
 		var ret = field.checkValidity();
 		
@@ -241,6 +245,7 @@ TestCase("formerlyHTMLValidations", {
 		
 		if (field.checkValidity === undefined) {
 			// Not working properly in Firefox, so test only formerly implementation....
+			formerly.initElement(field);
 
 			var ret = field.checkValidity();
 			
@@ -250,6 +255,7 @@ TestCase("formerlyHTMLValidations", {
 
 	"test should not set stepMismatch when valid steps from min": function () {
 		var field = document.getElementById("field13");
+		formerly.initElement(field);
 		
 		var ret = field.checkValidity();
 		

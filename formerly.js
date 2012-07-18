@@ -67,13 +67,12 @@ var formerly = (function () {
 	}
 	
 	function _checkTypeMismatch(el) {
-		if (el.value !== '') {
-			switch (el.type) {
+		if ((el.value !== '') && (el.attributes.type !== undefined)) {
+			switch (el.attributes.type.value) {
 			case 'email':
 				return !(_emailRegExp.test(el.value));
 			case 'url':
 				return !(_urlRegExp.test(el.value));
-			default:
 			}
 		}
 		
