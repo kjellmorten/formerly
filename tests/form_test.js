@@ -169,7 +169,20 @@ TestCase("formerlyFormConstraintInterface", sinon.testCase({
 		assertCalledOnce(ieForm.attachEvent);
 		assertEquals('onsubmit', ieForm.attachEvent.args[0][0]);
 		assertFunction(ieForm.attachEvent.args[0][1]);
+	},
+
+	"test should set isPolyfilling to true for unsupporting": function () {
+		formerly.init(this.unsupForm);
+		
+		assertTrue(formerly.isPolyfilling);
+	},
+	
+	"test should set isPolyfilling to false for supporting": function () {
+		formerly.init(this.supForm);
+		
+		assertFalse(formerly.isPolyfilling);
 	}
+
 
 }));
 

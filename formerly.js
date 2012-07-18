@@ -315,15 +315,17 @@ var formerly = (function () {
 	
 	// Inits a form
 	function _initForm(form) {
-		var i, il, supp = (form.checkValidity !== undefined);
+		var i, il, unsupp = (form.checkValidity === undefined);
 
-		if ((_config.touchSupporting) || (!supp)) {
+		this.isPolyfilling = unsupp;
+
+		if ((_config.touchSupporting) || (unsupp)) {
 			for (i = 0, il = form.length; i < il; i++) {
 				this.initElement(form.elements[i]);
 			}
 		}
 		
-		if (!supp) {
+		if (unsupp) {
 			form.checkValidity = _checkValidityForm;
 		
 			// Listen for submit event and cancel if form not valid
@@ -350,7 +352,8 @@ var formerly = (function () {
 	return {
 		init: init,
 		initElement: initElement,
-		getForms: getForms
+		getForms: getForms,
+		isPolyfilling: false
 	};
 	
 }());
