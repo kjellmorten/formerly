@@ -209,7 +209,7 @@ var formerly = (function () {
 
 	function _submitHandler(event) {
 		event = _getEvent(event);
-		if ((this.novalidate !== true) && !this.checkValidity()) {
+		if ((this.attributes.novalidate === undefined) && (!this.checkValidity())) {
 			if (event.preventDefault !== undefined) {
 				event.preventDefault();
 			} else if (event.returnValue !== undefined) {

@@ -56,8 +56,8 @@ TestCase("formerlyFormConstraintInterface", sinon.testCase({
 
 	setUp: function () {
 		this.func = function () {};
-		this.unsupForm = { addEventListener: sinon.stub() };
-		this.supForm = { checkValidity: this.func, addEventListener: sinon.stub() };
+		this.unsupForm = { addEventListener: sinon.stub(), attributes: {} };
+		this.supForm = { checkValidity: this.func, addEventListener: sinon.stub(), attributes: {} };
 	},
 	
 	makeFormValid: function (form) {
@@ -153,7 +153,7 @@ TestCase("formerlyFormConstraintInterface", sinon.testCase({
 
 	"test should not cancel submit event for form with novalidate attribute": function () {
 		this.makeFormInvalid(this.unsupForm);
-		this.unsupForm.novalidate = true;
+		this.unsupForm.attributes.novalidate = "novalidate";
 		formerly.init(this.unsupForm);
 		
 		var handler = this.unsupForm.addEventListener.args[0][1];
