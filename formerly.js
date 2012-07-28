@@ -12,8 +12,7 @@
 */
 
 var formerly = (function () {
-	var _elsToValidate = 'text search tel url email password datetime date month week time datetime-local number ' +
-						 'range color checkbox radio file submit select-one select-multiple textarea'.split(' '),
+	var _elsToValidateRegExp = /^(text|search|tel|url|email|password|datetime|date|month|week|time|datetime-local|number|range|color|checkbox|radio|file|submit|select-one|select-multiple|textarea)$/i,
 		_emailRegExp = /^[a-z][a-z0-9!#$%&'*+\-\/=?\^_`{|}~\.]*@[a-z0-9\-]+(\.[a-z0-9\-]+)*$/i,
 		_urlRegExp = /^\s*[a-z][a-z0-9+\-\.]+:\/\//i,
 		_config = {
@@ -54,15 +53,12 @@ var formerly = (function () {
 	
 	function _throwEvent(el, type) {
 		var event;
-		if (el.dispatchEvent !== undefined) {
+		if ((el.dispatchEvent !== undefined) && (document.createEvent !== undefined)) {
 			event = document.createEvent("HTMLEvents");		// Modern browsers
 			event.initEvent(type, false, true);
 			el.dispatchEvent(event);
-		} else if (el.fireEvent !== undefined) {
-		    event = document.createEventObject();			// Old IEs
-		    event.eventType = type;
-		    el.fireEvent("on" + type, event);
 		}
+		// Old IEs will trigger only the events they know, making it impossible to trigger an 'invalid' event without a workaround
 	}
 
 	function _getEvent(event) {
@@ -226,7 +222,7 @@ var formerly = (function () {
 	 */
 	 
 	function _willValidate(el) {
-		return ((!el.disabled) && (!el.readOnly) && (_elsToValidate.indexOf(el.type) !== -1));
+		return ((!el.disabled) && (!el.readOnly) && (_elsToValidateRegExp.test(el.type)));
 	}
 	
 	function _setCustomValidity(message) {

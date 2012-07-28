@@ -1,8 +1,8 @@
 function createElement(type, value, attrs, className, init, ie) {
-	var unknownTypes = "search tel url email datetime date month week time datetime-local number range color".split(" ");
+	var unknownTypesRegExp = /^(search|tel|url|email|datetime|date|month|week|time|datetime-local|number|range|color)$/i;
 
 	var el = {};
-	el.type = (unknownTypes.indexOf(type) !== -1) ? 'text' : type;		// To show that type can't be trusted for certain types
+	el.type = (unknownTypesRegExp.test(type)) ? 'text' : type;		// To show that type can't be trusted for certain types
 	el.value = el.defaultValue = value || "";
 	el.attributes = createAttributes(attrs);
 	el.attributes['type'] = { name: 'type', value: el.type };

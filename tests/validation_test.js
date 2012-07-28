@@ -392,16 +392,18 @@ TestCase("formerlyValidationStepMismatch", {
 TestCase("formerlyValidationInvalidEvent", sinon.testCase({
 	
 	"test should throw invalid event on checkValidity": function () {
-		var el = createElement("text", "", { required: 'required' }, "", true, false);
-		
-		el.checkValidity();
-		
-		assertCalledOnce(el.dispatchEvent);
-		var event = el.dispatchEvent.args[0][0];
-		assertObject(event);
-		assertEquals('invalid', event.type);
-		assertFalse('Bubbles', event.bubbles);
-		assertTrue('Cancelable', event.cancelable);
+		if (document.createEvent !== undefined) {		// Skip this for old IEs for now
+			var el = createElement("text", "", { required: 'required' }, "", true, false);
+			
+			el.checkValidity();
+			
+			assertCalledOnce(el.dispatchEvent);
+			var event = el.dispatchEvent.args[0][0];
+			assertObject(event);
+			assertEquals('invalid', event.type);
+			assertFalse('Bubbles', event.bubbles);
+			assertTrue('Cancelable', event.cancelable);
+		}
 	},
 	
 	"test should not throw invalid event when element valid": function () {
@@ -410,26 +412,12 @@ TestCase("formerlyValidationInvalidEvent", sinon.testCase({
 		el.checkValidity();
 		
 		assertNotCalled(el.dispatchEvent);
-	},
-	
-	"test should throw invalid event in older IE": function () {
-		var el = createElement("text", "", { required: 'required' }, "", true, true);
-		if (document.createEventObject === undefined) { document.createEventObject = function () {}; };
-		this.stub(document, "createEventObject").returns({ eventType: null });
-		
-		el.checkValidity();
-		
-		assertCalledOnce(el.fireEvent);
-		assertEquals('oninvalid', el.fireEvent.args[0][0]);
-		var event = el.fireEvent.args[0][1];
-		assertObject(event);
-		assertEquals('invalid', event.eventType);
 	}
-	
+
 }));
 
 
-TestCase("formerlyValidationClassNames", {	
+TestCase("formerlyValidationClassNames", {
 	"test should set valid class": function () {
 		var el = createElement("text", "");
 
@@ -459,11 +447,7 @@ TestCase("formerlyValidationClassNames", {
 
 		var ret = el.checkValidity();
 		
-		var classNames = el.className.split(' ');
-		
-		assertEquals(4, classNames.length);
-		assertNotEquals(-1, classNames.indexOf('other'));
-		assertNotEquals(-1, classNames.indexOf('valid'));
+		assertEquals("other class names valid", el.className);
 	},
 
 	"test should not add valid class if exists": function () {
@@ -471,11 +455,7 @@ TestCase("formerlyValidationClassNames", {
 
 		var ret = el.checkValidity();
 		
-		var classNames = el.className.split(' ');
-		
-		assertEquals(2, classNames.length);
-		assertNotEquals(-1, classNames.indexOf('already'));
-		assertNotEquals(-1, classNames.indexOf('valid'));
+		assertEquals("already valid", el.className);
 	},
 
 	"test should not be fooled by 'valid' in other class names": function () {
@@ -483,11 +463,7 @@ TestCase("formerlyValidationClassNames", {
 
 		var ret = el.checkValidity();
 		
-		var classNames = el.className.split(' ');
-		
-		assertEquals(3, classNames.length);
-		assertNotEquals(-1, classNames.indexOf('reallyvalid'));
-		assertNotEquals(-1, classNames.indexOf('valid'));
+		assertEquals("not reallyvalid valid", el.className);
 	},
 	
 	"test should remove invalid class": function () {
@@ -503,11 +479,7 @@ TestCase("formerlyValidationClassNames", {
 
 		var ret = el.checkValidity();
 		
-		var classNames = el.className.split(' ');
-		
-		assertEquals(2, classNames.length);
-		assertTrue("Has class 'is'", classNames.indexOf('is') > -1);
-		assertTrue("Has class 'valid'", classNames.indexOf('valid') > -1);
+		assertEquals("is valid", el.className);
 	},
 
 	"test should not be fooled by 'invalid' in other class names": function () {
@@ -515,12 +487,7 @@ TestCase("formerlyValidationClassNames", {
 
 		var ret = el.checkValidity();
 		
-		var classNames = el.className.split(' ');
-		
-		assertEquals(3, classNames.length);
-		assertTrue("Has class 'is'", classNames.indexOf('is') > -1);
-		assertTrue("Has class 'valid'", classNames.indexOf('valid') > -1);
-		assertTrue("Has class 'notinvalid'", classNames.indexOf('notinvalid') > -1);
+		assertEquals("is notinvalid valid", el.className);
 	},
 
 	"test should not be fooled by 'invalid' at the beginning of other class names": function () {
@@ -528,12 +495,7 @@ TestCase("formerlyValidationClassNames", {
 
 		var ret = el.checkValidity();
 		
-		var classNames = el.className.split(' ');
-		
-		assertEquals(3, classNames.length);
-		assertTrue("Has class 'is'", classNames.indexOf('is') > -1);
-		assertTrue("Has class 'valid'", classNames.indexOf('valid') > -1);
-		assertTrue("Has class 'notinvalid'", classNames.indexOf('invalidlike') > -1);
+		assertEquals("is invalidlike valid", el.className);
 	},
 	
 	"test should use custom valid class name when set": function () {
@@ -546,6 +508,9 @@ TestCase("formerlyValidationClassNames", {
 		var ret = el.checkValidity();
 		
 		assertEquals('okay', el.className);
+
+		// Tear down
+		formerly.init(form1, { validClass: 'valid' });
 	},
 
 	"test should use custom invalid class name when set": function () {
@@ -558,6 +523,9 @@ TestCase("formerlyValidationClassNames", {
 		var ret = el.checkValidity();
 		
 		assertEquals('fail', el.className);
+
+		// Tear down
+		formerly.init(form1, { invalidClass: 'invalid' });
 	}
 
 });

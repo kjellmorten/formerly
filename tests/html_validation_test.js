@@ -41,11 +41,13 @@ TestCase("formerlyHTMLConstraints", {
 	},
 
 	"test should fire invalid event": function () {
-		listenForEvent(this.field2, 'invalid', this.handler);
+		if (document.createEvent !== undefined) {		// Skip this for old IEs for now
+			listenForEvent(this.field2, 'invalid', this.handler);
 		
-		this.field2.checkValidity();
+			this.field2.checkValidity();
 		
-		assertCalledOnce(this.handler);
+			assertCalledOnce(this.handler);
+		}
 	},
 
 	"test should not fire invalid event": function () {
@@ -57,12 +59,14 @@ TestCase("formerlyHTMLConstraints", {
 	},
 
 	"test should find form invalid and fire one invalid event": function () {
-		listenForEvent(this.field1, 'invalid', this.handler);
-		listenForEvent(this.field2, 'invalid', this.handler);
-		
-		this.form1.checkValidity();
-		
-		assertCalledOnce(this.handler);
+		if (document.createEvent !== undefined) {		// Skip this for old IEs for now
+			listenForEvent(this.field1, 'invalid', this.handler);
+			listenForEvent(this.field2, 'invalid', this.handler);
+			
+			this.form1.checkValidity();
+			
+			assertCalledOnce(this.handler);
+		}
 	},
 
 	"test element should have setCustomValidity function": function () {
@@ -266,20 +270,20 @@ TestCase("formerlyHTMLValidations", {
 
 
 function listenForEvent (el, event, handler) {
-	if (el.addEventListener) {
+	if (el.addEventListener !== undefined) {
 		el.addEventListener(event, handler, false);
-	} else {
+	} else if (el.attachEven !== undefined) {
 		el.attachEven('on' + event, handler);
 	}
 }
 
 function throwEvent (el, type) {
 	var event;
-	if (el.dispatchEvent) {
+	if ((document.createEvent !== undefined) && (el.dispatchEvent !== undefined)) {
 		event = document.createEvent("HTMLEvents");
 		event.initEvent(type, false, true);
 		el.dispatchEvent(event);
-	} else {
+	} else if ((document.createEventObject !== undefined) && (el.fireEvent !== undefined)) {
 	    event = document.createEventObject();
 	    event.eventType = type;
 	    el.fireEvent("on" + type, event);
