@@ -1,10 +1,10 @@
-# formerly - a small and simple HTML5 Form Polyfill
+# Formerly. A small and simple HTML5 Form Polyfill
 
-_formerly_ implements the basics of [the W3C HTML5 constraint validation API](http://www.w3.org/TR/2011/WD-html5-20110525/association-of-controls-and-forms.html#the-constraint-validation-api) in unsupporting browsers, and that's it. There's no custom validations, fancy error messages, or elaborate input field widgets. The goal of _formerly_ is to provide a baseline for all browsers, so we can let the past be done. ;)
+_Formerly_ implements the basics of [the W3C HTML5 constraint validation API](http://www.w3.org/TR/2011/WD-html5-20110525/association-of-controls-and-forms.html#the-constraint-validation-api) in unsupporting browsers, and that's it. There's no custom validations, fancy error messages, or elaborate input field widgets. The goal of _Formerly_ is to provide a baseline for all browsers so we can let the past be done. ;)
 
 There are already a lot of form validators and also quite a few [HTML5 form polyfills](https://github.com/Modernizr/Modernizr/wiki/HTML5-Cross-Browser-Polyfills) out there. My motivation for building this was that I needed a simpler solution for getting just the basics of HTML5 validation working in older browsers.
 
-_formerly_ is completely stand-alone and does not depend on any third-party libraries.
+_Formerly_ is completely stand-alone and does not depend on any third-party libraries.
 
 The project is in an early state, and I really appreciate feedback. Please [log issues on GitHub](https://github.com/kjellmorten/formerly/issues).
 
@@ -18,10 +18,10 @@ The following constraints are implemented:
 * step
 * pattern
 * maxLength
-* email validation
-* url validation
+* email
+* url
 
-Form elements have the following attributes and methods:
+Form elements get the following attributes and methods:
 
 * willValidate
 * setCustomValidity(message)
@@ -37,17 +37,23 @@ Form elements have the following attributes and methods:
 * checkValidity()
 * validationMessage
 
-> **Note:** _formerly_ does not provide validation messages yet, except when it's set with `setCustomValidity`. Coming soon...
+Please see [the W3C specification](http://www.w3.org/TR/2011/WD-html5-20110525/association-of-controls-and-forms.html#the-constraint-validation-api) for further details.
 
-Supporting browser set the pseudo-classes `:valid` and `:invalid` on form elements to indicate their validity status. As this can't be done with JavaScript, _formerly_ will set class names on the form elements to replicate this behavior. The classes are set in supporting browsers as well, but this feature may be disabled by setting the `touchSupporting` config property to `false`.
+> **Note:** _Formerly_ does not yet provide validation messages, except when it's set with `setCustomValidity`. Coming soon...
+
+### Validity classes
+
+Supporting browsers set the `:valid` and `:invalid` pseudo-classes on form elements to indicate their validity status. As this can't be done with JavaScript, _Formerly_ will set class names on the form elements to replicate this behavior, both in supporting and unsupporting browsers. (You may disabled this in supporting browsers by setting the `touchSupporting` config property to `false`.) The classes have no default styles.
 
 The default validity class names are `valid` for valid elements and `invalid` for invalid elements, and may be overriden with the `validClass` and `invalidClass` config properties.
 
-At least for now, _formerly_ will only [statically validate the constraints](http://www.w3.org/TR/2011/WD-html5-20110525/association-of-controls-and-forms.html#statically-validate-the-constraints) of a form, by running the validations and setting the validity states. I've decided not to go into [the interactive validation](http://www.w3.org/TR/2011/WD-html5-20110525/association-of-controls-and-forms.html#interactively-validate-the-constraints) part, where validation problems are reported to the user. (Maybe I'll get back to it later.)
+### Statical and interactive validation
 
-According to the W3C spec, an event named `invalid` should be fired for all invalid elements on constraint validation. _formerly_ currently does this in browser supporting the W3C event model. In other words, the `invalid` event is not fired in Internet Explorer as of now.
+_Formerly_ will only [statically validate the constraints](http://www.w3.org/TR/2011/WD-html5-20110525/association-of-controls-and-forms.html#statically-validate-the-constraints) of a form, as it runs the validations and sets the validity states, but nothing is displayed in the browser by default. The HTML5 Form spec loosly describes steps for [interactivly validating the constraints](http://www.w3.org/TR/2011/WD-html5-20110525/association-of-controls-and-forms.html#interactively-validate-the-constraints), that involves reporting validation errors to the user, but I've decided to not include this in _Formerly_. At least for now.
 
-See the [W3C specification](http://www.w3.org/TR/2011/WD-html5-20110525/association-of-controls-and-forms.html#the-constraint-validation-api) for further details.
+### Events
+
+According to the spec, an event named `invalid` should be fired for all invalid elements on constraint validation. _Formerly_ currently does this in browser supporting the W3C event model. In other words, the `invalid` event is not fired in Internet Explorer as of now.
 
 ## Usage
 
@@ -55,25 +61,27 @@ Include the script:
 
 	<script src="formerly.js" type="text/javascript"></script>
 
-...and run _formerly_'s `init` method when the page DOM is loaded to polyfill all forms on the page:
+...and run _Formerly_'s `init` method when the page DOM is loaded, to polyfill all forms on the page:
 
 	window.onload = function () {
 		formerly.init();
 	}
 
-(Actually, you may rather want to run `formerly.init` in the document ready event when using [jQuery](http://www.jquery.com/), [MooTools](http://mootools.net/), etc.)
+> Actually, you may rather want to run `formerly.init` in the document ready event when using [jQuery](http://www.jquery.com/), [MooTools](http://mootools.net/), etc.
 	
 To polyfill only a specific form:
 
 	formerly.init(document.getElementById("theForm"));
 
+When _Formerly_ is running in an unsupporting browser, `formerly.isPolyfilling` will be `true`.
+
 ## Configuration
 
 The `formerly.init` method accepts a configuration object as its second parameter. The following config properties are available:
 
-* `touchSupporting`. Set to `true` (default) to apply some fixes even to browsers supporting the HTML5 Form constraint validation API. `false` will make _formerly_ keep its hands off supporting browsers completely.
-* `validClass`. The class name to use for valid form elements. Default is `"valid"`.
-* `invalidClass`. The class name to use for invalid form elements. Default is `"invalid"`.
+* `touchSupporting`: Set to `true` to apply some fixes even to browsers supporting the HTML5 Form constraint validation API. `false` will make _Formerly_ keep its hands off supporting browsers completely. Default is `true`.
+* `validClass`: The class name to use for valid form elements. Default is `"valid"`.
+* `invalidClass`: The class name to use for invalid form elements. Default is `"invalid"`.
 
 ### Configuration example
 
@@ -85,4 +93,4 @@ The `formerly.init` method accepts a configuration object as its second paramete
 
 ## Demo
 
-See `demo/index.html` for a simple demo of the implemented constraints.
+Open `demo/index.html` in your browser for a simple demo of the implemented constraints.
