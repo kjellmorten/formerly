@@ -6,7 +6,7 @@
 *
 * @package formerly
 * @author kjellmorten
-* @version formerly.js, v 0.6.2
+* @version formerly.js, v 0.7
 * @license BSD
 * @copyright (c) Kjell-Morten Bratsberg Thorsen http://kjellmorten.no/
 */
@@ -59,11 +59,7 @@ var formerly = (function (window, undef) {
 			event.initEvent(type, false, true);
 			el.dispatchEvent(event);
 		}
-		// Old IEs will trigger only the events they know, making it impossible to trigger an 'invalid' event without a workaround
-	}
-
-	function _getEvent(event) {
-		return (event) ? event : window.event;
+		// Old IEs will trigger only the events they know, making it impossible to trigger a native 'invalid' event
 	}
 
 	function _setConfig(config) {
@@ -204,7 +200,7 @@ var formerly = (function (window, undef) {
 	 */
 
 	function _submitHandler(event) {
-		event = _getEvent(event);
+		event = (event || window.event);
 		if ((this.attributes.novalidate === undef) && (!this.checkValidity())) {
 			if (event.preventDefault !== undef) {
 				event.preventDefault();
