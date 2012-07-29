@@ -5,14 +5,15 @@
 * formerly
 *
 * @package formerly
-* @author $Author: kjellmorten $
-* @version $Id: formerly.js, v 0.6.2 $
+* @author kjellmorten
+* @version formerly.js, v 0.6.2
 * @license BSD
 * @copyright (c) Kjell-Morten Bratsberg Thorsen http://kjellmorten.no/
 */
 
-var formerly = (function () {
-	var _elsToValidateRegExp = /^(text|search|tel|url|email|password|datetime|date|month|week|time|datetime-local|number|range|color|checkbox|radio|file|submit|select-one|select-multiple|textarea)$/i,
+var formerly = (function (window, undef) {
+	var document = window.document,
+		_elsToValidateRegExp = /^(text|search|tel|url|email|password|datetime|date|month|week|time|datetime-local|number|range|color|checkbox|radio|file|submit|select-one|select-multiple|textarea)$/i,
 		_emailRegExp = /^[a-z][a-z0-9!#$%&'*+\-\/=?\^_`{|}~\.]*@[a-z0-9\-]+(\.[a-z0-9\-]+)*$/i,
 		_urlRegExp = /^\s*[a-z][a-z0-9+\-\.]+:\/\//i,
 		_config = {
@@ -44,16 +45,16 @@ var formerly = (function () {
 	}
 	
 	function _catchEvent(el, type, handler) {
-		if (el.addEventListener !== undefined) {
+		if (el.addEventListener !== undef) {
 			el.addEventListener(type, handler, true);		// Modern browsers
-		} else if (el.attachEvent !== undefined) {
+		} else if (el.attachEvent !== undef) {
 			el.attachEvent('on' + type, handler);			// Old IEs
 		}
 	}
 	
 	function _throwEvent(el, type) {
 		var event;
-		if ((el.dispatchEvent !== undefined) && (document.createEvent !== undefined)) {
+		if ((el.dispatchEvent !== undef) && (document.createEvent !== undef)) {
 			event = document.createEvent("HTMLEvents");		// Modern browsers
 			event.initEvent(type, false, true);
 			el.dispatchEvent(event);
@@ -69,20 +70,19 @@ var formerly = (function () {
 		var prop;
 		if (config) {
 			for (prop in config) {
-				if (_config[prop] !== undefined) {
+				if (_config[prop] !== undef) {
 					_config[prop] = config[prop];
 				}
 			}
 		}
 	}
 	
-
 	/*
 	 * Validation methods
 	 */
 	
 	function _checkValueMissing(el) {
-		return ((el.attributes.required !== undefined) && (el.value === ''));
+		return ((el.attributes.required !== undef) && (el.value === ''));
 	}
 	
 	function _checkTypeMismatch(el) {
@@ -205,10 +205,10 @@ var formerly = (function () {
 
 	function _submitHandler(event) {
 		event = _getEvent(event);
-		if ((this.attributes.novalidate === undefined) && (!this.checkValidity())) {
-			if (event.preventDefault !== undefined) {
+		if ((this.attributes.novalidate === undef) && (!this.checkValidity())) {
+			if (event.preventDefault !== undef) {
 				event.preventDefault();
-			} else if (event.returnValue !== undefined) {
+			} else if (event.returnValue !== undef) {
 				event.returnValue = false;
 			} else {
 				return false;
@@ -265,11 +265,18 @@ var formerly = (function () {
 		return document.forms;
 	}
 
-	// Inits an element
+	/**
+	 * Initializes the given HTML form element. Will polyfill if HTML5 Constraint interface is not present.
+	 *
+	 * The function is primarily intended for use by the `init`function, but may be called directly 
+	 * when needed. E.g. to init an element that is created after the form is initialized.
+	 *
+	 * @params {Object} The HTML form element to init
+	 */
 	function initElement(el) {
 		var handler, originalCheckValidity;
 
-		if (el.checkValidity === undefined) {
+		if (el.checkValidity === undef) {
 
 			// Set up polyfills
 			el.willValidate = _willValidate(el);
@@ -311,7 +318,7 @@ var formerly = (function () {
 	
 	// Inits a form
 	function _initForm(form) {
-		var i, il, unsupp = (form.checkValidity === undefined);
+		var i, il, unsupp = (form.checkValidity === undef);
 
 		this.isPolyfilling = unsupp;
 
@@ -329,7 +336,12 @@ var formerly = (function () {
 		}
 	}
 
-	// Inits the given form or, if none is given, all forms.
+	/**
+	 * Form initialization. Will polyfill if HTML5 Constraint interface is not present.
+	 * 
+	 * @param {Object} The HTML form to polyfill. If not provided, all forms in the document will be initialized.
+	 * @param {Object} An optional config object. Will be used for all forms in the document.
+	 */
 	function init(form, config) {
 		var i, il, 
 			forms = (form) ? [form] : this.getForms();
@@ -352,4 +364,4 @@ var formerly = (function () {
 		isPolyfilling: false
 	};
 	
-}());
+}(window));
