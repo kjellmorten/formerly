@@ -271,7 +271,7 @@ var formerly = (function (window, undef) {
 	 * The function is primarily intended for use by the `init`function, but may be called directly 
 	 * when needed. E.g. to init an element that is created after the form is initialized.
 	 *
-	 * @params {Object} The HTML form element to init
+	 * @param {Object} The HTML form element to init
 	 */
 	function initElement(el) {
 		var handler, originalCheckValidity;
