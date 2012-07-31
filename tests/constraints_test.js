@@ -4,14 +4,15 @@ TestCase("formerlyElementConstraintInterface", {
 		this.func = function () {};
 		this.obj = {};
 		
-		this.unsupEl = { attributes: {} };
+		this.unsupEl = { attributes: {}, getAttribute: function () {} };
 		this.supEl = {
 			willValidate: this.obj,
 			validity: this.obj,
 			setCustomValidity: this.func,
 			checkValidity: this.func,
 			validationMessage: this.obj,
-			attributes: {}
+			attributes: {},
+			getAttribute: function () {}
 		}
 	},
 	
@@ -283,7 +284,7 @@ TestCase("formerlyElementWillValidate", {
 TestCase("formerlyElementValidityInterface", {
 
 	setUp: function () {
-		this.unsupEl = { attributes: {} };
+		this.unsupEl = { attributes: {}, getAttribute: function () {} };
 	},
 
 	"test should set validity.valueMissing": function () {

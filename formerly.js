@@ -218,7 +218,8 @@ var formerly = (function (window, undef) {
 	 */
 	 
 	function _willValidate(el) {
-		return ((!el.disabled) && (!el.readOnly) && (_elsToValidateRegExp.test(el.type)));
+		var type = _getAttr(el, 'type');
+		return ((!el.disabled) && (!el.readOnly) && (_elsToValidateRegExp.test(type)));
 	}
 	
 	function _setCustomValidity(message) {
