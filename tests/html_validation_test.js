@@ -31,7 +31,7 @@ TestCase("formerlyHTMLConstraints", {
 		var ret = this.field1.checkValidity();
 		
 		assertTrue(ret);
-		assertTrue(this.field1.validity.valid)
+		assertTrue(this.field1.validity.valid);
 	},
 
 	"test should be invalid": function () {

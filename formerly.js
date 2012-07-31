@@ -6,7 +6,7 @@
 *
 * @package formerly
 * @author kjellmorten
-* @version formerly.js, v 0.7
+* @version formerly.js, v 0.7.1
 * @license BSD
 * @copyright (c) Kjell-Morten Bratsberg Thorsen http://kjellmorten.no/
 */
@@ -245,7 +245,7 @@ var formerly = (function (window, undef) {
 		var valid = true, i, il;
 		
 		for (i = 0, il = this.elements.length; i < il; i++) {
-			valid = valid && this.elements[i].checkValidity();
+			valid = this.elements[i].checkValidity() && valid;
 		}
 		
 		return valid;
@@ -328,7 +328,9 @@ var formerly = (function (window, undef) {
 			form.checkValidity = _checkValidityForm;
 		
 			// Listen for submit event and cancel if form not valid
-			_catchEvent(form, 'submit', _submitHandler);
+			_catchEvent(form, 'submit', function (event) {
+				return _submitHandler.call(form, event);
+			});
 		}
 	}
 

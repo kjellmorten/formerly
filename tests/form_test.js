@@ -61,11 +61,17 @@ TestCase("formerlyFormConstraintInterface", sinon.testCase({
 	},
 	
 	makeFormValid: function (form) {
-		form.elements = [ createElement("text", ""), createElement("text", "") ];
+		form.elements = [
+			createElement("text", ""),
+			createElement("text", "")
+		];
 	},
 
 	makeFormInvalid: function (form) {
-		form.elements = [ createElement("text", ""), createElement("text", "", { required: "required" }) ];
+		form.elements = [
+			createElement("text", "", { required: "required" }),
+			createElement("text", "")
+		];
 	},
 	
 	"test should set checkValidity function": function () {
@@ -98,6 +104,18 @@ TestCase("formerlyFormConstraintInterface", sinon.testCase({
 		assertFalse(ret);
 	},
 	
+	"test should validate all elements": function () {
+		this.makeFormInvalid(this.unsupForm);
+		formerly.init(this.unsupForm);
+		var spy1 = sinon.spy(this.unsupForm.elements[0], "checkValidity");
+		var spy2 = sinon.spy(this.unsupForm.elements[1], "checkValidity");
+
+		this.unsupForm.checkValidity();
+		
+		assertCalledOnce(spy1);
+		assertCalledOnce(spy2);
+	},
+	
 	"test should listen for submit event": function () {
 		formerly.init(this.unsupForm);
 		
@@ -119,7 +137,7 @@ TestCase("formerlyFormConstraintInterface", sinon.testCase({
 		formerly.init(this.unsupForm);
 		
 		var handler = this.unsupForm.addEventListener.args[0][1];
-		var ret = handler.call(this.unsupForm, event);
+		handler.call(this.unsupForm, event);
 		assertCalledOnce(event.preventDefault);
 	},
 
@@ -129,7 +147,7 @@ TestCase("formerlyFormConstraintInterface", sinon.testCase({
 		formerly.init(this.unsupForm);
 		
 		var handler = this.unsupForm.addEventListener.args[0][1];
-		var ret = handler.call(this.unsupForm, event);
+		handler.call(this.unsupForm, event);
 		assertFalse(event.returnValue);
 	},
 
@@ -169,6 +187,16 @@ TestCase("formerlyFormConstraintInterface", sinon.testCase({
 		assertCalledOnce(ieForm.attachEvent);
 		assertEquals('onsubmit', ieForm.attachEvent.args[0][0]);
 		assertFunction(ieForm.attachEvent.args[0][1]);
+	},
+
+	"test should prevent default on submit event when not triggered on form": function () {
+		var event = { preventDefault: this.stub() };
+		this.makeFormInvalid(this.unsupForm);
+		formerly.init(this.unsupForm);
+		
+		var handler = this.unsupForm.addEventListener.args[0][1];
+		handler(event);
+		assertCalledOnce(event.preventDefault);
 	},
 
 	"test should set isPolyfilling to true for unsupporting": function () {
