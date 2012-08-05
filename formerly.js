@@ -6,7 +6,7 @@
 *
 * @package formerly
 * @author kjellmorten
-* @version formerly.js, v 0.7.1
+* @version formerly.js, v 0.7.2
 * @license BSD
 * @copyright (c) Kjell-Morten Bratsberg Thorsen http://kjellmorten.no/
 */
@@ -52,14 +52,38 @@ var formerly = (function (window, undef) {
 		}
 	}
 	
-	function _throwEvent(el, type) {
-		var event;
-		if ((el.dispatchEvent !== undef) && (document.createEvent !== undef)) {
+	function _throwInvalidEvent(el) {
+		var event, i, il;
+		if (el.dispatchEvent !== undef) {
 			event = document.createEvent("HTMLEvents");		// Modern browsers
-			event.initEvent(type, false, true);
+			event.initEvent("invalid", false, true);
 			el.dispatchEvent(event);
+		} else if (el._invalidHandlers) {
+			event = document.createEventObject();			// Workaround for IE
+			event.eventType = "invalid";
+			for (i = 0, il = el._invalidHandlers.length; i < il; i++) {
+				if (el._invalidHandlers[i]) {
+					el._invalidHandlers[i](event);
+				}
+			}
 		}
-		// Old IEs will trigger only the events they know, making it impossible to trigger a native 'invalid' event
+	}
+
+	function _attachInvalidEvent(el, eventName, fn) {
+		el._invalidHandlers.push(fn);
+		return true;
+	}
+	
+	function _detachInvalidEvent(el, eventName, fn) {
+		var i, il, handlers = el._invalidHandlers;
+		if (handlers) {
+			for (i = 0, il = handlers.length; i < il; i++) {
+				if (handlers[i] === fn) {
+					handlers[i] = null;
+				}
+			}
+		}
+		return 0;
 	}
 
 	function _setConfig(config) {
@@ -236,7 +260,7 @@ var formerly = (function (window, undef) {
 		_validate(this);
 		
 		if (!this.validity.valid) {
-			_throwEvent(this, 'invalid');
+			_throwInvalidEvent(this);
 		}
 
 		return this.validity.valid;
@@ -261,7 +285,7 @@ var formerly = (function (window, undef) {
 	function getForms() {
 		return document.forms;
 	}
-
+	
 	/**
 	 * Initializes the given HTML form element. Will polyfill if HTML5 Constraint interface is not present.
 	 *
@@ -271,7 +295,7 @@ var formerly = (function (window, undef) {
 	 * @param {Object} The HTML form element to init
 	 */
 	function initElement(el) {
-		var handler, originalCheckValidity;
+		var handler, originalCheckValidity, attachEvent, detachEvent;
 
 		if (el.checkValidity === undef) {
 
@@ -281,12 +305,25 @@ var formerly = (function (window, undef) {
 			el.validity = {};
 			_setValidity(el, false, false, false, false, false, false, false, false);
 			el.checkValidity = _checkValidity;
-			el.validationMessage = '';
+			el.validationMessage = "";
 			
 			// Validate element on keyup, change and blur events
 			handler = function () {
 				_validate(el);
 			};
+			
+			// Override native attachEvent and detachEvent if present, to allow attacing to the invalid event.
+			attachEvent = el.attachEvent;
+			detachEvent = el.detachEvent;
+			if ((attachEvent !== undef) && (detachEvent !== undef)) {
+				el._invalidHandlers = [];
+				el.attachEvent = function (eventName, fn) {
+					return (eventName === "oninvalid") ? _attachInvalidEvent(el, eventName, fn) : attachEvent(eventName, fn);
+				};
+				el.detachEvent = function (eventName, fn) {
+					return (eventName === "oninvalid") ? _detachInvalidEvent(el, eventName, fn) : detachEvent(eventName, fn);
+				};
+			}
 
 		} else if (_config.touchSupporting) {
 

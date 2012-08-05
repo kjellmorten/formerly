@@ -41,13 +41,11 @@ TestCase("formerlyHTMLConstraints", {
 	},
 
 	"test should fire invalid event": function () {
-		if (document.createEvent !== undefined) {		// Skip this for old IEs for now
-			listenForEvent(this.field2, 'invalid', this.handler);
-		
-			this.field2.checkValidity();
-		
-			assertCalledOnce(this.handler);
-		}
+		listenForEvent(this.field2, 'invalid', this.handler);
+	
+		this.field2.checkValidity();
+	
+		assertCalledOnce(this.handler);
 	},
 
 	"test should not fire invalid event": function () {
@@ -59,13 +57,22 @@ TestCase("formerlyHTMLConstraints", {
 	},
 
 	"test should find form invalid and fire one invalid event": function () {
-		if (document.createEvent !== undefined) {		// Skip this for old IEs for now
-			listenForEvent(this.field1, 'invalid', this.handler);
-			listenForEvent(this.field2, 'invalid', this.handler);
-			
-			this.form1.checkValidity();
-			
-			assertCalledOnce(this.handler);
+		listenForEvent(this.field1, 'invalid', this.handler);
+		listenForEvent(this.field2, 'invalid', this.handler);
+		
+		this.form1.checkValidity();
+		
+		assertCalledOnce(this.handler);
+	},
+
+	"test should detach invalid handler in IE": function () {
+		if (this.field2.detachEvent !== undefined) {
+			this.field2.attachEvent('oninvalid', this.handler);
+			this.field2.detachEvent('oninvalid', this.handler);
+	
+			this.field2.checkValidity();
+	
+			assertNotCalled(this.handler);
 		}
 	},
 
@@ -273,8 +280,8 @@ TestCase("formerlyHTMLValidations", {
 function listenForEvent (el, event, handler) {
 	if (el.addEventListener !== undefined) {
 		el.addEventListener(event, handler, false);
-	} else if (el.attachEven !== undefined) {
-		el.attachEven('on' + event, handler);
+	} else if (el.attachEvent !== undefined) {
+		el.attachEvent('on' + event, handler);
 	}
 }
 

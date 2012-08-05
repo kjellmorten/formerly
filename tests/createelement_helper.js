@@ -18,9 +18,20 @@ function createElement(type, value, attrs, className, init, ie) {
 	if (ie !== true) {
 		el.addEventListener = sinon.stub();
 		el.dispatchEvent = sinon.stub();
+		if (document.createEvent === undefined) {
+			document.createEvent = sinon.stub().returns({ initEvent: function (type, bubbles, cancelable) {
+				this.type = type;
+				this.bubbles = bubbles;
+				this.cancelable = cancelable;
+			}});
+		}
 	} else {
-		el.attachEvent = sinon.stub();
+		el.attachEvent = sinon.stub().returns(true);
+		el.detachEvent = sinon.stub().returns(0);
 		el.fireEvent = sinon.stub();
+		if (document.createEventObject === undefined) {
+			document.createEventObject = sinon.stub().returns({});
+		}
 	}
 
 	if (init === undefined || init) {

@@ -53,7 +53,9 @@ _Formerly_ will only [statically validate the constraints](http://www.w3.org/TR/
 
 ### Events
 
-According to the spec, an event named `invalid` should be fired for all invalid elements on constraint validation. _Formerly_ currently does this in browser supporting the W3C event model. In other words, the `invalid` event is not fired in Internet Explorer as of now.
+An event named `invalid` will be triggered for invalid elements on form submission or when `checkValidity` is called directly.
+
+> Note: To catch this event in Internet Explorer 8 and older, make sure to use the `attachElement` method on the relevant form elements. Other ways of attaching event handlers will not catch the `invalid` event.
 
 ## Usage
 

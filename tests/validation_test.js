@@ -415,9 +415,149 @@ TestCase("formerlyValidationInvalidEvent", sinon.testCase({
 	}
 
 }));
+	
+TestCase("formerlyValidationInvalidEventIE", sinon.testCase({
+
+	setUp: function () {
+		this.el = createElement("text", "", { required: 'required' }, "", false, true); // Imitate IE
+		this.nativeAttachEvent = this.el.attachEvent;
+		this.nativeDetachEvent = this.el.detachEvent;
+		formerly.initElement(this.el);
+	},
+
+	"test should override attachEvent when present": function () {
+		//formerly.initElement(this.el); -- Done in setUp
+		
+		assertNotEquals(this.nativeAttachEvent, this.el.attachEvent);
+	},
+
+	"test attachEvent should return true for native event": function () {
+		var ret = this.el.attachEvent('onclick', function () {});
+		
+		assertTrue(ret);
+	},
+
+	"test attachEvent should return true for invalid event": function () {
+		var ret = this.el.attachEvent('oninvalid', function () {});
+		
+		assertTrue(ret);
+	},
+	
+	"test should call browser attachEvent when not invalid event": function () {
+		this.el.attachEvent('onclick', function () {});
+		
+		assertCalledWith(this.nativeAttachEvent, 'onclick');
+	},
+	
+	"test should trigger invalid event on checkValidity in IE": function () {
+		var handler = sinon.stub();
+		this.el.attachEvent("oninvalid", handler);
+		
+		this.el.checkValidity();
+		
+		assertCalledOnce(handler);
+	},
+
+	"test should call back with event object": function () {
+		var handler = sinon.stub();
+		this.el.attachEvent("oninvalid", handler);
+		this.el.checkValidity();
+		
+		var event = handler.args[0][0];
+		
+		assertObject(event);
+		assertEquals("invalid", event.eventType);
+	},
+
+	"test should call several handlers on checkValidity in IE": function () {
+		var handler1 = sinon.stub();
+		var handler2 = sinon.stub();
+		this.el.attachEvent("oninvalid", handler1);
+		this.el.attachEvent("oninvalid", handler2);
+		
+		this.el.checkValidity();
+		
+		assertCalledOnce(handler1);
+		assertCalledOnce(handler2);
+	},
+	
+	"test should call handler for checked element only": function () {
+		var el2 = createElement("text", "", { required: 'required' }, "", true, true); // Imitate IE
+		var handler1 = sinon.stub();
+		var handler2 = sinon.stub();
+		this.el.attachEvent("oninvalid", handler1);
+		el2.attachEvent("oninvalid", handler2);
+
+		el2.checkValidity();
+
+		assertNotCalled(handler1);
+		assertCalledOnce(handler2);
+	},
+	
+	"test should override detachEvent when present": function () {
+		//formerly.initElement(this.el); -- Done in setUp
+		
+		assertNotEquals(this.nativeDetachEvent, this.el.detachEvent);
+	},
+
+	"test should call browser detachEvent when not invalid event": function () {
+		this.el.detachEvent('onclick', function () {});
+		
+		assertCalledWith(this.nativeDetachEvent, 'onclick');
+	},
+	
+	"test detachEvent should return 0 for invalid": function () {
+		var handler = sinon.stub();
+		this.el.attachEvent("oninvalid", handler);
+		
+		var ret = this.el.detachEvent("oninvalid", handler);
+		
+		assertEquals(0, ret);
+	},
+
+	"test detachEvent should return 0 for native events": function () {
+		var handler = sinon.stub();
+		this.el.attachEvent("onclick", handler);
+		
+		var ret = this.el.detachEvent("onclick", handler);
+		
+		assertEquals(0, ret);
+	},
+
+	"test should detach from invalid event": function () {
+		var handler = sinon.stub();
+		this.el.attachEvent("oninvalid", handler);
+		this.el.detachEvent("oninvalid", handler);
+		
+		this.el.checkValidity();
+		
+		assertNotCalled(handler);
+	},
+
+	"test should detach correct event": function () {
+		var handler1 = sinon.stub();
+		var handler2 = sinon.stub();
+		this.el.attachEvent("oninvalid", handler1);
+		this.el.attachEvent("oninvalid", handler2);
+		this.el.detachEvent("oninvalid", handler2);
+		
+		this.el.checkValidity();
+		
+		assertCalledOnce(handler1);
+		assertNotCalled(handler2);
+	}
+}));
 
 
 TestCase("formerlyValidationClassNames", {
+	setUp: function () {
+		this.form1 = { addEventListener: sinon.stub() };
+	},
+	
+	tearDown: function () {
+		formerly.init(this.form1, { validClass: 'valid' });		// Reset to default class name
+	},
+
 	"test should set valid class": function () {
 		var el = createElement("text", "");
 
@@ -499,33 +639,25 @@ TestCase("formerlyValidationClassNames", {
 	},
 	
 	"test should use custom valid class name when set": function () {
-		var form1 = { addEventListener: sinon.stub() };
 		var el = createElement("text", "", null, "", false);
-		form1.elements = [ el ];
-		form1.length = form1.elements.length;
-		formerly.init(form1, { validClass: 'okay' });
+		this.form1.elements = [ el ];
+		this.form1.length = this.form1.elements.length;
+		formerly.init(this.form1, { validClass: 'okay' });
 
 		var ret = el.checkValidity();
 		
 		assertEquals('okay', el.className);
-
-		// Tear down
-		formerly.init(form1, { validClass: 'valid' });
 	},
 
 	"test should use custom invalid class name when set": function () {
-		var form1 = { addEventListener: sinon.stub() };
 		var el = createElement("text", "", { required: "required" }, "", false);
-		form1.elements = [ el ];
-		form1.length = form1.elements.length;
-		formerly.init(form1, { invalidClass: 'fail' });
+		this.form1.elements = [ el ];
+		this.form1.length = this.form1.elements.length;
+		formerly.init(this.form1, { invalidClass: 'fail' });
 
 		var ret = el.checkValidity();
 		
 		assertEquals('fail', el.className);
-
-		// Tear down
-		formerly.init(form1, { invalidClass: 'invalid' });
 	}
 
 });

@@ -421,16 +421,17 @@ TestCase("formerlyUpdateValidity", {
 
 	"test should listen for keyup, change and blur events on element in old IE": function () {
 		var el = createElement("text", "", null, "", false, true);
+		var attachEvent = el.attachEvent;
 
 		formerly.initElement(el);
 		
-		assertCalledThrice(el.attachEvent);
-		assertCalledWith(el.attachEvent, "onkeyup");
-		assertCalledWith(el.attachEvent, "onchange");
-		assertCalledWith(el.attachEvent, "onblur");
-		assertFunction(el.attachEvent.args[0][1]);
-		assertFunction(el.attachEvent.args[1][1]);
-		assertFunction(el.attachEvent.args[2][1]);
+		assertCalledThrice(attachEvent);
+		assertCalledWith(attachEvent, "onkeyup");
+		assertCalledWith(attachEvent, "onchange");
+		assertCalledWith(attachEvent, "onblur");
+		assertFunction(attachEvent.args[0][1]);
+		assertFunction(attachEvent.args[1][1]);
+		assertFunction(attachEvent.args[2][1]);
 	},
 
 	"test should be invalid after change": function () {
