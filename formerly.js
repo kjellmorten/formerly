@@ -16,6 +16,12 @@ var formerly = (function (window, undef) {
 		_elsToValidateRegExp = /^(text|search|tel|url|email|password|datetime|date|month|week|time|datetime-local|number|range|color|checkbox|radio|file|submit|select-one|select-multiple|textarea)$/i,
 		_emailRegExp = /^[a-z][a-z0-9!#$%&'*+\-\/=?\^_`{|}~\.]*@[a-z0-9\-]+(\.[a-z0-9\-]+)*$/i,
 		_urlRegExp = /^\s*[a-z][a-z0-9+\-\.]+:\/\//i,
+		_dateTimeLocalRegExp = /^([\-0-9]+)T([\:\.0-9]+)$/i,
+		_dateTimeRegExp = /^([\-0-9]+)T([\:\.0-9]+)(Z|[\-\+](\d{2}\:\d{2}))$/i,
+		_dateRegExp = /^(\d{4,})-(\d{2})-(\d{2})$/i,
+		_timeRegExp = /^(\d{2})\:(\d{2})(\:(\d{2})(\.\d+)?)?$/i,
+		_monthRegExp = /^(\d{4,})-(\d{2})$/i,
+		_weekRegExp = /^(\d{4,})-W(\d{2})$/i,
 		_config = {
 			touchSupporting: true,
 			validClass: 'valid',
@@ -105,6 +111,37 @@ var formerly = (function (window, undef) {
 		return ((el.attributes.required !== undef) && (el.value === ''));
 	}
 	
+	function _checkTypeMismatchDate(value) {
+		var match = _dateRegExp.exec(value);
+		return ((match === null) || (match[1] <= 0) || isNaN(Date.parse(value)));
+	}
+
+	function _checkTypeMismatchTime(value) {
+		var match = _timeRegExp.exec(value);
+		return ((match === null) || (match[1] > 23) || (match[2] > 59) || ((match.length > 4) && (match[4] > 59)));
+	}
+	
+	function _checkTypeMismatchDateTimeLocal(value) {
+		var match = _dateTimeLocalRegExp.exec(value);
+		return ((match === null) || _checkTypeMismatchDate(match[1]) || _checkTypeMismatchTime(match[2]));
+	}
+
+	function _checkTypeMismatchDateTime(value) {
+		var match = _dateTimeRegExp.exec(value);
+		return ((match === null) || _checkTypeMismatchDate(match[1]) || _checkTypeMismatchTime(match[2]) || 
+				((match.length > 4) && !!(match[4]) && _checkTypeMismatchTime(match[4])));
+	}
+
+	function _checkTypeMismatchMonth(value) {
+		var match = _monthRegExp.exec(value);
+		return ((match === null) || (match[1] <= 0) || isNaN(Date.parse(value)));
+	}
+	
+	function _checkTypeMismatchWeek(value) {
+		var match = _weekRegExp.exec(value);
+		return ((match === null) || (match[1] <= 0) || (match[2] < 1) || (match[2] > 53));
+	}
+
 	function _checkTypeMismatch(el) {
 		var type = _getAttr(el, 'type');
 		if (type) {
@@ -113,6 +150,18 @@ var formerly = (function (window, undef) {
 				return !(_emailRegExp.test(el.value));
 			case 'url':
 				return !(_urlRegExp.test(el.value));
+			case 'datetime':
+				return _checkTypeMismatchDateTime(el.value);
+			case 'date':
+				return _checkTypeMismatchDate(el.value);
+			case 'time':
+				return _checkTypeMismatchTime(el.value);
+			case 'month':
+				return _checkTypeMismatchMonth(el.value);
+			case 'week':
+				return _checkTypeMismatchWeek(el.value);
+			case 'datetime-local':
+				return _checkTypeMismatchDateTimeLocal(el.value);
 			}
 		}
 		

@@ -114,6 +114,446 @@ TestCase("formerlyValidationTypeMismatchUrl", {
 	}
 });
 
+TestCase("formerlyValidationTypeMismatchDateTime", {
+	
+	"test should set typeMismatch for invalid datetime": function () {
+		var el = createElement("datetime", "nodatetime");
+		
+		var ret = el.checkValidity();
+		
+		assertInvalid(ret, el, 'typeMismatch');
+	},
+
+	"test should not set typeMismatch for valid datetime": function () {
+		var el = createElement("datetime", "2012-08-07T18:45Z");
+		
+		var ret = el.checkValidity();
+		
+		assertValid(ret, el, 'typeMismatch');
+	},
+	
+	"test should accept empty string": function () {
+		var el = createElement("datetime", "");
+		
+		var ret = el.checkValidity();
+		
+		assertValid(ret, el, 'typeMismatch');
+	},
+
+	"test should not accept invalid date": function () {
+		var el = createElement("datetime", "2012-08-32T18:45Z");
+		
+		var ret = el.checkValidity();
+		
+		assertInvalid(ret, el, 'typeMismatch');
+	},
+
+	"test should not accept invalid time": function () {
+		var el = createElement("datetime", "2012-08-07T18:60Z");
+		
+		var ret = el.checkValidity();
+		
+		assertInvalid(ret, el, 'typeMismatch');
+	},
+
+	"test should accept positive time zone": function () {
+		var el = createElement("datetime", "2012-08-07T18:45+01:00");
+		
+		var ret = el.checkValidity();
+		
+		assertValid(ret, el, 'typeMismatch');
+	},
+
+	"test should accept negative time zone": function () {
+		var el = createElement("datetime", "2012-08-07T18:45-01:00");
+		
+		var ret = el.checkValidity();
+		
+		assertValid(ret, el, 'typeMismatch');
+	},
+
+	"test should not accept invalid time zone": function () {
+		var el = createElement("datetime", "2012-08-07T18:45-01:60");
+		
+		var ret = el.checkValidity();
+		
+		assertInvalid(ret, el, 'typeMismatch');
+	}
+
+});
+
+TestCase("formerlyValidationTypeMismatchDateTimeLocal", {
+	
+	"test should set typeMismatch for invalid datetime-local": function () {
+		var el = createElement("datetime-local", "nodatetime");
+		
+		var ret = el.checkValidity();
+		
+		assertInvalid(ret, el, 'typeMismatch');
+	},
+
+	"test should not set typeMismatch for valid datetime-local": function () {
+		var el = createElement("datetime-local", "2012-08-07T18:45");
+		
+		var ret = el.checkValidity();
+		
+		assertValid(ret, el, 'typeMismatch');
+	},
+
+	"test should accept empty string": function () {
+		var el = createElement("datetime-local", "");
+		
+		var ret = el.checkValidity();
+		
+		assertValid(ret, el, 'typeMismatch');
+	},
+
+	"test should not accept invalid date": function () {
+		var el = createElement("datetime-local", "2012-08-32T18:45");
+		
+		var ret = el.checkValidity();
+		
+		assertInvalid(ret, el, 'typeMismatch');
+	},
+
+	"test should not accept invalid time": function () {
+		var el = createElement("datetime-local", "2012-08-07T18:60");
+		
+		var ret = el.checkValidity();
+		
+		assertInvalid(ret, el, 'typeMismatch');
+	}
+	
+});
+
+TestCase("formerlyValidationTypeMismatchDate", {
+	
+	"test should set typeMismatch for invalid date": function () {
+		var el = createElement("date", "nodate");
+		
+		var ret = el.checkValidity();
+		
+		assertInvalid(ret, el, 'typeMismatch');
+	},
+
+	"test should not set typeMismatch for valid date": function () {
+		var el = createElement("date", "2012-08-07");
+		
+		var ret = el.checkValidity();
+		
+		assertValid(ret, el, 'typeMismatch');
+	},
+	
+	"test should accept empty string": function () {
+		var el = createElement("date", "");
+		
+		var ret = el.checkValidity();
+		
+		assertValid(ret, el, 'typeMismatch');
+	},
+
+	"test should accept years with more than five digits": function () {
+		var el = createElement("date", "12012-08-07");
+		
+		var ret = el.checkValidity();
+		
+		assertValid(ret, el, 'typeMismatch');
+	},
+
+	"test should not accept less than four digit year": function () {
+		var el = createElement("date", "12-08-02");
+		
+		var ret = el.checkValidity();
+		
+		assertInvalid(ret, el, 'typeMismatch');
+	},
+
+	"test should not accept year zero": function () {
+		var el = createElement("date", "0000-08-07");
+		
+		var ret = el.checkValidity();
+		
+		assertInvalid(ret, el, 'typeMismatch');
+	},
+
+	"test should not accept single digits in month and day": function () {
+		var el = createElement("date", "2012-8-2");
+		
+		var ret = el.checkValidity();
+		
+		assertInvalid(ret, el, 'typeMismatch');
+	},
+
+	"test should set typeMismatch when day's to high": function () {
+		var el = createElement("date", "2012-08-32");
+		
+		var ret = el.checkValidity();
+		
+		assertInvalid(ret, el, 'typeMismatch');
+	},
+
+	"test should set typeMismatch when day's to low": function () {
+		var el = createElement("date", "2012-08-00");
+		
+		var ret = el.checkValidity();
+		
+		assertInvalid(ret, el, 'typeMismatch');
+	},
+
+	"test should set typeMismatch when month's to high": function () {
+		var el = createElement("date", "2012-13-07");
+		
+		var ret = el.checkValidity();
+		
+		assertInvalid(ret, el, 'typeMismatch');
+	},
+
+	"test should set typeMismatch when month's to low": function () {
+		var el = createElement("date", "2012-00-07");
+		
+		var ret = el.checkValidity();
+		
+		assertInvalid(ret, el, 'typeMismatch');
+	}
+
+});
+
+TestCase("formerlyValidationTypeMismatchTime", {
+	
+	"test should set typeMismatch for invalid time": function () {
+		var el = createElement("time", "notime");
+		
+		var ret = el.checkValidity();
+		
+		assertInvalid(ret, el, 'typeMismatch');
+	},
+
+	"test should not set typeMismatch for valid time": function () {
+		var el = createElement("time", "18:45");
+		
+		var ret = el.checkValidity();
+		
+		assertValid(ret, el, 'typeMismatch');
+	},
+
+	"test should accept empty string": function () {
+		var el = createElement("time", "");
+		
+		var ret = el.checkValidity();
+		
+		assertValid(ret, el, 'typeMismatch');
+	},
+
+	"test should set typeMismatch when hour's too high": function () {
+		var el = createElement("time", "24:45");
+		
+		var ret = el.checkValidity();
+		
+		assertInvalid(ret, el, 'typeMismatch');
+	},
+
+	"test should set typeMismatch when hour's too low": function () {
+		var el = createElement("time", "-1:45");
+		
+		var ret = el.checkValidity();
+		
+		assertInvalid(ret, el, 'typeMismatch');
+	},
+
+	"test should set typeMismatch when minut's too high": function () {
+		var el = createElement("time", "18:60");
+		
+		var ret = el.checkValidity();
+		
+		assertInvalid(ret, el, 'typeMismatch');
+	},
+
+	"test should set typeMismatch when minute's too low": function () {
+		var el = createElement("time", "18:-1");
+		
+		var ret = el.checkValidity();
+		
+		assertInvalid(ret, el, 'typeMismatch');
+	},
+
+	"test should not set typeMismatch for valid time with seconds": function () {
+		var el = createElement("time", "18:45:37");
+		
+		var ret = el.checkValidity();
+		
+		assertValid(ret, el, 'typeMismatch');
+	},
+
+	"test should set typeMismatch when second's too high": function () {
+		var el = createElement("time", "18:45:60");
+		
+		var ret = el.checkValidity();
+		
+		assertInvalid(ret, el, 'typeMismatch');
+	},
+
+	"test should set typeMismatch when second's too low": function () {
+		var el = createElement("time", "18:45:-1");
+		
+		var ret = el.checkValidity();
+		
+		assertInvalid(ret, el, 'typeMismatch');
+	},
+
+	"test should not set typeMismatch for valid time with fractions of a second": function () {
+		var el = createElement("time", "18:45:37.174");
+		
+		var ret = el.checkValidity();
+		
+		assertValid(ret, el, 'typeMismatch');
+	}
+
+});
+
+TestCase("formerlyValidationTypeMismatchMonth", {
+	
+	"test should set typeMismatch for invalid month": function () {
+		var el = createElement("month", "nomonth");
+		
+		var ret = el.checkValidity();
+		
+		assertInvalid(ret, el, 'typeMismatch');
+	},
+
+	"test should not set typeMismatch for valid month": function () {
+		var el = createElement("month", "2012-08");
+		
+		var ret = el.checkValidity();
+		
+		assertValid(ret, el, 'typeMismatch');
+	},
+
+	"test should accept empty string": function () {
+		var el = createElement("month", "");
+		
+		var ret = el.checkValidity();
+		
+		assertValid(ret, el, 'typeMismatch');
+	},
+
+	"test should accept years with more than five digits": function () {
+		var el = createElement("month", "12012-08");
+		
+		var ret = el.checkValidity();
+		
+		assertValid(ret, el, 'typeMismatch');
+	},
+
+	"test should not accept less than four digit year": function () {
+		var el = createElement("month", "12-08");
+		
+		var ret = el.checkValidity();
+		
+		assertInvalid(ret, el, 'typeMismatch');
+	},
+
+	"test should not accept year zero": function () {
+		var el = createElement("month", "0000-08");
+		
+		var ret = el.checkValidity();
+		
+		assertInvalid(ret, el, 'typeMismatch');
+	},
+
+	"test should not accept single digits in month": function () {
+		var el = createElement("month", "2012-8");
+		
+		var ret = el.checkValidity();
+		
+		assertInvalid(ret, el, 'typeMismatch');
+	},
+
+	"test should set typeMismatch when month's to high": function () {
+		var el = createElement("month", "2012-13");
+		
+		var ret = el.checkValidity();
+		
+		assertInvalid(ret, el, 'typeMismatch');
+	},
+
+	"test should set typeMismatch when month's to low": function () {
+		var el = createElement("month", "2012-00");
+		
+		var ret = el.checkValidity();
+		
+		assertInvalid(ret, el, 'typeMismatch');
+	}
+
+});
+
+TestCase("formerlyValidationTypeMismatchWeek", {
+	
+	"test should set typeMismatch for invalid week": function () {
+		var el = createElement("week", "noweek");
+		
+		var ret = el.checkValidity();
+		
+		assertInvalid(ret, el, 'typeMismatch');
+	},
+
+	"test should not set typeMismatch for valid week": function () {
+		var el = createElement("week", "2012-W32");
+		
+		var ret = el.checkValidity();
+		
+		assertValid(ret, el, 'typeMismatch');
+	},
+
+	"test should accept empty string": function () {
+		var el = createElement("week", "");
+		
+		var ret = el.checkValidity();
+		
+		assertValid(ret, el, 'typeMismatch');
+	},
+
+	"test should accept years with more than five digits": function () {
+		var el = createElement("week", "12012-W32");
+		
+		var ret = el.checkValidity();
+		
+		assertValid(ret, el, 'typeMismatch');
+	},
+
+	"test should not accept less than four digit year": function () {
+		var el = createElement("week", "12-W32");
+		
+		var ret = el.checkValidity();
+		
+		assertInvalid(ret, el, 'typeMismatch');
+	},
+
+	"test should not accept year zero": function () {
+		var el = createElement("week", "0000-W32");
+		
+		var ret = el.checkValidity();
+		
+		assertInvalid(ret, el, 'typeMismatch');
+	},
+
+	"test should not accept too low week": function () {
+		var el = createElement("week", "2012-W00");
+		
+		var ret = el.checkValidity();
+		
+		assertInvalid(ret, el, 'typeMismatch');
+	},
+
+	"test should not accept too high week": function () {
+		var el = createElement("week", "2012-W54");
+		
+		var ret = el.checkValidity();
+		
+		assertInvalid(ret, el, 'typeMismatch');
+	}
+
+});
+
 TestCase("formerlyValidationPatternMismatch", {
 
 	"test should set patternMismatch": function () {
