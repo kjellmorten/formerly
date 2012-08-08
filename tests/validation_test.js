@@ -178,6 +178,14 @@ TestCase("formerlyValidationTypeMismatchDateTime", {
 		var ret = el.checkValidity();
 		
 		assertInvalid(ret, el, 'typeMismatch');
+	},
+
+	"test should not accept missing time zone": function () {
+		var el = createElement("datetime", "2012-08-07T18:45");
+		
+		var ret = el.checkValidity();
+		
+		assertInvalid(ret, el, 'typeMismatch');
 	}
 
 });
@@ -218,6 +226,14 @@ TestCase("formerlyValidationTypeMismatchDateTimeLocal", {
 
 	"test should not accept invalid time": function () {
 		var el = createElement("datetime-local", "2012-08-07T18:60");
+		
+		var ret = el.checkValidity();
+		
+		assertInvalid(ret, el, 'typeMismatch');
+	},
+
+	"test should not accept time zone": function () {
+		var el = createElement("datetime-local", "2012-08-07T18:45Z");
 		
 		var ret = el.checkValidity();
 		
@@ -278,6 +294,14 @@ TestCase("formerlyValidationTypeMismatchDate", {
 
 	"test should not accept single digits in month and day": function () {
 		var el = createElement("date", "2012-8-2");
+		
+		var ret = el.checkValidity();
+		
+		assertInvalid(ret, el, 'typeMismatch');
+	},
+
+	"test should not accept missing day": function () {
+		var el = createElement("date", "2012-08");
 		
 		var ret = el.checkValidity();
 		
@@ -478,6 +502,14 @@ TestCase("formerlyValidationTypeMismatchMonth", {
 
 	"test should set typeMismatch when month's to low": function () {
 		var el = createElement("month", "2012-00");
+		
+		var ret = el.checkValidity();
+		
+		assertInvalid(ret, el, 'typeMismatch');
+	},
+
+	"test should not accept day": function () {
+		var el = createElement("month", "2012-08-07");
 		
 		var ret = el.checkValidity();
 		

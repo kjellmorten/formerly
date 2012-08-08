@@ -6,7 +6,7 @@
 *
 * @package formerly
 * @author kjellmorten
-* @version formerly.js, v 0.7.2
+* @version formerly.js, v 0.8.0
 * @license BSD
 * @copyright (c) Kjell-Morten Bratsberg Thorsen http://kjellmorten.no/
 */
@@ -16,11 +16,9 @@ var formerly = (function (window, undef) {
 		_elsToValidateRegExp = /^(text|search|tel|url|email|password|datetime|date|month|week|time|datetime-local|number|range|color|checkbox|radio|file|submit|select-one|select-multiple|textarea)$/i,
 		_emailRegExp = /^[a-z][a-z0-9!#$%&'*+\-\/=?\^_`{|}~\.]*@[a-z0-9\-]+(\.[a-z0-9\-]+)*$/i,
 		_urlRegExp = /^\s*[a-z][a-z0-9+\-\.]+:\/\//i,
-		_dateTimeLocalRegExp = /^([\-0-9]+)T([\:\.0-9]+)$/i,
-		_dateTimeRegExp = /^([\-0-9]+)T([\:\.0-9]+)(Z|[\-\+](\d{2}\:\d{2}))$/i,
-		_dateRegExp = /^(\d{4,})-(\d{2})-(\d{2})$/i,
+		_dateTimeRegExp = /^([\-0-9]+)T([\:\.0-9]+)(Z|[\-\+](\d{2}\:\d{2}))?$/i,
+		_dateRegExp = /^(\d{4,})-\d{2}(-\d{2})?$/i,
 		_timeRegExp = /^(\d{2})\:(\d{2})(\:(\d{2})(\.\d+)?)?$/i,
-		_monthRegExp = /^(\d{4,})-(\d{2})$/i,
 		_weekRegExp = /^(\d{4,})-W(\d{2})$/i,
 		_config = {
 			touchSupporting: true,
@@ -111,35 +109,35 @@ var formerly = (function (window, undef) {
 		return ((el.attributes.required !== undef) && (el.value === ''));
 	}
 	
-	function _checkTypeMismatchDate(value) {
-		var match = _dateRegExp.exec(value);
-		return ((match === null) || (match[1] <= 0) || isNaN(Date.parse(value)));
-	}
-
 	function _checkTypeMismatchTime(value) {
 		var match = _timeRegExp.exec(value);
-		return ((match === null) || (match[1] > 23) || (match[2] > 59) || ((match.length > 4) && (match[4] > 59)));
+		return ((match === null) || 
+				(match[1] > 23) || (match[2] > 59) || /* Validate hour and minute */
+				((match.length > 4) && (match[4] > 59))); /* Validate second if present */
 	}
 	
-	function _checkTypeMismatchDateTimeLocal(value) {
-		var match = _dateTimeLocalRegExp.exec(value);
-		return ((match === null) || _checkTypeMismatchDate(match[1]) || _checkTypeMismatchTime(match[2]));
+	function _checkTypeMismatchDate(value, requireDay) {
+		var match = _dateRegExp.exec(value);
+		return ((match === null) || 
+				(match[1] <= 0) || /* Don't allow year zero */
+				(requireDay ? !match[2] : !!match[2]) || /* Require or disallow day */
+				isNaN(Date.parse(value))); /* Validate agains JavaScript Date object */
 	}
 
-	function _checkTypeMismatchDateTime(value) {
+	function _checkTypeMismatchDateTime(value, requireTimeZone) {
 		var match = _dateTimeRegExp.exec(value);
-		return ((match === null) || _checkTypeMismatchDate(match[1]) || _checkTypeMismatchTime(match[2]) || 
-				((match.length > 4) && !!(match[4]) && _checkTypeMismatchTime(match[4])));
+		return ((match === null) ||
+				 _checkTypeMismatchDate(match[1], true) || _checkTypeMismatchTime(match[2]) || /* Validate date and time parts */
+				(requireTimeZone ? !match[3] : !!match[3]) || /* Require or disallow time zone */
+				((match.length > 4) && !!(match[4]) && _checkTypeMismatchTime(match[4]))); /* Validate time zone other than Z */
 	}
 
-	function _checkTypeMismatchMonth(value) {
-		var match = _monthRegExp.exec(value);
-		return ((match === null) || (match[1] <= 0) || isNaN(Date.parse(value)));
-	}
-	
 	function _checkTypeMismatchWeek(value) {
 		var match = _weekRegExp.exec(value);
-		return ((match === null) || (match[1] <= 0) || (match[2] < 1) || (match[2] > 53));
+		return ((match === null) || 
+				(match[1] <= 0) || /* Don't allow year zero */
+				(match[2] < 1) || (match[2] > 53)); /* Validate week number. */
+				// Note: Does not check whether the year have 52 or 53 weeks according to the Gregorian calendar, for now. Is it worth it?
 	}
 
 	function _checkTypeMismatch(el) {
@@ -151,17 +149,17 @@ var formerly = (function (window, undef) {
 			case 'url':
 				return !(_urlRegExp.test(el.value));
 			case 'datetime':
-				return _checkTypeMismatchDateTime(el.value);
+				return _checkTypeMismatchDateTime(el.value, true);
 			case 'date':
-				return _checkTypeMismatchDate(el.value);
+				return _checkTypeMismatchDate(el.value, true);
 			case 'time':
 				return _checkTypeMismatchTime(el.value);
 			case 'month':
-				return _checkTypeMismatchMonth(el.value);
+				return _checkTypeMismatchDate(el.value, false);
 			case 'week':
 				return _checkTypeMismatchWeek(el.value);
 			case 'datetime-local':
-				return _checkTypeMismatchDateTimeLocal(el.value);
+				return _checkTypeMismatchDateTime(el.value, false);
 			}
 		}
 		
