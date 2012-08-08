@@ -733,11 +733,57 @@ TestCase("formerlyValidationRangeUnderflow", {
 		var ret = el.checkValidity();
 		
 		assertValid(ret, el, 'rangeUnderflow');
-	}
+	},
 	
-	// TODO: Write for range and the dates and times
-	// TODO: Honour default min
-	// TODO: Skip check for types this does not apply to
+	"test should have no default min for number field": function () {
+		var el = createElement("number", "-1");
+		
+		var ret = el.checkValidity();
+		
+		assertValid(ret, el, 'rangeUnderflow');
+	},
+
+	"test should have default min = 0 for range field": function () {
+		var el = createElement("range", "-1");
+		
+		var ret = el.checkValidity();
+		
+		assertInvalid(ret, el, 'rangeUnderflow');
+	},
+
+	"test should set rangeUnderflow for datetime field": function () {
+		var el = createElement("datetime", "2012-08-07T18:45Z", { min: "2012-08-07T18:46Z" });
+		
+		var ret = el.checkValidity();
+		
+		assertInvalid(ret, el, 'rangeUnderflow');
+	},
+
+	"test should set rangeUnderflow for date field": function () {
+		var el = createElement("date", "2012-08-07", { min: "2012-08-08" });
+		
+		var ret = el.checkValidity();
+		
+		assertInvalid(ret, el, 'rangeUnderflow');
+	},
+
+	"test should set rangeUnderflow for time field": function () {
+		var el = createElement("time", "18:45", { min: "18:46" });
+		
+		var ret = el.checkValidity();
+		
+		assertInvalid(ret, el, 'rangeUnderflow');
+	},
+
+	"test should set rangeUnderflow for datetime-local field": function () {
+		var el = createElement("datetime-local", "2012-08-07T18:45", { min: "2012-08-07T18:46" });
+		
+		var ret = el.checkValidity();
+		
+		assertInvalid(ret, el, 'rangeUnderflow');
+	},
+	
+	// TODO: Write for month, week
 
 });
 
@@ -789,10 +835,25 @@ TestCase("formerlyValidationRangeOverflow", {
 		var ret = el.checkValidity();
 		
 		assertValid(ret, el, 'rangeOverflow');
+	},
+
+	"test should have no default max for number": function () {
+		var el = createElement("number", "99999999");
+		
+		var ret = el.checkValidity();
+		
+		assertValid(ret, el, 'rangeOverflow');
+	},
+
+	"test should have default max = 100 for range": function () {
+		var el = createElement("range", "101");
+		
+		var ret = el.checkValidity();
+		
+		assertInvalid(ret, el, 'rangeOverflow');
 	}
 
 	// TODO: Write for range and the dates and times
-	// TODO: Honour default max
 	// TODO: Skip check for types this does not apply to
 
 });

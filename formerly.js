@@ -142,6 +142,7 @@ var formerly = (function (window, undef) {
 
 	function _checkTypeMismatch(el) {
 		var type = _getAttr(el, 'type');
+
 		if (type) {
 			switch (type) {
 			case 'email':
@@ -182,18 +183,41 @@ var formerly = (function (window, undef) {
 	}
 	
 	function _checkRangeUnderflow(el) {
-		var val, min = _getAttr(el, 'min');
-		if (min) {
-			val = parseFloat(el.value);
-			min = parseFloat(min);
-			return (min > val);
+		var val, min = _getAttr(el, 'min'), type = _getAttr(el, 'type');
+
+		if (type) {
+			switch (type) {
+			case "range":
+				min = min || "0";
+			case "number":
+				val = parseFloat(el.value);
+				min = parseFloat(min);
+				break;
+			case "datetime":
+			case "date":
+			case "datetime-local":
+				val = Date.parse(el.value);
+				min = Date.parse(min);
+				break;
+			case "time":
+				if (min) {
+					val = Date.parse("1970-01-01T" + el.value);
+					min = Date.parse("1970-01-01T" + min);
+					break;
+				}
+			default:
+				return false;
+			}
 		}
 		
-		return false;
+		return (!isNaN(min) && (min > val));
 	}
 
 	function _checkRangeOverflow(el) {
-		var val, max = _getAttr(el, 'max');
+		var val, max = _getAttr(el, 'max'), type = _getAttr(el, 'type');
+		if ((!max) && (type === 'range')) {
+			max = "100";
+		}
 		if (max) {
 			val = parseFloat(el.value);
 			max = parseFloat(max);
