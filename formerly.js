@@ -30,6 +30,17 @@ var formerly = (function (window, undef) {
 	 * Private help functions
 	 */
 	 
+	function _typeValue(value, type) {
+		if (/^(range|number)/.test(type)) {
+			value = parseFloat(value);
+		} else if (/^(date)/.test(type)) {
+			value = Date.parse(value);
+		} else if (/^(time)/.test(type)) {
+			value = Date.parse("1970-01-01T" + value);
+		}
+		return value;
+	}
+	
 	function _getAttr(el, attr) {
 		return el.getAttribute(attr);
 	}
@@ -140,9 +151,7 @@ var formerly = (function (window, undef) {
 				// Note: Does not check whether the year have 52 or 53 weeks according to the Gregorian calendar, for now. Is it worth it?
 	}
 
-	function _checkTypeMismatch(el) {
-		var type = _getAttr(el, 'type');
-
+	function _checkTypeMismatch(el, type) {
 		if (type) {
 			switch (type) {
 			case 'email':
@@ -182,62 +191,32 @@ var formerly = (function (window, undef) {
 		return ((el.maxLength !== -1) && (el.value !== el.defaultValue) && (el.value.length > el.maxLength));
 	}
 	
-	function _checkRangeUnderflow(el) {
-		var val, min = _getAttr(el, 'min'), type = _getAttr(el, 'type');
-
-		if (type) {
-			switch (type) {
-			case "range":
-				min = min || "0";
-			case "number":
-				val = parseFloat(el.value);
-				min = parseFloat(min);
-				break;
-			case "datetime":
-			case "date":
-			case "datetime-local":
-				val = Date.parse(el.value);
-				min = Date.parse(min);
-				break;
-			case "time":
-				if (min) {
-					val = Date.parse("1970-01-01T" + el.value);
-					min = Date.parse("1970-01-01T" + min);
-					break;
-				}
-			default:
-				return false;
-			}
+	function _checkRangeUnderflow(val, min, type) {
+		// Set default min
+		if (type === "range" && isNaN(min)) {
+			min = 0.0;
 		}
 		
-		return (!isNaN(min) && (min > val));
+		// Return true when underflow
+		return (!isNaN(min) && (/^(range|number|date|time)/i).test(type) && (min > val));
 	}
 
-	function _checkRangeOverflow(el) {
-		var val, max = _getAttr(el, 'max'), type = _getAttr(el, 'type');
-		if ((!max) && (type === 'range')) {
-			max = "100";
-		}
-		if (max) {
-			val = parseFloat(el.value);
-			max = parseFloat(max);
-			return (val > max);
+	function _checkRangeOverflow(val, max, type) {
+		// Set default max
+		if (type === "range" && isNaN(max)) {
+			max = 100.0;
 		}
 	
-		return false;
+		// Return true when overflow
+		return (!isNaN(max) && (/^(range|number|date|time)/i).test(type) && (val > max));
 	}
 	
-	function _checkStepMismatch(el) {
-		var val, step = _getAttr(el, 'step'), min = _getAttr(el, 'min');
-		if (step) {
-			val = parseFloat(el.value);
-			step = parseFloat(step);
-			if ((val) && (step)) {
-				if ((min) && (min = parseFloat(min))) {
-					val -= min;
-				}
-				return ((val % step) !== 0);
+	function _checkStepMismatch(val, step, min) {
+		if ((val) && (step)) {
+			if (min) {
+				val -= min;
 			}
+			return ((val % step) !== 0);
 		}
 		
 		return false;
@@ -273,15 +252,21 @@ var formerly = (function (window, undef) {
 
 	function _validate(el) {
 		if (el.willValidate) {
-			var hasval = (el.value !== '');
+			var hasval = (el.value !== ''),
+				type = _getAttr(el, 'type'), 
+				val = _typeValue(el.value, type), 
+				min = _typeValue(_getAttr(el, 'min'), type),
+				max = _typeValue(_getAttr(el, 'max'), type),
+				step = _typeValue(_getAttr(el, 'step'), type);
+
 			_setValidity(el,
 				_checkValueMissing(el),
-				(hasval && _checkTypeMismatch(el)),
+				(hasval && _checkTypeMismatch(el, type)),
 				(hasval && _checkPatternMismatch(el)),
 				(hasval && _checkTooLong(el)),
-				(hasval && _checkRangeUnderflow(el)),
-				(hasval && _checkRangeOverflow(el)),
-				(hasval && _checkStepMismatch(el)),
+				(hasval && _checkRangeUnderflow(val, min, type)),
+				(hasval && _checkRangeOverflow(val, max, type)),
+				(hasval && _checkStepMismatch(val, step, min)),
 				el.validity.customError
 			);
 			

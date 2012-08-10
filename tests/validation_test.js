@@ -782,6 +782,14 @@ TestCase("formerlyValidationRangeUnderflow", {
 		
 		assertInvalid(ret, el, 'rangeUnderflow');
 	},
+
+	"test should not set rangeUnderflow for text field": function () {
+		var el = createElement("text", "8", { min: "10" });
+		
+		var ret = el.checkValidity();
+		
+		assertValid(ret, el, 'rangeUnderflow');
+	}
 	
 	// TODO: Write for month, week
 
@@ -851,10 +859,49 @@ TestCase("formerlyValidationRangeOverflow", {
 		var ret = el.checkValidity();
 		
 		assertInvalid(ret, el, 'rangeOverflow');
+	},
+
+	"test should set rangeOverflow for datetime field": function () {
+		var el = createElement("datetime", "2012-08-07T18:45Z", { max: "2012-08-07T18:44Z" });
+		
+		var ret = el.checkValidity();
+		
+		assertInvalid(ret, el, 'rangeOverflow');
+	},
+
+	"test should set rangeOverflow for date field": function () {
+		var el = createElement("date", "2012-08-07", { max: "2012-08-06" });
+		
+		var ret = el.checkValidity();
+		
+		assertInvalid(ret, el, 'rangeOverflow');
+	},
+
+	"test should set rangeOverflow for time field": function () {
+		var el = createElement("time", "18:45", { max: "18:44" });
+		
+		var ret = el.checkValidity();
+		
+		assertInvalid(ret, el, 'rangeOverflow');
+	},
+
+	"test should set rangeOverflow for datetime-local field": function () {
+		var el = createElement("datetime-local", "2012-08-07T18:45", { max: "2012-08-07T18:44" });
+		
+		var ret = el.checkValidity();
+		
+		assertInvalid(ret, el, 'rangeOverflow');
+	},
+
+	"test should not set rangeOverflow for text field": function () {
+		var el = createElement("text", "12", { max: "10" });
+		
+		var ret = el.checkValidity();
+		
+		assertValid(ret, el, 'rangeOverflow');
 	}
 
-	// TODO: Write for range and the dates and times
-	// TODO: Skip check for types this does not apply to
+	// TODO: Write for month, week
 
 });
 
