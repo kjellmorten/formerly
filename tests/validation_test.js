@@ -401,7 +401,7 @@ TestCase("formerlyValidationTypeMismatchTime", {
 	},
 
 	"test should not set typeMismatch for valid time with seconds": function () {
-		var el = createElement("time", "18:45:37");
+		var el = createElement("time", "18:45:37", { step: "any" });
 		
 		var ret = el.checkValidity();
 		
@@ -425,7 +425,7 @@ TestCase("formerlyValidationTypeMismatchTime", {
 	},
 
 	"test should not set typeMismatch for valid time with fractions of a second": function () {
-		var el = createElement("time", "18:45:37.174");
+		var el = createElement("time", "18:45:37.174", { step: "any" });
 		
 		var ret = el.checkValidity();
 		
@@ -939,16 +939,24 @@ TestCase("formerlyValidationStepMismatch", {
 		assertValid(ret, el, 'stepMismatch');
 	},
 
-	"test should not set stepMismatch with illegal step": function () {
+	"test should use default step with illegal step value": function () {
 		var el = createElement("number", "3.5", { step: "illegal" });
+		
+		var ret = el.checkValidity();
+		
+		assertInvalid(ret, el, 'stepMismatch');
+	},
+
+	"test should not set stepMismatch with step 'any'": function () {
+		var el = createElement("number", "3.5", { step: "any" });
 		
 		var ret = el.checkValidity();
 		
 		assertValid(ret, el, 'stepMismatch');
 	},
 
-	"test should not set stepMismatch with step 'any'": function () {
-		var el = createElement("number", "3.5", { step: "any" });
+	"test should not set stepMismatch with step = 0": function () {
+		var el = createElement("number", "3", { step: "0" });
 		
 		var ret = el.checkValidity();
 		
@@ -970,9 +978,104 @@ TestCase("formerlyValidationStepMismatch", {
 		
 		assertValid(ret, el, 'stepMismatch');
 	},
-	
-	// TODO: Implement step for range and dates/times
-	// TODO: Honour default min, max, step
+
+	"test should correctly set stepMismatch with value = 0": function () {
+		var el = createElement("number", "0", { min: "-0.5", step: "1" });
+		
+		var ret = el.checkValidity();
+		
+		assertInvalid(ret, el, 'stepMismatch');
+	},
+
+	"test should have default step = 1 for range": function () {
+		var el = createElement("range", "0.5");
+		
+		var ret = el.checkValidity();
+		
+		assertInvalid(ret, el, 'stepMismatch');
+	},
+
+	"test should set stepMismatch for datetime": function () {
+		var el = createElement("datetime", "2012-08-07T18:45:52Z", { step: "30" });
+		
+		var ret = el.checkValidity();
+		
+		assertInvalid(ret, el, 'stepMismatch');
+	},
+
+	"test should not set stepMismatch for datetime matching step": function () {
+		var el = createElement("datetime", "2012-08-07T18:45:30Z", { step: "30" });
+		
+		var ret = el.checkValidity();
+		
+		assertValid(ret, el, 'stepMismatch');
+	},
+
+	"test should have default step = 60 for datetime": function () {
+		var el = createElement("datetime", "2012-08-07T18:45:30Z");
+		
+		var ret = el.checkValidity();
+		
+		assertInvalid(ret, el, 'stepMismatch');
+	},
+
+	"test should set stepMismatch for date": function () {
+		var el = createElement("date", "2012-08-07", { step: "2" });
+		
+		var ret = el.checkValidity();
+		
+		assertInvalid(ret, el, 'stepMismatch');
+	},
+
+	"test should not set stepMismatch for date matching step": function () {
+		var el = createElement("date", "2012-08-08", { step: "2" });
+		
+		var ret = el.checkValidity();
+		
+		assertValid(ret, el, 'stepMismatch');
+	},
+
+	"test should have default step = 1 for date": function () {
+		var el = createElement("date", "2012-08-07");
+		
+		var ret = el.checkValidity();
+		
+		assertValid(ret, el, 'stepMismatch');
+	},
+
+	"test should set stepMismatch for time": function () {
+		var el = createElement("time", "18:45:45", { step: "30" });
+		
+		var ret = el.checkValidity();
+		
+		assertInvalid(ret, el, 'stepMismatch');
+	},
+
+	"test should not set stepMismatch for time matching step": function () {
+		var el = createElement("time", "18:45:30", { step: "30" });
+		
+		var ret = el.checkValidity();
+		
+		assertValid(ret, el, 'stepMismatch');
+	},
+
+	"test should have default step = 60 for time": function () {
+		var el = createElement("time", "18:45:30");
+		
+		var ret = el.checkValidity();
+		
+		assertInvalid(ret, el, 'stepMismatch');
+	},
+
+	"test should have default step = 60 for datetime-local": function () {
+		var el = createElement("datetime-local", "2012-08-07T18:45:30");
+		
+		var ret = el.checkValidity();
+		
+		assertInvalid(ret, el, 'stepMismatch');
+	},
+
+	// TODO: Implement step for month and week
 	// TODO: Skip check for types this does not apply to
 
 });

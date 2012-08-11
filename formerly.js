@@ -32,13 +32,15 @@ var formerly = (function (window, undef) {
 	 
 	function _typeValue(value, type) {
 		if (/^(range|number)/.test(type)) {
-			return parseFloat(value);
+			value = parseFloat(value);
 		} else if (/^(date)/.test(type)) {
-			return Date.parse(value);
+			value = Date.parse(value);
 		} else if (/^(time)/.test(type)) {
-			return Date.parse("1970-01-01T" + value);
+			value = Date.parse("1970-01-01T" + value);
+		} else {
+			return null;
 		}
-		return null;
+		return (isNaN(value)) ? null : value;
 	}
 	
 	function _getAttr(el, attr) {
@@ -193,33 +195,44 @@ var formerly = (function (window, undef) {
 	
 	function _checkRangeUnderflow(val, min, type) {
 		// Set default min
-		if (type === "range" && isNaN(min)) {
+		if (type === "range" && min === null) {
 			min = 0.0;
 		}
 		
 		// Return true when underflow
-		return (!isNaN(min) && (min > val));
+		return (val !== null && min !== null && (min > val));
 	}
 
 	function _checkRangeOverflow(val, max, type) {
 		// Set default max
-		if (type === "range" && isNaN(max)) {
+		if (type === "range" && max === null) {
 			max = 100.0;
 		}
 	
 		// Return true when overflow
-		return (!isNaN(max) && (val > max));
+		return (max !== null && (val > max));
 	}
 	
 	function _checkStepMismatch(val, step, min, type) {
-		if ((val) && !isNaN(step)) {
-			if (min) {
-				val -= min;
-			}
-			return ((val % step) !== 0);
+		var scale = 1;
+		switch (type) {
+		case "datetime":
+		case "datetime-local":
+		case "time":
+			scale = 1000;
+			step = step || 60;
+			break;
+		case "date":
+			scale = 86400000;
+			step = step || 1;
+			break;
+		default:
+			step = step || 1;
 		}
-		
-		return false;
+	
+		return (step !== null && val !== null &&						/* Return false if missing step or value */
+				step !== "any" &&										/* Allow any step */
+				(((val - (min || 0.0)) % (step * scale)) !== 0));		/* Return true when not on step */
 	}
 
 	function _getValidState(el) {
@@ -257,8 +270,12 @@ var formerly = (function (window, undef) {
 				val = _typeValue(el.value, type), 
 				min = _typeValue(_getAttr(el, 'min'), type),
 				max = _typeValue(_getAttr(el, 'max'), type),
-				step = _typeValue(_getAttr(el, 'step'), type);
+				step = _getAttr(el, 'step');
 
+			if (step !== "any") {
+				step = _typeValue(step, "number");
+			}
+				
 			_setValidity(el,
 				_checkValueMissing(el),
 				(hasval && _checkTypeMismatch(el, type)),
