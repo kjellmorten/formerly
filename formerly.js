@@ -32,13 +32,13 @@ var formerly = (function (window, undef) {
 	 
 	function _typeValue(value, type) {
 		if (/^(range|number)/.test(type)) {
-			value = parseFloat(value);
+			return parseFloat(value);
 		} else if (/^(date)/.test(type)) {
-			value = Date.parse(value);
+			return Date.parse(value);
 		} else if (/^(time)/.test(type)) {
-			value = Date.parse("1970-01-01T" + value);
+			return Date.parse("1970-01-01T" + value);
 		}
-		return value;
+		return null;
 	}
 	
 	function _getAttr(el, attr) {
@@ -198,7 +198,7 @@ var formerly = (function (window, undef) {
 		}
 		
 		// Return true when underflow
-		return (!isNaN(min) && (/^(range|number|date|time)/i).test(type) && (min > val));
+		return (!isNaN(min) && (min > val));
 	}
 
 	function _checkRangeOverflow(val, max, type) {
@@ -208,11 +208,11 @@ var formerly = (function (window, undef) {
 		}
 	
 		// Return true when overflow
-		return (!isNaN(max) && (/^(range|number|date|time)/i).test(type) && (val > max));
+		return (!isNaN(max) && (val > max));
 	}
 	
-	function _checkStepMismatch(val, step, min) {
-		if ((val) && (step)) {
+	function _checkStepMismatch(val, step, min, type) {
+		if ((val) && !isNaN(step)) {
 			if (min) {
 				val -= min;
 			}
@@ -266,7 +266,7 @@ var formerly = (function (window, undef) {
 				(hasval && _checkTooLong(el)),
 				(hasval && _checkRangeUnderflow(val, min, type)),
 				(hasval && _checkRangeOverflow(val, max, type)),
-				(hasval && _checkStepMismatch(val, step, min)),
+				(hasval && _checkStepMismatch(val, step, min, type)),
 				el.validity.customError
 			);
 			

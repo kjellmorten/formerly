@@ -961,7 +961,15 @@ TestCase("formerlyValidationStepMismatch", {
 		var ret = el.checkValidity();
 		
 		assertValid(ret, el, 'stepMismatch');
-	}
+	},
+
+	"test should not set stepMismatch for text field": function () {
+		var el = createElement("text", "1.5", { step: "1" });
+		
+		var ret = el.checkValidity();
+		
+		assertValid(ret, el, 'stepMismatch');
+	},
 	
 	// TODO: Implement step for range and dates/times
 	// TODO: Honour default min, max, step
