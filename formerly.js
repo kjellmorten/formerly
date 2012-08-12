@@ -30,23 +30,26 @@ var formerly = (function (window, undef) {
 	 * Private help functions
 	 */
 	 
-	function _typeValue(value, type) {
-		if (/^(range|number)/.test(type)) {
-			value = parseFloat(value);
-		} else if (/^(date)/.test(type)) {
-			value = Date.parse(value);
-		} else if (/^(time)/.test(type)) {
-			value = Date.parse("1970-01-01T" + value);
-		} else {
-			return null;
-		}
-		return (isNaN(value)) ? null : value;
-	}
-	
 	function _getAttr(el, attr) {
 		return el.getAttribute(attr);
 	}
-	 
+
+	function _floatValue(value) {
+		return parseFloat(value);
+	}
+
+	function _dateValue(value) {
+		return Date.parse(value);
+	}
+
+	function _timeValue(value) {
+		return Date.parse("1970-01-01T" + value);
+	}
+	
+	function _numericOrDefault(value, defaultValue) {
+		return (isNaN(value)) ? defaultValue : value;
+	}
+		
 	function _removeLeadingSpace(str) {
 		return (str.charAt(0) === ' ') ? str.substr(1) : str;
 	}
@@ -118,10 +121,6 @@ var formerly = (function (window, undef) {
 	 * Validation methods
 	 */
 	
-	function _checkValueMissing(el) {
-		return ((el.attributes.required !== undef) && (el.value === ''));
-	}
-	
 	function _checkTypeMismatchTime(value) {
 		var match = _timeRegExp.exec(value);
 		return ((match === null) || 
@@ -189,52 +188,6 @@ var formerly = (function (window, undef) {
 		return false;
 	}
 	
-	function _checkTooLong(el) {
-		return ((el.maxLength !== -1) && (el.value !== el.defaultValue) && (el.value.length > el.maxLength));
-	}
-	
-	function _checkRangeUnderflow(val, min, type) {
-		// Set default min
-		if (type === "range" && min === null) {
-			min = 0.0;
-		}
-		
-		// Return true when underflow
-		return (val !== null && min !== null && (min > val));
-	}
-
-	function _checkRangeOverflow(val, max, type) {
-		// Set default max
-		if (type === "range" && max === null) {
-			max = 100.0;
-		}
-	
-		// Return true when overflow
-		return (max !== null && (val > max));
-	}
-	
-	function _checkStepMismatch(val, step, min, type) {
-		var scale = 1;
-		switch (type) {
-		case "datetime":
-		case "datetime-local":
-		case "time":
-			scale = 1000;
-			step = step || 60;
-			break;
-		case "date":
-			scale = 86400000;
-			step = step || 1;
-			break;
-		default:
-			step = step || 1;
-		}
-	
-		return (step !== null && val !== null &&						/* Return false if missing step or value */
-				step !== "any" &&										/* Allow any step */
-				(((val - (min || 0.0)) % (step * scale)) !== 0));		/* Return true when not on step */
-	}
-
 	function _getValidState(el) {
 		var val = el.validity;
 		return !(
@@ -265,28 +218,54 @@ var formerly = (function (window, undef) {
 
 	function _validate(el) {
 		if (el.willValidate) {
-			var hasval = (el.value !== ''),
+			var val = el.value,
+				maxLength = el.maxLength,
 				type = _getAttr(el, 'type'), 
-				val = _typeValue(el.value, type), 
-				min = _typeValue(_getAttr(el, 'min'), type),
-				max = _typeValue(_getAttr(el, 'max'), type),
-				step = _getAttr(el, 'step');
+				step = _getAttr(el, 'step'),
+				numVal = null,
+				numMin = null,
+				numMax = null,
+				numStep = 1,
+				numScale = 1,
+				getVal = function () {
+					return null;
+				};
 
-			if (step !== "any") {
-				step = _typeValue(step, "number");
+			// Set defaults
+			if (type === "number") {
+				getVal = _floatValue;
+			} else if (type === "range") {
+				numMin = 0.0;
+				numMax = 100.0;
+				getVal = _floatValue;
+			} else if ((/^(datetime|time)/i).test(type)) {
+				numScale = 1000;
+				numStep = 60;
+				getVal = (type === "time") ? _timeValue : _dateValue;
+			} else if (type === "date") {
+				numScale = 86400000;
+				getVal = _dateValue;
 			}
-				
+
+			// Type values or use defaults
+			numVal = _numericOrDefault(getVal(val), numVal);
+			numMin = _numericOrDefault(getVal(_getAttr(el, 'min')), numMin);
+			numMax = _numericOrDefault(getVal(_getAttr(el, 'max')), numMax);
+			numStep = (step === "any") ? null : _numericOrDefault(_floatValue(step), numStep) || null;
+
+			// Set validity states
 			_setValidity(el,
-				_checkValueMissing(el),
-				(hasval && _checkTypeMismatch(el, type)),
-				(hasval && _checkPatternMismatch(el)),
-				(hasval && _checkTooLong(el)),
-				(hasval && _checkRangeUnderflow(val, min, type)),
-				(hasval && _checkRangeOverflow(val, max, type)),
-				(hasval && _checkStepMismatch(val, step, min, type)),
-				el.validity.customError
+				((el.attributes.required !== undef) && val === ""),															/* valueMissing */
+				(val !== "" && _checkTypeMismatch(el, type)),																/* typeMismatch */
+				(val !== "" && _checkPatternMismatch(el)),																	/* patternMismatch */
+				(val !== "" && (maxLength !== -1) && (val !== el.defaultValue) && (val.length > maxLength)),				/* tooLong */
+				(numVal !== null && numMin !== null && (numMin > numVal)),													/* rangeUnderflow */
+				(numVal !== null && numMax !== null && (numVal > numMax)),													/* rangeOverflow */
+				(numVal !== null && numStep !== null && (((numVal - (numMin || 0.0)) % (numStep * numScale)) !== 0)),		/* stepMismatch */
+				el.validity.customError																						/* customError */
 			);
 			
+			// Update validity classes on element
 			_setValidityClass(el);
 		}
 	}
