@@ -40,9 +40,22 @@ var formerly = (function (window, undef) {
 		return _numericOrDefault(parseInt(value, 10), null);
 	}
 
-	/* Validation: 
+	/* 
+	 * Parses the given value as a date.
+	 * Returns the date as the number of milliseconds since 1970-01-01.
+	 *
+	 * If the value is not a date, or the date doesn't pass the required
+	 * validation, null is returned.
+	 *
+	 * Format: yyyy-mm-ddThh:mm:ss.sssZ
+	 *   Z can also be set with +hh:mm or -hh:mm
+	 * 
+	 * If no validation is requested, only yyyy-mm is required to pass as 
+	 * a date.
+	 * 
+	 * Validation parameter:
 	 * 0 = no validation
-	 * 1 = no day, time or time zone
+	 * 1 = require no day, time or time zone
 	 * 2 = require day, but no time or time zone
 	 * 3 = require day & time, but no time zone
 	 * 4 = require day, time and time zone
@@ -71,7 +84,8 @@ var formerly = (function (window, undef) {
 			((validation > 2) ? ((date.getUTCHours() !== hour) || (date.getUTCMinutes() !== minute) ||					/* Hour and minute */
 				((second !== null) && (date.getUTCSeconds() !== second)) ||												/* Second */
 				((millisec !== null) && (date.getUTCMilliseconds() !== millisec))) : !!match[5]) ||						/* Milliseconds */
-			((validation > 3) ? (!match[12] || (!!(match[13]) && (_parseDate("1970-01-01T" + match[13], 3) === null))) : !!match[12])	/* Time zone */
+			((validation > 3) ? (!match[12] ||
+				(!!(match[13]) && (_parseDate("1970-01-01T" + match[13], 3) === null))) : !!match[12])					/* Time zone */
 		)) {
 			return null;
 		}
@@ -80,8 +94,23 @@ var formerly = (function (window, undef) {
 	}
 	// TODO: parse time zone into return value
 	
+	/*
+	 * Parses the given value as a time.
+	 * Returns the date as the number of milliseconds since midnight.
+	 *
+	 * If the value is not a time, or the time doesn't pass the required
+	 * validation, null is returned.
+	 *
+	 * Format: hh:mm:ss.sss
+	 *   ss and .sss are optional
+	 * 
+	 * Validation parameter:
+	 * false = no validation
+	 * true  = validate time
+	 *
+	 */
 	function _parseTime(value, validation) {
-		return _parseDate("1970-01-01T" + value, validation);
+		return _parseDate("1970-01-01T" + value, (validation) ? 3 : 0);
 	}
 
 	function _removeLeadingSpace(str) {
@@ -175,7 +204,7 @@ var formerly = (function (window, undef) {
 			case 'date':
 				return (_parseDate(el.value, 2) === null);
 			case 'time':
-				return (_parseTime(el.value, 3) === null);
+				return (_parseTime(el.value, true) === null);
 			case 'month':
 				return (_parseDate(el.value, 1) === null);
 			case 'week':
