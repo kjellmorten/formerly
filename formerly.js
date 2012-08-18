@@ -16,9 +16,7 @@ var formerly = (function (window, undef) {
 		_elsToValidateRegExp = /^(text|search|tel|url|email|password|datetime|date|month|week|time|datetime-local|number|range|color|checkbox|radio|file|submit|select-one|select-multiple|textarea)$/i,
 		_emailRegExp = /^[a-z][a-z0-9!#$%&'*+\-\/=?\^_`{|}~\.]*@[a-z0-9\-]+(\.[a-z0-9\-]+)*$/i,
 		_urlRegExp = /^\s*[a-z][a-z0-9+\-\.]+:\/\//i,
-		_dateTimeRegExp = /^([\-0-9]+)T([\:\.0-9]+)(Z|[\-\+](\d{2}\:\d{2}))?$/i,
-		_dateRegExp = /^(\d{4,})-\d{2}(-\d{2})?$/i,
-		_timeRegExp = /^(\d{2})\:(\d{2})(\:(\d{2})(\.\d+)?)?$/i,
+		_dateRegExp = /^(\d{4,})-(\d{2})(-(\d{2}))?(T(\d{2})\:(\d{2})(\:(\d{2})(\.(\d+))?)?)?(Z|[\-\+](\d{2}\:\d{2}))?$/i,
 		_weekRegExp = /^(\d{4,})-W(\d{2})$/i,
 		_config = {
 			touchSupporting: true,
@@ -34,22 +32,58 @@ var formerly = (function (window, undef) {
 		return el.getAttribute(attr);
 	}
 
-	function _floatValue(value) {
-		return parseFloat(value);
-	}
-
-	function _dateValue(value) {
-		return Date.parse(value);
-	}
-
-	function _timeValue(value) {
-		return Date.parse("1970-01-01T" + value);
-	}
-	
 	function _numericOrDefault(value, defaultValue) {
 		return (isNaN(value)) ? defaultValue : value;
 	}
+
+	function _intOrNull(value) {
+		return _numericOrDefault(parseInt(value, 10), null);
+	}
+
+	/* Validation: 
+	 * 0 = no validation
+	 * 1 = no day, time or time zone
+	 * 2 = require day, but no time or time zone
+	 * 3 = require day & time, but no time zone
+	 * 4 = require day, time and time zone
+	 */
+	function _parseDate(value, validation) {
+		var match = _dateRegExp.exec(value), date = new Date(0), year, month, day, hour, minute, second, millisec;
+
+		if (match === null) {
+			return null;
+		}
+
+		year = _intOrNull(match[1]);
+		month = _intOrNull(match[2]) - 1;
+		day = _intOrNull(match[4]);
+		hour = _intOrNull(match[6]);
+		minute = _intOrNull(match[7]);
+		second = _intOrNull(match[9]);
+		millisec = _intOrNull(match[11]);
 		
+		date.setUTCFullYear(year, month, day || 1);
+		date.setUTCHours(hour || 0, minute || 0, second || 0, millisec || 0);
+
+		if ((validation) && (
+			(date.getUTCFullYear() !== year) || (year <= 0) || (date.getUTCMonth() !== month) ||						/* Year and month */
+			((validation > 1) ? (date.getUTCDate() !== day) : !!match[3]) ||											/* Day */
+			((validation > 2) ? ((date.getUTCHours() !== hour) || (date.getUTCMinutes() !== minute) ||					/* Hour and minute */
+				((second !== null) && (date.getUTCSeconds() !== second)) ||												/* Second */
+				((millisec !== null) && (date.getUTCMilliseconds() !== millisec))) : !!match[5]) ||						/* Milliseconds */
+			((validation > 3) ? (!match[12] || (!!(match[13]) && (_parseDate("1970-01-01T" + match[13], 3) === null))) : !!match[12])	/* Time zone */
+		)) {
+			return null;
+		}
+
+		return date.getTime();
+	}
+	// TODO: parse time zone into return value
+	
+	function _parseTime(value, validation) {
+		return _parseDate("1970-01-01T" + value, validation);
+	}
+
 	function _removeLeadingSpace(str) {
 		return (str.charAt(0) === ' ') ? str.substr(1) : str;
 	}
@@ -120,35 +154,12 @@ var formerly = (function (window, undef) {
 	/*
 	 * Validation methods
 	 */
-	
-	function _checkTypeMismatchTime(value) {
-		var match = _timeRegExp.exec(value);
-		return ((match === null) || 
-				(match[1] > 23) || (match[2] > 59) || /* Validate hour and minute */
-				((match.length > 4) && (match[4] > 59))); /* Validate second if present */
-	}
-	
-	function _checkTypeMismatchDate(value, requireDay) {
-		var match = _dateRegExp.exec(value);
-		return ((match === null) || 
-				(match[1] <= 0) || /* Don't allow year zero */
-				(requireDay ? !match[2] : !!match[2]) || /* Require or disallow day */
-				isNaN(Date.parse(value))); /* Validate agains JavaScript Date object */
-	}
-
-	function _checkTypeMismatchDateTime(value, requireTimeZone) {
-		var match = _dateTimeRegExp.exec(value);
-		return ((match === null) ||
-				 _checkTypeMismatchDate(match[1], true) || _checkTypeMismatchTime(match[2]) || /* Validate date and time parts */
-				(requireTimeZone ? !match[3] : !!match[3]) || /* Require or disallow time zone */
-				((match.length > 4) && !!(match[4]) && _checkTypeMismatchTime(match[4]))); /* Validate time zone other than Z */
-	}
-
+	 
 	function _checkTypeMismatchWeek(value) {
 		var match = _weekRegExp.exec(value);
 		return ((match === null) || 
-				(match[1] <= 0) || /* Don't allow year zero */
-				(match[2] < 1) || (match[2] > 53)); /* Validate week number. */
+				(match[1] <= 0) ||																	/* Don't allow year zero */
+				(match[2] < 1) || (match[2] > 53));													/* Validate week number. */
 				// Note: Does not check whether the year have 52 or 53 weeks according to the Gregorian calendar, for now. Is it worth it?
 	}
 
@@ -160,17 +171,17 @@ var formerly = (function (window, undef) {
 			case 'url':
 				return !(_urlRegExp.test(el.value));
 			case 'datetime':
-				return _checkTypeMismatchDateTime(el.value, true);
+				return (_parseDate(el.value, 4) === null);
 			case 'date':
-				return _checkTypeMismatchDate(el.value, true);
+				return (_parseDate(el.value, 2) === null);
 			case 'time':
-				return _checkTypeMismatchTime(el.value);
+				return (_parseTime(el.value, 3) === null);
 			case 'month':
-				return _checkTypeMismatchDate(el.value, false);
+				return (_parseDate(el.value, 1) === null);
 			case 'week':
 				return _checkTypeMismatchWeek(el.value);
 			case 'datetime-local':
-				return _checkTypeMismatchDateTime(el.value, false);
+				return (_parseDate(el.value, 3) === null);
 			}
 		}
 		
@@ -233,25 +244,25 @@ var formerly = (function (window, undef) {
 
 			// Set defaults
 			if (type === "number") {
-				getVal = _floatValue;
+				getVal = parseFloat;
 			} else if (type === "range") {
 				numMin = 0.0;
 				numMax = 100.0;
-				getVal = _floatValue;
+				getVal = parseFloat;
 			} else if ((/^(datetime|time)/i).test(type)) {
 				numScale = 1000;
 				numStep = 60;
-				getVal = (type === "time") ? _timeValue : _dateValue;
+				getVal = (type === "time") ? _parseTime : _parseDate;
 			} else if (type === "date") {
 				numScale = 86400000;
-				getVal = _dateValue;
+				getVal = _parseDate;
 			}
 
 			// Type values or use defaults
 			numVal = _numericOrDefault(getVal(val), numVal);
 			numMin = _numericOrDefault(getVal(_getAttr(el, 'min')), numMin);
 			numMax = _numericOrDefault(getVal(_getAttr(el, 'max')), numMax);
-			numStep = (step === "any") ? null : _numericOrDefault(_floatValue(step), numStep) || null;
+			numStep = (step === "any") ? null : _numericOrDefault(parseFloat(step), numStep) || null;
 
 			// Set validity states
 			_setValidity(el,

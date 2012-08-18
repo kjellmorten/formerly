@@ -224,6 +224,14 @@ TestCase("formerlyValidationTypeMismatchDateTimeLocal", {
 		assertInvalid(ret, el, 'typeMismatch');
 	},
 
+	"test should not accept date only": function () {
+		var el = createElement("datetime-local", "2012-08-07");
+		
+		var ret = el.checkValidity();
+		
+		assertInvalid(ret, el, 'typeMismatch');
+	},
+
 	"test should not accept invalid time": function () {
 		var el = createElement("datetime-local", "2012-08-07T18:60");
 		
@@ -292,6 +300,14 @@ TestCase("formerlyValidationTypeMismatchDate", {
 		assertInvalid(ret, el, 'typeMismatch');
 	},
 
+	"test should accept year 1": function () {
+		var el = createElement("date", "0001-08-07");
+		
+		var ret = el.checkValidity();
+		
+		assertValid(ret, el, 'typeMismatch');
+	},
+
 	"test should not accept single digits in month and day": function () {
 		var el = createElement("date", "2012-8-2");
 		
@@ -334,6 +350,14 @@ TestCase("formerlyValidationTypeMismatchDate", {
 
 	"test should set typeMismatch when month's to low": function () {
 		var el = createElement("date", "2012-00-07");
+		
+		var ret = el.checkValidity();
+		
+		assertInvalid(ret, el, 'typeMismatch');
+	},
+
+	"test should not accept time": function () {
+		var el = createElement("date", "2012-08-07T18:45");
 		
 		var ret = el.checkValidity();
 		
@@ -1073,7 +1097,7 @@ TestCase("formerlyValidationStepMismatch", {
 		var ret = el.checkValidity();
 		
 		assertInvalid(ret, el, 'stepMismatch');
-	},
+	}
 
 	// TODO: Implement step for month and week
 
