@@ -606,6 +606,38 @@ TestCase("formerlyValidationTypeMismatchWeek", {
 		var ret = el.checkValidity();
 		
 		assertInvalid(ret, el, 'typeMismatch');
+	},
+
+	"test should not accept 53 weeks in year with 52 weeks": function () {
+		var el = createElement("week", "2012-W53");
+		
+		var ret = el.checkValidity();
+		
+		assertInvalid(ret, el, 'typeMismatch');
+	},
+
+	"test should accept 53 weeks in year with 53 weeks": function () {
+		var el = createElement("week", "2009-W53");
+		
+		var ret = el.checkValidity();
+		
+		assertValid(ret, el, 'typeMismatch');
+	},
+
+	"test should accept 53 weeks in year with 53 weeks and first day on Wednesday": function () {
+		var el = createElement("week", "1992-W53");
+		
+		var ret = el.checkValidity();
+		
+		assertValid(ret, el, 'typeMismatch');
+	},
+
+	"test should not accept 53 weeks in year with 52 weeks and first day on Wednesday": function () {
+		var el = createElement("week", "1997-W53");
+		
+		var ret = el.checkValidity();
+		
+		assertInvalid(ret, el, 'typeMismatch');
 	}
 
 });
@@ -807,6 +839,14 @@ TestCase("formerlyValidationRangeUnderflow", {
 		assertInvalid(ret, el, 'rangeUnderflow');
 	},
 
+	"test should set rangeUnderflow for week field": function () {
+		var el = createElement("week", "2012-W32", { min: "2012-W33" });
+		
+		var ret = el.checkValidity();
+		
+		assertInvalid(ret, el, 'rangeUnderflow');
+	},
+
 	"test should not set rangeUnderflow for text field": function () {
 		var el = createElement("text", "8", { min: "10" });
 		
@@ -815,7 +855,7 @@ TestCase("formerlyValidationRangeUnderflow", {
 		assertValid(ret, el, 'rangeUnderflow');
 	}
 	
-	// TODO: Write for month, week
+	// TODO: Write for month
 
 });
 
@@ -917,6 +957,14 @@ TestCase("formerlyValidationRangeOverflow", {
 		assertInvalid(ret, el, 'rangeOverflow');
 	},
 
+	"test should set rangeOverflow for week field": function () {
+		var el = createElement("week", "2012-W32", { max: "2012-W31" });
+		
+		var ret = el.checkValidity();
+		
+		assertInvalid(ret, el, 'rangeOverflow');
+	},
+
 	"test should not set rangeOverflow for text field": function () {
 		var el = createElement("text", "12", { max: "10" });
 		
@@ -925,7 +973,7 @@ TestCase("formerlyValidationRangeOverflow", {
 		assertValid(ret, el, 'rangeOverflow');
 	}
 
-	// TODO: Write for month, week
+	// TODO: Write for month
 
 });
 
@@ -1097,9 +1145,25 @@ TestCase("formerlyValidationStepMismatch", {
 		var ret = el.checkValidity();
 		
 		assertInvalid(ret, el, 'stepMismatch');
+	},
+
+	"test should set stepMismatch for week": function () {
+		var el = createElement("week", "2012-W33", { step: "2" });
+		
+		var ret = el.checkValidity();
+		
+		assertInvalid(ret, el, 'stepMismatch');
+	},
+
+	"test should not set stepMismatch for week matching step": function () {
+		var el = createElement("week", "2012-W32", { step: "2" });
+		
+		var ret = el.checkValidity();
+		
+		assertValid(ret, el, 'stepMismatch');
 	}
 
-	// TODO: Implement step for month and week
+	// TODO: Implement step for month
 
 });
 

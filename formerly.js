@@ -42,7 +42,7 @@ var formerly = (function (window, undef) {
 
 	/* 
 	 * Parses the given value as a date.
-	 * Returns the date as the number of milliseconds since 1970-01-01.
+	 * Returns the date as the number of milliseconds since midnight 1970-01-01.
 	 *
 	 * If the value is not a date, or the date doesn't pass the required
 	 * validation, null is returned.
@@ -111,6 +111,41 @@ var formerly = (function (window, undef) {
 	 */
 	function _parseTime(value, validation) {
 		return _parseDate("1970-01-01T" + value, (validation) ? 3 : 0);
+	}
+
+	/*
+	 * Parses the given value as a week.
+	 * Returns the week as the number of milliseconds from midnight 1970-01-01 
+	 * to midnight of the Monday of the given week.
+	 *
+	 * If the value is not a week or the week does not pass validation,
+	 * null is returned.
+	 *
+	 * Format: yyyy-Www
+	 */
+	function _parseWeek(value) {
+		var match = _weekRegExp.exec(value), year, week, firstDate = new Date(0), firstDay, dateInWeek, maxWeeks = 52;
+		if (match === null) {
+			return null;
+		}
+		
+		year = _intOrNull(match[1]);
+		week = _intOrNull(match[2]);
+		firstDate.setUTCFullYear(year, 0, 1);
+		firstDay = firstDate.getDay();
+		if ((firstDay === 4) || ((firstDay === 3) && ((year % 400 === 0) || ((year % 4 === 0) && (year % 100 !== 0))))) {
+			maxWeeks = 53;
+		}
+		
+		if (
+			(year <= 0) ||																/* Don't allow year zero */
+			(week < 1) || (week > maxWeeks)												/* Validate week number. */
+		) {
+			return null;
+		}
+		
+		dateInWeek = new Date(firstDate.getTime() + (week * 604800000));				// Get a day in the given week
+		return dateInWeek.getTime() - ((dateInWeek.getDay() - 1) * 86400000);			// Return milliseconds for the Monday in that week
 	}
 
 	function _removeLeadingSpace(str) {
@@ -183,14 +218,6 @@ var formerly = (function (window, undef) {
 	/*
 	 * Validation methods
 	 */
-	 
-	function _checkTypeMismatchWeek(value) {
-		var match = _weekRegExp.exec(value);
-		return ((match === null) || 
-				(match[1] <= 0) ||																	/* Don't allow year zero */
-				(match[2] < 1) || (match[2] > 53));													/* Validate week number. */
-				// Note: Does not check whether the year have 52 or 53 weeks according to the Gregorian calendar, for now. Is it worth it?
-	}
 
 	function _checkTypeMismatch(el, type) {
 		if (type) {
@@ -199,18 +226,18 @@ var formerly = (function (window, undef) {
 				return !(_emailRegExp.test(el.value));
 			case 'url':
 				return !(_urlRegExp.test(el.value));
-			case 'datetime':
-				return (_parseDate(el.value, 4) === null);
-			case 'date':
-				return (_parseDate(el.value, 2) === null);
-			case 'time':
-				return (_parseTime(el.value, true) === null);
 			case 'month':
 				return (_parseDate(el.value, 1) === null);
-			case 'week':
-				return _checkTypeMismatchWeek(el.value);
+			case 'date':
+				return (_parseDate(el.value, 2) === null);
 			case 'datetime-local':
 				return (_parseDate(el.value, 3) === null);
+			case 'datetime':
+				return (_parseDate(el.value, 4) === null);
+			case 'time':
+				return (_parseTime(el.value, true) === null);
+			case 'week':
+				return (_parseWeek(el.value) === null);
 			}
 		}
 		
@@ -265,6 +292,7 @@ var formerly = (function (window, undef) {
 				numVal = null,
 				numMin = null,
 				numMax = null,
+				numStepBase = null,
 				numStep = 1,
 				numScale = 1,
 				getVal = function () {
@@ -285,6 +313,10 @@ var formerly = (function (window, undef) {
 			} else if (type === "date") {
 				numScale = 86400000;
 				getVal = _parseDate;
+			} else if (type === "week") {
+				numScale = 604800000;
+				numStepBase = -259200000;
+				getVal = _parseWeek;
 			}
 
 			// Type values or use defaults
@@ -301,7 +333,7 @@ var formerly = (function (window, undef) {
 				(val !== "" && (maxLength !== -1) && (val !== el.defaultValue) && (val.length > maxLength)),				/* tooLong */
 				(numVal !== null && numMin !== null && (numMin > numVal)),													/* rangeUnderflow */
 				(numVal !== null && numMax !== null && (numVal > numMax)),													/* rangeOverflow */
-				(numVal !== null && numStep !== null && (((numVal - (numMin || 0.0)) % (numStep * numScale)) !== 0)),		/* stepMismatch */
+				(numVal !== null && numStep !== null && (((numVal - (numMin || numStepBase || 0.0)) % (numStep * numScale)) !== 0)),		/* stepMismatch */
 				el.validity.customError																						/* customError */
 			);
 			
