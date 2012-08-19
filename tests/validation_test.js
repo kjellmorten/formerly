@@ -39,6 +39,62 @@ TestCase("formerlyValidationValueMissing", {
 	
 });
 
+TestCase("formerlyValidationTypeMismatchNumber", {
+	
+	"test should set typeMismatch for invalid number": function () {
+		var el = createElement("number", "nonumber");
+		
+		var ret = el.checkValidity();
+		
+		assertInvalid(ret, el, 'typeMismatch');
+	},
+	
+	"test should not set typeMismatch for valid number": function () {
+		var el = createElement("number", "5");
+		
+		var ret = el.checkValidity();
+		
+		assertValid(ret, el, 'typeMismatch');
+	},
+	
+	"test should not set typeMismatch for empty string": function () {
+		var el = createElement("number", "");
+		
+		var ret = el.checkValidity();
+		
+		assertValid(ret, el, 'typeMismatch');
+	}
+
+});
+
+TestCase("formerlyValidationTypeMismatchRange", {
+	
+	"test should set typeMismatch for invalid range": function () {
+		var el = createElement("range", "norange");
+		
+		var ret = el.checkValidity();
+		
+		assertInvalid(ret, el, 'typeMismatch');
+	},
+	
+	"test should not set typeMismatch for valid range": function () {
+		var el = createElement("range", "5");
+		
+		var ret = el.checkValidity();
+		
+		assertValid(ret, el, 'typeMismatch');
+	},
+	
+	"test should set typeMismatch for empty string": function () {
+		var el = createElement("range", "");
+		
+		var ret = el.checkValidity();
+		
+		assertInvalid(ret, el, 'typeMismatch');
+	}
+
+});
+
 TestCase("formerlyValidationTypeMismatchEmail", {
 	
 	"test should set typeMismatch for invalid email": function () {
@@ -408,7 +464,7 @@ TestCase("formerlyValidationTypeMismatchTime", {
 		assertInvalid(ret, el, 'typeMismatch');
 	},
 
-	"test should set typeMismatch when minut's too high": function () {
+	"test should set typeMismatch when minute's too high": function () {
 		var el = createElement("time", "18:60");
 		
 		var ret = el.checkValidity();
@@ -788,7 +844,7 @@ TestCase("formerlyValidationRangeUnderflow", {
 		
 		var ret = el.checkValidity();
 		
-		assertValid(ret, el, 'rangeUnderflow');
+		assertFalse("validity.rangeUnderflow", el.validity.rangeUnderflow);
 	},
 	
 	"test should have no default min for number field": function () {
@@ -912,7 +968,7 @@ TestCase("formerlyValidationRangeOverflow", {
 		
 		var ret = el.checkValidity();
 		
-		assertValid(ret, el, 'rangeOverflow');
+		assertFalse("validity.rangeOverflow", el.validity.rangeOverflow);
 	},
 
 	"test should have no default max for number": function () {
@@ -1052,7 +1108,7 @@ TestCase("formerlyValidationStepMismatch", {
 		
 		var ret = el.checkValidity();
 		
-		assertValid(ret, el, 'stepMismatch');
+		assertFalse("validity.stepMismatch", el.validity.stepMismatch);
 	},
 
 	"test should not set stepMismatch for text field": function () {

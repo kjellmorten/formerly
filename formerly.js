@@ -16,17 +16,18 @@ var formerly = (function (window, undef) {
 		_elsToValidateRegExp = /^(text(area)?|search|tel|url|email|password|date(time(-local)?)?|month|week|time|number|range|color|checkbox|radio|file|submit|select-(one|multiple))$/i,
 		_validityStates = "valueMissing typeMismatch patternMismatch tooLong rangeUnderflow rangeOverflow stepMismatch customError".split(" "),
 		_emailRegExp = /^[a-z][a-z0-9!#$%&'*+\-\/=?\^_`{|}~\.]*@[a-z0-9\-]+(\.[a-z0-9\-]+)*$/i,
-		_urlRegExp = /^\s*[a-z][a-z0-9+\-\.]+:\/\//i,
+		_urlRegExp = /^\s*([a-z][a-z0-9+\-\.]+:\S*)\/\//i,
 		_dateRegExp = /^(\d{4,})-(\d{2})(-(\d{2}))?(T(\d{2})\:(\d{2})(\:(\d{2})(\.(\d+))?)?)?(Z|[\-\+](\d{2}\:\d{2}))?$/i,
 		_weekRegExp = /^(\d{4,})-W(\d{2})$/i,
 		_millsInDay = 86400000,
 		_millsInWeek = 604800000,
 		_millsForFirstWeek = -259200000,
 		_firstDateString = "1970-01-01T",
+		_typeDefaults,
 		_config = {
 			touchSupporting: true,
-			validClass: 'valid',
-			invalidClass: 'invalid'
+			validClass: "valid",
+			invalidClass: "invalid"
 		};
 
 	/*
@@ -37,14 +38,33 @@ var formerly = (function (window, undef) {
 		return el.getAttribute(attr);
 	}
 
-	function _numericOrDefault(value, defaultValue) {
-		return (isNaN(value)) ? defaultValue : value;
+	function _valueOrDefault(value, defaultValue) {
+		return (value === null) ? defaultValue : value;
+	}
+	
+	function _parseString(value) {
+		return value;
 	}
 
-	function _intOrNull(value) {
-		return _numericOrDefault(parseInt(value, 10), null);
+	function _parseInt(value) {
+		var ret = parseInt(value, 10);
+		return (isNaN(ret)) ? null : ret;
+	}
+	
+	function _parseFloat(value) {
+		var ret = parseFloat(value);
+		return (isNaN(ret)) ? null : ret;
 	}
 
+	function _parseEmail(value) {
+		return (_emailRegExp.test(value)) ? value : null;
+	}
+
+	function _parseUrl(value) {
+		var match = _urlRegExp.test(value);
+		return (match) ? match[1] : null;
+	}
+	
 	/* 
 	 * Parses the given value as a date.
 	 * Returns the date as the number of milliseconds since midnight 1970-01-01.
@@ -59,44 +79,55 @@ var formerly = (function (window, undef) {
 	 * a date.
 	 * 
 	 * Validation parameter:
-	 * 0 = no validation
-	 * 1 = require date, but no time or time zone
-	 * 2 = require date and time, but no time zone
-	 * 3 = require date, time and time zone
+	 * 0 = require date, but no time or time zone
+	 * 1 = require date and time, but no time zone
+	 * 2 = require date, time and time zone
 	 */
-	function _parseDate(value, validation) {
+	function _parseDateAll(value, validation) {
 		var match = _dateRegExp.exec(value), date = new Date(0), year, month, day, hour, minute, second, millisec;
 
-		if (match === null) {
+		if (!match) {
 			return null;
 		}
 
-		year = _intOrNull(match[1]);
-		month = _intOrNull(match[2]) - 1;
-		day = _intOrNull(match[4]);
-		hour = _intOrNull(match[6]);
-		minute = _intOrNull(match[7]);
-		second = _intOrNull(match[9]);
-		millisec = _intOrNull(match[11]);
+		year = _parseInt(match[1]);
+		month = _parseInt(match[2]) - 1;
+		day = _parseInt(match[4]);
+		hour = _parseInt(match[6]);
+		minute = _parseInt(match[7]);
+		second = _parseInt(match[9]);
+		millisec = _parseInt(match[11]);
 		
 		date.setUTCFullYear(year, month, day || 1);
 		date.setUTCHours(hour || 0, minute || 0, second || 0, millisec || 0);
 
-		if ((validation) && (
-			(date.getUTCFullYear() !== year) || (year <= 0) ||															/* Year */
-			(date.getUTCMonth() !== month) || (date.getUTCDate() !== day) ||											/* Month and day */
-			((validation > 1) ? ((date.getUTCHours() !== hour) || (date.getUTCMinutes() !== minute) ||					/* Hour and minute */
-				((second !== null) && (date.getUTCSeconds() !== second)) ||												/* Second */
-				((millisec !== null) && (date.getUTCMilliseconds() !== millisec))) : !!match[5]) ||						/* Milliseconds */
-			((validation > 2) ? (!match[12] ||
-				(!!(match[13]) && (_parseDate(_firstDateString + match[13], 2) === null))) : !!match[12])					/* Time zone */
-		)) {
+		if (
+			date.getUTCFullYear() !== year || year <= 0 ||															/* Year */
+			date.getUTCMonth() !== month || date.getUTCDate() !== day ||											/* Month and day */
+			((validation > 0) ? (date.getUTCHours() !== hour || date.getUTCMinutes() !== minute ||					/* Hour and minute */
+				(second !== null && date.getUTCSeconds() !== second) ||												/* Second */
+				(millisec !== null && date.getUTCMilliseconds() !== millisec)) : !!match[5]) ||						/* Milliseconds */
+			((validation > 1) ? (!match[12] ||
+				(!!match[13] && _parseDateAll(_firstDateString + match[13], 1) === null)) : !!match[12])			/* Time zone */
+		) {
 			return null;
 		}
 
 		return date.getTime();
+		// TODO: parse time zone into return value
 	}
-	// TODO: parse time zone into return value
+	
+	function _parseDate(value) {
+		return _parseDateAll(value, 0);
+	}
+
+	function _parseDateTimeLocal(value) {
+		return _parseDateAll(value, 1);
+	}
+
+	function _parseDateTime(value) {
+		return _parseDateAll(value, 2);
+	}
 	
 	/*
 	 * Parses the given value as a time.
@@ -113,8 +144,8 @@ var formerly = (function (window, undef) {
 	 * true  = validate time
 	 *
 	 */
-	function _parseTime(value, validation) {
-		return _parseDate(_firstDateString + value, (validation) ? 2 : 0);
+	function _parseTime(value) {
+		return _parseDateAll(_firstDateString + value, 1);
 	}
 
 	/*
@@ -129,14 +160,14 @@ var formerly = (function (window, undef) {
 	function _parseMonth(value) {
 		var match = _dateRegExp.exec(value), year, month;
 
-		if ((match === null) || (match[3])) {											/* Validate format match (no day, etc) */
+		if (match === null || match[3]) {										/* Validate format match (no day, etc) */
 			return null;
 		}
 
-		year = _intOrNull(match[1]);
-		month = _intOrNull(match[2]) - 1;
+		year = _parseInt(match[1]);
+		month = _parseInt(match[2]) - 1;
 		
-		if ((year <= 0) || (month < 0) || (month > 11)) {								/* Validate year and month */
+		if (year <= 0 || month < 0 || month > 11) {								/* Validate year and month */
 			return null;
 		}
 
@@ -159,23 +190,20 @@ var formerly = (function (window, undef) {
 			return null;
 		}
 		
-		year = _intOrNull(match[1]);
-		week = _intOrNull(match[2]);
+		year = _parseInt(match[1]);
+		week = _parseInt(match[2]);
 		firstDate.setUTCFullYear(year, 0, 1);
 		firstDay = firstDate.getDay();
-		if ((firstDay === 4) || ((firstDay === 3) && ((year % 400 === 0) || ((year % 4 === 0) && (year % 100 !== 0))))) {
+		if (firstDay === 4 || (firstDay === 3 && (year % 400 === 0 || (year % 4 === 0 && year % 100 !== 0)))) {
 			maxWeeks = 53;
 		}
 		
-		if (
-			(year <= 0) ||																/* Don't allow year zero */
-			(week < 1) || (week > maxWeeks)												/* Validate week number. */
-		) {
+		if (year <= 0 || week < 1 || week > maxWeeks) {									// Validate year and week number
 			return null;
 		}
 		
 		dateInWeek = new Date(firstDate.getTime() + (week * _millsInWeek));				// Get a day in the given week
-		return dateInWeek.getTime() - ((dateInWeek.getDay() - 1) * _millsInDay);			// Return milliseconds for the Monday in that week
+		return dateInWeek.getTime() - ((dateInWeek.getDay() - 1) * _millsInDay);		// Return milliseconds for the Monday in that week
 	}
 	
 	function _removeLeadingSpace(str) {
@@ -201,17 +229,17 @@ var formerly = (function (window, undef) {
 	}
 	
 	function _throwInvalidEvent(el) {
-		var event, i, il;
+		var event, i, il, invalidHandlers = el._invalidHandlers;
 		if (el.dispatchEvent !== undef) {
 			event = document.createEvent("HTMLEvents");		// Modern browsers
 			event.initEvent("invalid", false, true);
 			el.dispatchEvent(event);
-		} else if (el._invalidHandlers) {
+		} else if (invalidHandlers) {
 			event = document.createEventObject();			// Workaround for IE
 			event.eventType = "invalid";
-			for (i = 0, il = el._invalidHandlers.length; i < il; i++) {
-				if (el._invalidHandlers[i]) {
-					el._invalidHandlers[i](event);
+			for (i = 0, il = invalidHandlers.length; i < il; i++) {
+				if (invalidHandlers[i]) {
+					invalidHandlers[i](event);
 				}
 			}
 		}
@@ -221,36 +249,11 @@ var formerly = (function (window, undef) {
 	 * Validation methods
 	 */
 
-	function _checkTypeMismatch(el, type) {
-		if (type) {
-			switch (type) {
-			case 'email':
-				return !(_emailRegExp.test(el.value));
-			case 'url':
-				return !(_urlRegExp.test(el.value));
-			case 'date':
-				return (_parseDate(el.value, 1) === null);
-			case 'datetime-local':
-				return (_parseDate(el.value, 2) === null);
-			case 'datetime':
-				return (_parseDate(el.value, 3) === null);
-			case 'time':
-				return (_parseTime(el.value, true) === null);
-			case 'month':
-				return (_parseMonth(el.value) === null);
-			case 'week':
-				return (_parseWeek(el.value) === null);
-			}
-		}
-		
-		return false;
-	}
-	
 	function _checkPatternMismatch(el) {
-		var pattern = _getAttr(el, 'pattern');
+		var pattern = _getAttr(el, "pattern");
 		if (pattern) {
 			try {
-				return !(new RegExp('^' + pattern + '$').test(el.value));
+				return !(new RegExp("^" + pattern + "$").test(el.value));
 			} catch (err) {}
 		}
 
@@ -258,9 +261,9 @@ var formerly = (function (window, undef) {
 	}
 	
 	function _getValidState(el) {
-		var val = el.validity, valid = true, i, il;
+		var val = el.validity, valid = true, i, il = _validityStates.length;
 
-		for (i = 0, il = _validityStates.length; i < il; i++) {
+		for (i = 0; i < il; i++) {
 			valid = !val[_validityStates[i]] && valid;
 		}
 		
@@ -268,9 +271,9 @@ var formerly = (function (window, undef) {
 	}
 
 	function _setValidity(el) {
-		var val = el.validity, i, il;
+		var val = el.validity, i, il = _validityStates.length;
 		
-		for (i = 0, il = _validityStates.length; i < il; i++) {
+		for (i = 0; i < il; i++) {
 			val[_validityStates[i]] = arguments[i + 1] || false;
 		}
 
@@ -278,65 +281,46 @@ var formerly = (function (window, undef) {
 	}
 
 	function _setValidityClass(el) {
-		var validClass = _config.validClass, invalidClass = _config.invalidClass;
-		_addClass(el, (el.validity.valid) ? validClass : invalidClass);
-		_removeClass(el, (el.validity.valid) ? invalidClass : validClass);
+		var validClass = _config.validClass, 
+			invalidClass = _config.invalidClass,
+			valid = el.validity.valid;
+
+		_addClass(el, (valid) ? validClass : invalidClass);
+		_removeClass(el, (valid) ? invalidClass : validClass);
 	}
 
 	function _validate(el) {
 		if (el.willValidate) {
 			var val = el.value,
+				parsedVal,
 				maxLength = el.maxLength,
-				type = _getAttr(el, 'type'), 
-				step = _getAttr(el, 'step'),
-				numVal = null,
-				numMin = null,
-				numMax = null,
-				numStepBase = null,
-				numStep = 1,
-				numScale = 1,
-				getVal = function () {
-					return null;
-				};
-
-			// Set defaults
-			if (type === "number") {
-				getVal = parseFloat;
-			} else if (type === "range") {
-				numMin = 0.0;
-				numMax = 100.0;
-				getVal = parseFloat;
-			} else if ((/^(datetime|time)/i).test(type)) {
-				numScale = 1000;
-				numStep = 60;
-				getVal = (type === "time") ? _parseTime : _parseDate;
-			} else if (type === "date") {
-				numScale = _millsInDay;
-				getVal = _parseDate;
-			} else if (type === "week") {
-				numScale = _millsInWeek;
-				numStepBase = _millsForFirstWeek;
-				getVal = _parseWeek;
-			} else if (type === "month") {
-				getVal = _parseMonth;
-			}
+				type = _getAttr(el, "type"),
+				step = _getAttr(el, "step"),
+				defs = _typeDefaults[type] || _typeDefaults.def,
+				getVal = defs[0],
+				isNum = defs[1],
+				numScale = defs[2] || 1,
+				numStep = defs[3] || 1,
+				numStepBase = defs[4],
+				numMin = (defs[5] === undef) ? null : defs[5],
+				numMax = (defs[6] === undef) ? null : defs[6];
 
 			// Type values or use defaults
-			numVal = _numericOrDefault(getVal(val), numVal);
-			numMin = _numericOrDefault(getVal(_getAttr(el, 'min')), numMin);
-			numMax = _numericOrDefault(getVal(_getAttr(el, 'max')), numMax);
-			numStep = (step === "any") ? null : _numericOrDefault(parseFloat(step), numStep) || null;
+			parsedVal = getVal(val);
+			numMin = _valueOrDefault(getVal(_getAttr(el, "min")), numMin);
+			numMax = _valueOrDefault(getVal(_getAttr(el, "max")), numMax);
+			numStep = (step === "any") ? null : _valueOrDefault(_parseFloat(step), numStep) || null;
 
 			// Set validity states
 			_setValidity(el,
-				((el.attributes.required !== undef) && val === ""),															/* valueMissing */
-				(val !== "" && _checkTypeMismatch(el, type)),																/* typeMismatch */
-				(val !== "" && _checkPatternMismatch(el)),																	/* patternMismatch */
-				(val !== "" && (maxLength !== -1) && (val !== el.defaultValue) && (val.length > maxLength)),				/* tooLong */
-				(numVal !== null && numMin !== null && (numMin > numVal)),													/* rangeUnderflow */
-				(numVal !== null && numMax !== null && (numVal > numMax)),													/* rangeOverflow */
-				(numVal !== null && numStep !== null && (((numVal - (numMin || numStepBase || 0.0)) % (numStep * numScale)) !== 0)),		/* stepMismatch */
-				el.validity.customError																						/* customError */
+				(el.attributes.required !== undef && val === ""),																					/* valueMissing */
+				((val !== "" || type === "range") && parsedVal === null),																			/* typeMismatch */
+				(val !== "" && _checkPatternMismatch(el)),																							/* patternMismatch */
+				(val !== "" && maxLength !== -1 && val !== el.defaultValue && val.length > maxLength),												/* tooLong */
+				(parsedVal !== null && isNum && numMin !== null && numMin > parsedVal),																/* rangeUnderflow */
+				(parsedVal !== null && isNum && numMax !== null && parsedVal > numMax),																/* rangeOverflow */
+				(parsedVal !== null && isNum && numStep !== null && ((parsedVal - (numMin || numStepBase || 0.0)) % (numStep * numScale)) !== 0),	/* stepMismatch */
+				el.validity.customError																												/* customError */
 			);
 			
 			// Update validity classes on element
@@ -350,8 +334,8 @@ var formerly = (function (window, undef) {
 	 */
 
 	function _submitHandler(event) {
-		event = (event || window.event);
-		if ((this.attributes.novalidate === undef) && (!this.checkValidity())) {
+		event = event || window.event;
+		if (this.attributes.novalidate === undef && !this.checkValidity()) {
 			if (event.preventDefault !== undef) {
 				event.preventDefault();
 			} else if (event.returnValue !== undef) {
@@ -368,13 +352,13 @@ var formerly = (function (window, undef) {
 	 */
 	 
 	function _willValidate(el) {
-		var type = _getAttr(el, 'type');
-		return ((!el.disabled) && (!el.readOnly) && (_elsToValidateRegExp.test(type)));
+		var type = _getAttr(el, "type");
+		return (!el.disabled && !el.readOnly && _elsToValidateRegExp.test(type));
 	}
 	
 	function _setCustomValidity(message) {
 		this.validationMessage = message;
-		this.validity.customError = (message !== '');
+		this.validity.customError = (message !== "");
 		this.validity.valid = _getValidState(this);
 	}
 	
@@ -421,7 +405,10 @@ var formerly = (function (window, undef) {
 	 * @param {Object} The HTML form element to init
 	 */
 	function initElement(el) {
-		var handler, originalCheckValidity, attachEvent, detachEvent, i, il, handlers;
+		var handler, i, il, handlers,
+			originalCheckValidity = el.checkValidity,
+			attachEvent = el.attachEvent,
+			detachEvent = el.detachEvent;
 
 		if (el.checkValidity === undef) {
 
@@ -439,9 +426,7 @@ var formerly = (function (window, undef) {
 			};
 			
 			// Override native attachEvent and detachEvent if present, to allow attacing to the invalid event.
-			attachEvent = el.attachEvent;
-			detachEvent = el.detachEvent;
-			if ((attachEvent !== undef) && (detachEvent !== undef)) {
+			if (attachEvent !== undef && detachEvent !== undef) {
 				el._invalidHandlers = [];
 				el.attachEvent = function (eventName, fn) {
 					if (eventName === "oninvalid") {
@@ -471,7 +456,6 @@ var formerly = (function (window, undef) {
 		} else if (_config.touchSupporting) {
 
 			// Wrap browsers checkValidity to update validity classes at validation
-			originalCheckValidity = el.checkValidity;
 			el.checkValidity = function () {
 				var ret = originalCheckValidity.call(this);
 				_setValidityClass(el);
@@ -487,9 +471,9 @@ var formerly = (function (window, undef) {
 
 		// Bind listeners to element
 		if (handler) {
-			_catchEvent(el, 'keyup', handler);
-			_catchEvent(el, 'change', handler);
-			_catchEvent(el, 'blur', handler);
+			_catchEvent(el, "keyup", handler);
+			_catchEvent(el, "change", handler);
+			_catchEvent(el, "blur", handler);
 		}
 	}
 	
@@ -499,7 +483,7 @@ var formerly = (function (window, undef) {
 
 		this.isPolyfilling = unsupp;
 
-		if ((_config.touchSupporting) || (unsupp)) {
+		if (_config.touchSupporting || unsupp) {
 			for (i = 0, il = form.length; i < il; i++) {
 				this.initElement(form.elements[i]);
 			}
@@ -509,7 +493,7 @@ var formerly = (function (window, undef) {
 			form.checkValidity = _checkValidityForm;
 		
 			// Listen for submit event and cancel if form not valid
-			_catchEvent(form, 'submit', function (event) {
+			_catchEvent(form, "submit", function (event) {
 				return _submitHandler.call(form, event);
 			});
 		}
@@ -537,6 +521,25 @@ var formerly = (function (window, undef) {
 			_initForm.call(this, forms[i]);
 		}
 	}
+	
+	/*
+	 * Arrays of defaults for field types
+	 *						getValFunction,			isNum,	scale,			step,	stepBase,	min,	max
+	 */
+
+	_typeDefaults = {
+		number:				[_parseFloat,			true],
+		range:				[_parseFloat,			true,	1,				1,		null,		0.0,	100.0],
+		email:				[_parseEmail,			false],
+		url:				[_parseUrl,				false],
+		date:				[_parseDate,			true,	_millsInDay],
+		"datetime-local":	[_parseDateTimeLocal,	true,	1000,			60],
+		datetime:			[_parseDateTime,		true,	1000,			60],
+		time:				[_parseTime,			true,	1000,			60],
+		month:				[_parseMonth,			true],
+		week:				[_parseWeek,			true,	_millsInWeek,	1,		_millsForFirstWeek],
+		def:				[_parseString,			false]
+	};
 	
 	/*
 	 * The formerly object.
