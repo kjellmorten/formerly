@@ -847,6 +847,14 @@ TestCase("formerlyValidationRangeUnderflow", {
 		assertInvalid(ret, el, 'rangeUnderflow');
 	},
 
+	"test should set rangeUnderflow for month field": function () {
+		var el = createElement("month", "2012-08", { min: "2012-09" });
+		
+		var ret = el.checkValidity();
+		
+		assertInvalid(ret, el, 'rangeUnderflow');
+	},
+
 	"test should not set rangeUnderflow for text field": function () {
 		var el = createElement("text", "8", { min: "10" });
 		
@@ -854,8 +862,6 @@ TestCase("formerlyValidationRangeUnderflow", {
 		
 		assertValid(ret, el, 'rangeUnderflow');
 	}
-	
-	// TODO: Write for month
 
 });
 
@@ -965,6 +971,14 @@ TestCase("formerlyValidationRangeOverflow", {
 		assertInvalid(ret, el, 'rangeOverflow');
 	},
 
+	"test should set rangeOverflow for month field": function () {
+		var el = createElement("month", "2012-08", { max: "2012-07" });
+		
+		var ret = el.checkValidity();
+		
+		assertInvalid(ret, el, 'rangeOverflow');
+	},
+
 	"test should not set rangeOverflow for text field": function () {
 		var el = createElement("text", "12", { max: "10" });
 		
@@ -972,8 +986,6 @@ TestCase("formerlyValidationRangeOverflow", {
 		
 		assertValid(ret, el, 'rangeOverflow');
 	}
-
-	// TODO: Write for month
 
 });
 
@@ -1161,9 +1173,23 @@ TestCase("formerlyValidationStepMismatch", {
 		var ret = el.checkValidity();
 		
 		assertValid(ret, el, 'stepMismatch');
-	}
+	},
 
-	// TODO: Implement step for month
+	"test should set stepMismatch for month": function () {
+		var el = createElement("month", "2012-08", { step: "2" });
+		
+		var ret = el.checkValidity();
+		
+		assertInvalid(ret, el, 'stepMismatch');
+	},
+
+	"test should not set stepMismatch for month matching step": function () {
+		var el = createElement("month", "2012-09", { step: "2" });
+		
+		var ret = el.checkValidity();
+		
+		assertValid(ret, el, 'stepMismatch');
+	}
 
 });
 

@@ -55,10 +55,9 @@ var formerly = (function (window, undef) {
 	 * 
 	 * Validation parameter:
 	 * 0 = no validation
-	 * 1 = require no day, time or time zone
-	 * 2 = require day, but no time or time zone
-	 * 3 = require day & time, but no time zone
-	 * 4 = require day, time and time zone
+	 * 1 = require date, but no time or time zone
+	 * 2 = require date and time, but no time zone
+	 * 3 = require date, time and time zone
 	 */
 	function _parseDate(value, validation) {
 		var match = _dateRegExp.exec(value), date = new Date(0), year, month, day, hour, minute, second, millisec;
@@ -79,13 +78,13 @@ var formerly = (function (window, undef) {
 		date.setUTCHours(hour || 0, minute || 0, second || 0, millisec || 0);
 
 		if ((validation) && (
-			(date.getUTCFullYear() !== year) || (year <= 0) || (date.getUTCMonth() !== month) ||						/* Year and month */
-			((validation > 1) ? (date.getUTCDate() !== day) : !!match[3]) ||											/* Day */
-			((validation > 2) ? ((date.getUTCHours() !== hour) || (date.getUTCMinutes() !== minute) ||					/* Hour and minute */
+			(date.getUTCFullYear() !== year) || (year <= 0) ||															/* Year */
+			(date.getUTCMonth() !== month) || (date.getUTCDate() !== day) ||											/* Month and day */
+			((validation > 1) ? ((date.getUTCHours() !== hour) || (date.getUTCMinutes() !== minute) ||					/* Hour and minute */
 				((second !== null) && (date.getUTCSeconds() !== second)) ||												/* Second */
 				((millisec !== null) && (date.getUTCMilliseconds() !== millisec))) : !!match[5]) ||						/* Milliseconds */
-			((validation > 3) ? (!match[12] ||
-				(!!(match[13]) && (_parseDate("1970-01-01T" + match[13], 3) === null))) : !!match[12])					/* Time zone */
+			((validation > 2) ? (!match[12] ||
+				(!!(match[13]) && (_parseDate("1970-01-01T" + match[13], 2) === null))) : !!match[12])					/* Time zone */
 		)) {
 			return null;
 		}
@@ -110,7 +109,33 @@ var formerly = (function (window, undef) {
 	 *
 	 */
 	function _parseTime(value, validation) {
-		return _parseDate("1970-01-01T" + value, (validation) ? 3 : 0);
+		return _parseDate("1970-01-01T" + value, (validation) ? 2 : 0);
+	}
+
+	/*
+	 * Parses the given value as a month.
+	 * Returns the month as the number of months since January 1970.
+	 *
+	 * If the value is not a month or the month does not pass validation,
+	 * null is returned.
+	 *
+	 * Format: yyyy-mm
+	 */
+	function _parseMonth(value) {
+		var match = _dateRegExp.exec(value), year, month;
+
+		if ((match === null) || (match[3])) {											/* Validate format match (no day, etc) */
+			return null;
+		}
+
+		year = _intOrNull(match[1]);
+		month = _intOrNull(match[2]) - 1;
+		
+		if ((year <= 0) || (month < 0) || (month > 11)) {								/* Validate year and month */
+			return null;
+		}
+
+		return ((year - 1970) * 12) + month;
 	}
 
 	/*
@@ -147,7 +172,7 @@ var formerly = (function (window, undef) {
 		dateInWeek = new Date(firstDate.getTime() + (week * 604800000));				// Get a day in the given week
 		return dateInWeek.getTime() - ((dateInWeek.getDay() - 1) * 86400000);			// Return milliseconds for the Monday in that week
 	}
-
+	
 	function _removeLeadingSpace(str) {
 		return (str.charAt(0) === ' ') ? str.substr(1) : str;
 	}
@@ -226,16 +251,16 @@ var formerly = (function (window, undef) {
 				return !(_emailRegExp.test(el.value));
 			case 'url':
 				return !(_urlRegExp.test(el.value));
-			case 'month':
-				return (_parseDate(el.value, 1) === null);
 			case 'date':
-				return (_parseDate(el.value, 2) === null);
+				return (_parseDate(el.value, 1) === null);
 			case 'datetime-local':
-				return (_parseDate(el.value, 3) === null);
+				return (_parseDate(el.value, 2) === null);
 			case 'datetime':
-				return (_parseDate(el.value, 4) === null);
+				return (_parseDate(el.value, 3) === null);
 			case 'time':
 				return (_parseTime(el.value, true) === null);
+			case 'month':
+				return (_parseMonth(el.value) === null);
 			case 'week':
 				return (_parseWeek(el.value) === null);
 			}
@@ -317,6 +342,8 @@ var formerly = (function (window, undef) {
 				numScale = 604800000;
 				numStepBase = -259200000;
 				getVal = _parseWeek;
+			} else if (type === "month") {
+				getVal = _parseMonth;
 			}
 
 			// Type values or use defaults
