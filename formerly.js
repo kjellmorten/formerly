@@ -13,11 +13,16 @@
 
 var formerly = (function (window, undef) {
 	var document = window.document,
-		_elsToValidateRegExp = /^(text|search|tel|url|email|password|datetime|date|month|week|time|datetime-local|number|range|color|checkbox|radio|file|submit|select-one|select-multiple|textarea)$/i,
+		_elsToValidateRegExp = /^(text(area)?|search|tel|url|email|password|date(time(-local)?)?|month|week|time|number|range|color|checkbox|radio|file|submit|select-(one|multiple))$/i,
+		_validityStates = "valueMissing typeMismatch patternMismatch tooLong rangeUnderflow rangeOverflow stepMismatch customError".split(" "),
 		_emailRegExp = /^[a-z][a-z0-9!#$%&'*+\-\/=?\^_`{|}~\.]*@[a-z0-9\-]+(\.[a-z0-9\-]+)*$/i,
 		_urlRegExp = /^\s*[a-z][a-z0-9+\-\.]+:\/\//i,
 		_dateRegExp = /^(\d{4,})-(\d{2})(-(\d{2}))?(T(\d{2})\:(\d{2})(\:(\d{2})(\.(\d+))?)?)?(Z|[\-\+](\d{2}\:\d{2}))?$/i,
 		_weekRegExp = /^(\d{4,})-W(\d{2})$/i,
+		_millsInDay = 86400000,
+		_millsInWeek = 604800000,
+		_millsForFirstWeek = -259200000,
+		_firstDateString = "1970-01-01T",
 		_config = {
 			touchSupporting: true,
 			validClass: 'valid',
@@ -84,7 +89,7 @@ var formerly = (function (window, undef) {
 				((second !== null) && (date.getUTCSeconds() !== second)) ||												/* Second */
 				((millisec !== null) && (date.getUTCMilliseconds() !== millisec))) : !!match[5]) ||						/* Milliseconds */
 			((validation > 2) ? (!match[12] ||
-				(!!(match[13]) && (_parseDate("1970-01-01T" + match[13], 2) === null))) : !!match[12])					/* Time zone */
+				(!!(match[13]) && (_parseDate(_firstDateString + match[13], 2) === null))) : !!match[12])					/* Time zone */
 		)) {
 			return null;
 		}
@@ -109,7 +114,7 @@ var formerly = (function (window, undef) {
 	 *
 	 */
 	function _parseTime(value, validation) {
-		return _parseDate("1970-01-01T" + value, (validation) ? 2 : 0);
+		return _parseDate(_firstDateString + value, (validation) ? 2 : 0);
 	}
 
 	/*
@@ -169,8 +174,8 @@ var formerly = (function (window, undef) {
 			return null;
 		}
 		
-		dateInWeek = new Date(firstDate.getTime() + (week * 604800000));				// Get a day in the given week
-		return dateInWeek.getTime() - ((dateInWeek.getDay() - 1) * 86400000);			// Return milliseconds for the Monday in that week
+		dateInWeek = new Date(firstDate.getTime() + (week * _millsInWeek));				// Get a day in the given week
+		return dateInWeek.getTime() - ((dateInWeek.getDay() - 1) * _millsInDay);			// Return milliseconds for the Monday in that week
 	}
 	
 	function _removeLeadingSpace(str) {
@@ -212,34 +217,6 @@ var formerly = (function (window, undef) {
 		}
 	}
 
-	function _attachInvalidEvent(el, eventName, fn) {
-		el._invalidHandlers.push(fn);
-		return true;
-	}
-	
-	function _detachInvalidEvent(el, eventName, fn) {
-		var i, il, handlers = el._invalidHandlers;
-		if (handlers) {
-			for (i = 0, il = handlers.length; i < il; i++) {
-				if (handlers[i] === fn) {
-					handlers[i] = null;
-				}
-			}
-		}
-		return 0;
-	}
-
-	function _setConfig(config) {
-		var prop;
-		if (config) {
-			for (prop in config) {
-				if (_config[prop] !== undef) {
-					_config[prop] = config[prop];
-				}
-			}
-		}
-	}
-	
 	/*
 	 * Validation methods
 	 */
@@ -281,24 +258,22 @@ var formerly = (function (window, undef) {
 	}
 	
 	function _getValidState(el) {
-		var val = el.validity;
-		return !(
-			val.valueMissing || val.typeMismatch || val.patternMismatch || 
-			val.tooLong || val.rangeUnderflow || val.rangeOverflow || 
-			val.stepMismatch || val.customError
-		);
+		var val = el.validity, valid = true, i, il;
+
+		for (i = 0, il = _validityStates.length; i < il; i++) {
+			valid = !val[_validityStates[i]] && valid;
+		}
+		
+		return valid;
 	}
 
-	function _setValidity(el, valueMissing, typeMismatch, patternMismatch, tooLong, rangeUnderflow, rangeOverflow, stepMismatch, customError) {
-		var val = el.validity;
-		val.valueMissing = valueMissing;
-		val.typeMismatch = typeMismatch;
-		val.patternMismatch = patternMismatch;
-		val.tooLong = tooLong;
-		val.rangeUnderflow = rangeUnderflow;
-		val.rangeOverflow = rangeOverflow;
-		val.stepMismatch = stepMismatch;
-		val.customError = customError;
+	function _setValidity(el) {
+		var val = el.validity, i, il;
+		
+		for (i = 0, il = _validityStates.length; i < il; i++) {
+			val[_validityStates[i]] = arguments[i + 1] || false;
+		}
+
 		val.valid = _getValidState(el);
 	}
 
@@ -336,11 +311,11 @@ var formerly = (function (window, undef) {
 				numStep = 60;
 				getVal = (type === "time") ? _parseTime : _parseDate;
 			} else if (type === "date") {
-				numScale = 86400000;
+				numScale = _millsInDay;
 				getVal = _parseDate;
 			} else if (type === "week") {
-				numScale = 604800000;
-				numStepBase = -259200000;
+				numScale = _millsInWeek;
+				numStepBase = _millsForFirstWeek;
 				getVal = _parseWeek;
 			} else if (type === "month") {
 				getVal = _parseMonth;
@@ -446,7 +421,7 @@ var formerly = (function (window, undef) {
 	 * @param {Object} The HTML form element to init
 	 */
 	function initElement(el) {
-		var handler, originalCheckValidity, attachEvent, detachEvent;
+		var handler, originalCheckValidity, attachEvent, detachEvent, i, il, handlers;
 
 		if (el.checkValidity === undef) {
 
@@ -454,7 +429,7 @@ var formerly = (function (window, undef) {
 			el.willValidate = _willValidate(el);
 			el.setCustomValidity = _setCustomValidity;
 			el.validity = {};
-			_setValidity(el, false, false, false, false, false, false, false, false);
+			_setValidity(el);
 			el.checkValidity = _checkValidity;
 			el.validationMessage = "";
 			
@@ -469,10 +444,27 @@ var formerly = (function (window, undef) {
 			if ((attachEvent !== undef) && (detachEvent !== undef)) {
 				el._invalidHandlers = [];
 				el.attachEvent = function (eventName, fn) {
-					return (eventName === "oninvalid") ? _attachInvalidEvent(el, eventName, fn) : attachEvent(eventName, fn);
+					if (eventName === "oninvalid") {
+						el._invalidHandlers.push(fn);
+						return true;
+					} else {
+						return attachEvent(eventName, fn);
+					}
 				};
 				el.detachEvent = function (eventName, fn) {
-					return (eventName === "oninvalid") ? _detachInvalidEvent(el, eventName, fn) : detachEvent(eventName, fn);
+					if (eventName === "oninvalid") {
+						handlers = el._invalidHandlers;
+						if (handlers) {
+							for (i = 0, il = handlers.length; i < il; i++) {
+								if (handlers[i] === fn) {
+									handlers[i] = null;
+								}
+							}
+						}
+						return 0;
+					} else {
+						return detachEvent(eventName, fn);
+					}
 				};
 			}
 
@@ -530,10 +522,16 @@ var formerly = (function (window, undef) {
 	 * @param {Object} An optional config object. Will be used for all forms in the document.
 	 */
 	function init(form, config) {
-		var i, il, 
+		var i, il, prop, 
 			forms = (form) ? [form] : this.getForms();
 		
-		_setConfig(config);
+		if (config) {
+			for (prop in config) {
+				if (_config[prop] !== undef) {
+					_config[prop] = config[prop];
+				}
+			}
+		}
 	
 		for (i = 0, il = forms.length; i < il; i++) {
 			_initForm.call(this, forms[i]);
