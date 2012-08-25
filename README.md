@@ -1,10 +1,10 @@
 # Formerly. A small and simple HTML5 Form Polyfill
 
-_Formerly_ implements the basics of [the W3C HTML5 constraint validation API](http://www.w3.org/TR/2011/WD-html5-20110525/association-of-controls-and-forms.html#the-constraint-validation-api) in unsupporting browsers, and that's it. There's no custom validations, fancy error messages, or elaborate input field widgets. The goal of _Formerly_ is to provide a baseline for all browsers so we can let the past be done. ;)
+_Formerly_ implements the basics of [the W3C HTML5 constraint validation API](http://dev.w3.org/html5/spec/constraints.html#the-constraint-validation-api) in unsupporting browsers, and that's it. There's no custom validations, fancy error messages, or elaborate input field widgets. The goal of _Formerly_ is to provide a baseline for all browsers so we can let the past be done. ;)
 
 There are already a lot of form validators and also quite a few [HTML5 form polyfills](https://github.com/Modernizr/Modernizr/wiki/HTML5-Cross-Browser-Polyfills) out there. My motivation for building this was that I needed a simpler solution for getting just the basics of HTML5 validation working in older browsers.
 
-_Formerly_ is completely stand-alone and does not depend on any third-party libraries.
+_Formerly_ is completely stand-alone and does not depend on any third-party libraries (sinon.js is only included for testing).
 
 The project is in an early state, and I really appreciate feedback. Please [log issues on GitHub](https://github.com/kjellmorten/formerly/issues).
 
@@ -20,6 +20,15 @@ The following constraints are implemented:
 * maxLength
 * email
 * url
+* date
+* time
+* datetime
+* datetime-local
+* week
+* month
+
+> **A note on dates and times:** The W3C specification is really strict on the format of dates, times, weeks and months submitted from a form. On the other hand, what formats to accept from the user is left for each browser to decide, as long as it is converted to the correct format on submit. Thus, each browser does this differently.
+> _Formerly_ currently does no conversion, and therefore verifies the user input according to the formats set by W3C. This is not especially user friendly, and may be changed in a future version. For now, I recommend sticking to the date, time and month input types, as they have formats that are at least human readable, even though they are strict.
 
 Form elements get the following attributes and methods:
 
@@ -37,7 +46,7 @@ Form elements get the following attributes and methods:
 * checkValidity()
 * validationMessage
 
-Please see [the W3C specification](http://www.w3.org/TR/2011/WD-html5-20110525/association-of-controls-and-forms.html#the-constraint-validation-api) for further details.
+Please see [the W3C specification](http://dev.w3.org/html5/spec/constraints.html#the-constraint-validation-api) for further details.
 
 > **Note:** _Formerly_ does not yet provide validation messages, except when it's set with `setCustomValidity`. Coming soon...
 
@@ -45,11 +54,11 @@ Please see [the W3C specification](http://www.w3.org/TR/2011/WD-html5-20110525/a
 
 Supporting browsers set the `:valid` and `:invalid` pseudo-classes on form elements to indicate their validity status. As this can't be done with JavaScript, _Formerly_ will set class names on the form elements to replicate this behavior, both in supporting and unsupporting browsers. (You may disabled this in supporting browsers by setting the `touchSupporting` config property to `false`.) The classes have no default styles.
 
-The default validity class names are `valid` for valid elements and `invalid` for invalid elements, and may be overriden with the `validClass` and `invalidClass` config properties.
+The default validity class names are `valid` for valid elements and `invalid` for invalid elements, and may be overridden with the `validClass` and `invalidClass` config properties.
 
 ### Statical and interactive validation
 
-_Formerly_ will only [statically validate the constraints](http://www.w3.org/TR/2011/WD-html5-20110525/association-of-controls-and-forms.html#statically-validate-the-constraints) of a form, as it runs the validations and sets the validity states, but nothing is displayed in the browser by default. The HTML5 Form spec loosly describes steps for [interactivly validating the constraints](http://www.w3.org/TR/2011/WD-html5-20110525/association-of-controls-and-forms.html#interactively-validate-the-constraints), that involves reporting validation errors to the user, but I've decided to not include this in _Formerly_. At least for now.
+_Formerly_ will only [statically validate the constraints](http://dev.w3.org/html5/spec/constraints.html#statically-validate-the-constraints) of a form, as it runs the validations and sets the validity states, but nothing is displayed in the browser by default. The HTML5 Form spec loosely describes steps for [interactively validating the constraints](http://dev.w3.org/html5/spec/constraints.html#interactively-validate-the-constraints), that involves reporting validation errors to the user, but I've decided to not include this in _Formerly_. At least for now.
 
 ### Events
 
