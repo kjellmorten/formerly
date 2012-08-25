@@ -20,15 +20,16 @@ The following constraints are implemented:
 * maxLength
 * email
 * url
-* date
-* time
-* datetime
-* datetime-local
-* week
-* month
+* date (format: yyyy-mm-dd)
+* time (format: hh:mm:ss.sss)
+* datetime (format: yyyy-mm-ddThh:mm:ss.sssZ)
+* datetime-local (format: yyyy-mm-ddThh:mm:ss.sss)
+* week (format: yyyy-Www)
+* month (format: yyyy-mm)
 
-> **A note on dates and times:** The W3C specification is really strict on the format of dates, times, weeks and months submitted from a form. On the other hand, what formats to accept from the user is left for each browser to decide, as long as it is converted to the correct format on submit. Thus, each browser does this differently.
-> _Formerly_ currently does no conversion, and therefore verifies the user input according to the formats set by W3C. This is not especially user friendly, and may be changed in a future version. For now, I recommend sticking to the date, time and month input types, as they have formats that are at least human readable, even though they are strict.
+> **A note on dates and times:** _Formerly_ currently validates date, time, datetime, datetime-local, week and month according to the format set by W3C for form submission. This is not especially user friendly, and may be changed in a future version - the specifications allows browsers to accepts any format on the user input, as long as it is converted to the required format on submit.
+>
+> For now, I recommend sticking to the date, time and month input types, as they have formats that are at least human readable, even though they are strict.
 
 Form elements get the following attributes and methods:
 
