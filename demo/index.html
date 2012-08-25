@@ -11,7 +11,7 @@
 			
 			var polyfillStatus = document.getElementById("polyfillStatus");
 			if (polyfillStatus && formerly.isPolyfilling) {
-				polyfillStatus.innerHTML = "by formerly";
+				polyfillStatus.innerHTML = "by Formerly";
 			}
 		}
 	</script>
@@ -65,17 +65,17 @@
 
 		<p>
 			<label for="timeInput">Time <small>(hh:mm:ss)</small></label><br />
-			<input type="time" id="timeInput" name="timeInput" value="" />
+			<input type="time" id="timeInput" name="timeInput" value="" step="any" />
 		</p>
 
 		<p>
 			<label for="datetimeInput">Date and time <small>(yyyy-mm-ddThh:mm:ssZ)</small></label><br />
-			<input type="datetime" id="datetimeInput" name="datetimeInput" value="" />
+			<input type="datetime" id="datetimeInput" name="datetimeInput" value="" step="any" />
 		</p>
 
 		<p>
 			<label for="datetimeLocalInput">Date and time local <small>(yyyy-mm-ddThh:mm:ss)</small></label><br />
-			<input type="datetime-local" id="datetimeLocalInput" name="datetimeLocalInput" value="" />
+			<input type="datetime-local" id="datetimeLocalInput" name="datetimeLocalInput" value="" step="any" />
 		</p>
 		
 		<p class="buttonRow">
