@@ -135,6 +135,8 @@ TestCase("formerlyHTMLValidations", {
 				<input type="number" id="field11" value="9" max="10" />
 				<input type="number" id="field12" value="1.5" step="1" />
 				<input type="number" id="field13" value="3.5" step="1" min="0.5" />
+				<input type="date" id="field14" value="nodate" />
+				<input type="date" id="field15" value="2012-08-07" />
 			</form>
 		*/
 	},
@@ -172,6 +174,26 @@ TestCase("formerlyHTMLValidations", {
 		
 		var ret = field.checkValidity();
 
+		assertValid(ret, field, 'typeMismatch');
+	},
+
+	"test should set typeMismatch for invalid date": function () {
+		var field = document.getElementById("field14");
+		if (field.checkValidity === undefined) {
+			formerly.initElement(field);
+			
+			var ret = field.checkValidity();
+			
+			assertInvalid(ret, field, 'typeMismatch');
+		}
+	},
+
+	"test should not set typeMismatch for valid date": function () {
+		var field = document.getElementById("field15");
+		formerly.initElement(field);
+		
+		var ret = field.checkValidity();
+		
 		assertValid(ret, field, 'typeMismatch');
 	},
 

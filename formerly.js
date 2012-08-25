@@ -193,7 +193,7 @@ var formerly = (function (window, undef) {
 		year = _parseInt(match[1]);
 		week = _parseInt(match[2]);
 		firstDate.setUTCFullYear(year, 0, 1);
-		firstDay = firstDate.getDay();
+		firstDay = firstDate.getUTCDay();
 		if (firstDay === 4 || (firstDay === 3 && (year % 400 === 0 || (year % 4 === 0 && year % 100 !== 0)))) {
 			maxWeeks = 53;
 		}
@@ -203,7 +203,7 @@ var formerly = (function (window, undef) {
 		}
 		
 		dateInWeek = new Date(firstDate.getTime() + (week * _millsInWeek));				// Get a day in the given week
-		return dateInWeek.getTime() - ((dateInWeek.getDay() - 1) * _millsInDay);		// Return milliseconds for the Monday in that week
+		return dateInWeek.getTime() - ((dateInWeek.getUTCDay() - 1) * _millsInDay);		// Return milliseconds for the Monday in that week
 	}
 	
 	function _removeLeadingSpace(str) {
